@@ -61,10 +61,10 @@
       <Filter>Pliki nagłówkowe\app</Filter>
     </ClInclude>
     <ClInclude Include="scene.h">
-      <Filter>Pliki nagłówkowe</Filter>
+      <Filter>Pliki nagłówkowe\ds2</Filter>
     </ClInclude>
     <ClInclude Include="collision_detection.h">
-      <Filter>Pliki nagłówkowe</Filter>
+      <Filter>Pliki nagłówkowe\ds2</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -86,14 +86,14 @@
     <ClCompile Include="ConvexDebug.cpp">
       <Filter>Pliki źródłowe\app</Filter>
     </ClCompile>
-    <ClCompile Include="scene.cpp">
-      <Filter>Pliki źródłowe</Filter>
-    </ClCompile>
-    <ClCompile Include="collision_detection.cpp">
-      <Filter>Pliki źródłowe</Filter>
-    </ClCompile>
     <ClCompile Include="Utils.cpp">
       <Filter>Pliki źródłowe\app</Filter>
+    </ClCompile>
+    <ClCompile Include="collision_detection.cpp">
+      <Filter>Pliki źródłowe\ds2</Filter>
+    </ClCompile>
+    <ClCompile Include="scene.cpp">
+      <Filter>Pliki źródłowe\ds2</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
