@@ -22,6 +22,12 @@
     <Filter Include="Pliki źródłowe\ds2">
       <UniqueIdentifier>{fd42302b-f1d3-4ade-bec7-899a9a8b6a64}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Pliki nagłówkowe\app">
+      <UniqueIdentifier>{021021e5-f5ba-47fe-95b2-8f283a3b7525}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Pliki źródłowe\app">
+      <UniqueIdentifier>{e36b7084-6c54-49d9-a02c-27f17c81d1be}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mat.h">
@@ -36,28 +42,58 @@
     <ClInclude Include="vec2.h">
       <Filter>Pliki nagłówkowe\vector-lib</Filter>
     </ClInclude>
-    <ClInclude Include="CircleDebug.h">
-      <Filter>Pliki nagłówkowe</Filter>
-    </ClInclude>
     <ClInclude Include="object.h">
       <Filter>Pliki nagłówkowe\ds2</Filter>
     </ClInclude>
     <ClInclude Include="circle_object.h">
       <Filter>Pliki nagłówkowe\ds2</Filter>
     </ClInclude>
+    <ClInclude Include="convex_object.h">
+      <Filter>Pliki nagłówkowe\ds2</Filter>
+    </ClInclude>
+    <ClInclude Include="CircleDebug.h">
+      <Filter>Pliki nagłówkowe\app</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils.h">
+      <Filter>Pliki nagłówkowe\app</Filter>
+    </ClInclude>
+    <ClInclude Include="ConvexDebug.h">
+      <Filter>Pliki nagłówkowe\app</Filter>
+    </ClInclude>
+    <ClInclude Include="scene.h">
+      <Filter>Pliki nagłówkowe</Filter>
+    </ClInclude>
+    <ClInclude Include="collision_detection.h">
+      <Filter>Pliki nagłówkowe</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>Pliki źródłowe</Filter>
-    </ClCompile>
-    <ClCompile Include="CircleDebug.cpp">
-      <Filter>Pliki źródłowe</Filter>
-    </ClCompile>
     <ClCompile Include="circle_object.cpp">
       <Filter>Pliki źródłowe\ds2</Filter>
     </ClCompile>
     <ClCompile Include="object.cpp">
       <Filter>Pliki źródłowe\ds2</Filter>
+    </ClCompile>
+    <ClCompile Include="convex_object.cpp">
+      <Filter>Pliki źródłowe\ds2</Filter>
+    </ClCompile>
+    <ClCompile Include="CircleDebug.cpp">
+      <Filter>Pliki źródłowe\app</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Pliki źródłowe\app</Filter>
+    </ClCompile>
+    <ClCompile Include="ConvexDebug.cpp">
+      <Filter>Pliki źródłowe\app</Filter>
+    </ClCompile>
+    <ClCompile Include="scene.cpp">
+      <Filter>Pliki źródłowe</Filter>
+    </ClCompile>
+    <ClCompile Include="collision_detection.cpp">
+      <Filter>Pliki źródłowe</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils.cpp">
+      <Filter>Pliki źródłowe\app</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

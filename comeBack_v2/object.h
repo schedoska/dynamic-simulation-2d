@@ -13,11 +13,19 @@ namespace ds2
 		const vl::vec2d&	vel() const;
 		double& mass();
 		const double& mass() const;
-		void update(const double& dt);
+		double& rot();
+		const double& rot() const;
+		double& rot_vel();
+		const double& rot_vel() const;
+		virtual void update(const double& dt);
 
 	private:
 		vl::vec2d _pos;
 		vl::vec2d _vel;
+
+		double _rot;
+		double _rot_vel;
+
 		double _mass;
 	};
 }

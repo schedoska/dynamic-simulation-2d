@@ -4,7 +4,6 @@
 
 #include <SFML/Graphics.hpp>
 
-
 class CircleDebug : public ds2::circle_object
 {
 public:

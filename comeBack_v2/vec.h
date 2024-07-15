@@ -43,7 +43,7 @@ namespace vl
 
         inline _value len() const;
         inline _value dot(const vec<T, N>& v) const;
-        inline vec<T, N>& norm();
+        inline vec<T, N>& normalize();
         template<typename ... Args> vec(const T& e1, const Args& ... par);
 
         // TESY CODE, REMOVE LATER
@@ -74,6 +74,7 @@ namespace vl
 
     template<typename T, std::size_t N>
     const T& vec<T, N>::operator[](std::size_t i) const {
+        //static_assert(i < N, "index outside of vector range");
         return _data[i];
     }
 
@@ -202,10 +203,14 @@ namespace vl
     };
 
     template<typename T, std::size_t N>
-    vec<T, N>& vec<T, N>::norm() {
+    vec<T, N>& vec<T, N>::normalize() {
         (*this) /= len();
         return *this;
     }
+
+    using vec2i = vec<int, 2>;
+    using vec2f = vec<float, 2>;
+    using vec2d = vec<double, 2>;
 }
 
 template<typename T, std::size_t N>

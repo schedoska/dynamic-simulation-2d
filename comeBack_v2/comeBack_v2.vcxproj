@@ -21,17 +21,27 @@
   <ItemGroup>
     <ClInclude Include="CircleDebug.h" />
     <ClInclude Include="circle_object.h" />
+    <ClInclude Include="collision_detection.h" />
+    <ClInclude Include="ConvexDebug.h" />
+    <ClInclude Include="convex_object.h" />
     <ClInclude Include="mat.h" />
     <ClInclude Include="mat22.h" />
     <ClInclude Include="object.h" />
+    <ClInclude Include="scene.h" />
+    <ClInclude Include="Utils.h" />
     <ClInclude Include="vec.h" />
     <ClInclude Include="vec2.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CircleDebug.cpp" />
     <ClCompile Include="circle_object.cpp" />
+    <ClCompile Include="collision_detection.cpp" />
+    <ClCompile Include="ConvexDebug.cpp" />
+    <ClCompile Include="convex_object.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="object.cpp" />
+    <ClCompile Include="scene.cpp" />
+    <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

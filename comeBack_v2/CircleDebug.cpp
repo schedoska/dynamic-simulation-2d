@@ -6,11 +6,14 @@ CircleDebug::CircleDebug(vl::vec2d pos, double radius)
 	_shape.setFillColor(sf::Color::Transparent);
 	_shape.setOutlineThickness(2);
 	_shape.setOutlineColor(sf::Color::Blue);
-	_shape.setRadius(radius);
-	_shape.setPosition(pos.x, pos.y);
 }
 
 void CircleDebug::draw(sf::RenderWindow& window)
 {
+	double rad = radius();
+	_shape.setRadius(rad);
+	_shape.setPosition(pos()[0], pos()[1]);
+	_shape.setOrigin(rad, rad);
 	window.draw(_shape);
 }
+
