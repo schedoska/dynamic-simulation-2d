@@ -12,24 +12,33 @@
 int main()
 {
     sf::RenderWindow window(sf::VideoMode(1200, 800), "My window");
-    window.setFramerateLimit(30);
+    window.setFramerateLimit(20);
 
     sf::Clock clock;
     
     ds2::scene scene;
 
     std::shared_ptr<ConvexDebug> conv1(new ConvexDebug(vl::vec2d(100, 100)));
+    conv1->add_vertex(vl::vec2d(0, 0));
+    conv1->add_vertex(vl::vec2d(0, 200/2));
+    conv1->add_vertex(vl::vec2d(150/2, 0));
     conv1->update_shape();
     scene.add_object(conv1);
     std::shared_ptr<ConvexDebug> conv2(new ConvexDebug(vl::vec2d(300, 200)));
-    conv1->update_shape();
+    conv2->add_vertex(vl::vec2d(0, 0));
+    conv2->add_vertex(vl::vec2d(0, 20));
+    conv2->add_vertex(vl::vec2d(15, 0));
+    conv2->rot_vel() = 0.00000001;
+    conv2->update_shape();
     scene.add_object(conv2);
     
     std::shared_ptr<CircleDebug> v(new CircleDebug(vl::vec2d(100, 100), 20));
     v->vel() = vl::vec2d(25, 10);
     std::shared_ptr<CircleDebug> v1(new CircleDebug(vl::vec2d(200, 100), 20));
-    v1->vel() = vl::vec2d(15, 10);
-    std::shared_ptr<CircleDebug> v2(new CircleDebug(vl::vec2d(300, 100), 40));
+    //v1->vel() = vl::vec2d(15, 10);
+    v1->rot() = 0.002;
+    std::shared_ptr<CircleDebug> v2(new CircleDebug(vl::vec2d(300, 100), 100));
+    v2->rot() = 0.002;
     //v2->vel() = vl::vec2d(5, 15);
 
     scene.add_object(v);
@@ -50,7 +59,7 @@ int main()
                 if (event.key.code == sf::Keyboard::Down) conv1->pos() = conv1->pos() + vl::vec2d(0, 9);
                 if (event.key.code == sf::Keyboard::Right) conv1->pos() = conv1->pos() + vl::vec2d(9, 0);
                 if (event.key.code == sf::Keyboard::Left) conv1->pos() = conv1->pos() + vl::vec2d(-9, 0);
-                if (event.key.code == sf::Keyboard::R) conv1->rot() = conv1->rot() + 0.000003;
+                if (event.key.code == sf::Keyboard::R) conv1->rot() = conv1->rot() + 0.03;
             }
         }
 

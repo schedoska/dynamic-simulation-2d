@@ -12,6 +12,9 @@ void ds2::scene::update(const double& dt){
 	for (auto& i : _circle_shapes) {
 		i->update(dt);
 	}
+	for (auto& i : _convex_shapes) {
+		i->update(dt);
+	}
 	
 	_collisions.clear();
 	for (auto& i : _circle_shapes) {
@@ -22,10 +25,21 @@ void ds2::scene::update(const double& dt){
 			}
 		}
 	}
+
+	_collisions.clear();
+	for (auto& i : _circle_shapes) {
+		for (auto& j : _convex_shapes) {
+			collision_data cd = collision_detection::check(j, i);
+			if (cd.collides) {
+				_collisions.push_back(cd);
+			}
+		}
+	}
+
 	int c = 0;
 	for (auto& i : _convex_shapes) {
 		for (auto& j : _convex_shapes) {
-			if (c >= 2) continue;
+			//if (c >= 2) continue;
 			collision_data cd = collision_detection::check(i, j);
 			if (cd.collides) {
 				_collisions.push_back(cd);

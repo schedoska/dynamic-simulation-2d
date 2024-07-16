@@ -4,11 +4,6 @@
 ConvexDebug::ConvexDebug(vl::vec2d pos) :
 	convex_object(pos)
 {
-	add_vertex(vl::vec2d(0, 0));
-	add_vertex(vl::vec2d(0, 200));
-	add_vertex(vl::vec2d(150, 0));
-
-	update_shape();
 }
 
 void ConvexDebug::draw(sf::RenderWindow& window)

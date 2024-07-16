@@ -39,6 +39,10 @@ namespace ds2
 
 		static collision_data check(
 			const std::shared_ptr<convex_object>& a,
+			const std::shared_ptr<circle_object>& b);
+
+		static collision_data check(
+			const std::shared_ptr<convex_object>& a,
 			const std::shared_ptr<convex_object>& b);
 
 	private:
