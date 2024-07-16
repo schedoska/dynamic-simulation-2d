@@ -66,6 +66,9 @@
     <ClInclude Include="collision_detection.h">
       <Filter>Pliki nagłówkowe\ds2</Filter>
     </ClInclude>
+    <ClInclude Include="collision_solver.h">
+      <Filter>Pliki nagłówkowe\ds2</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="circle_object.cpp">
@@ -93,6 +96,9 @@
       <Filter>Pliki źródłowe\ds2</Filter>
     </ClCompile>
     <ClCompile Include="scene.cpp">
+      <Filter>Pliki źródłowe\ds2</Filter>
+    </ClCompile>
+    <ClCompile Include="collision_solver.cpp">
       <Filter>Pliki źródłowe\ds2</Filter>
     </ClCompile>
   </ItemGroup>

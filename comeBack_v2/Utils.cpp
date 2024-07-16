@@ -26,13 +26,13 @@ void utils::drawLine(vl::vec2d start, vl::vec2d end, sf::RenderWindow& window, s
     window.draw(line);
 }
 
-void utils::drawPoint(vl::vec2d point, sf::RenderWindow& window)
+void utils::drawPoint(vl::vec2d point, sf::RenderWindow& window, sf::Color color)
 {
     static sf::CircleShape pointDrawable;
     pointDrawable.setOrigin(2, 2);
     pointDrawable.setPosition(vec2_to_sfml(point));
     pointDrawable.setRadius(4);
-    pointDrawable.setFillColor(sf::Color::Black);
+    pointDrawable.setFillColor(color);
 
     window.draw(pointDrawable);
 }

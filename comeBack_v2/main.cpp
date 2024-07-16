@@ -18,33 +18,24 @@ int main()
     
     ds2::scene scene;
 
-    std::shared_ptr<ConvexDebug> conv1(new ConvexDebug(vl::vec2d(100, 100)));
-    conv1->add_vertex(vl::vec2d(0, 0));
-    conv1->add_vertex(vl::vec2d(0, 200/2));
-    conv1->add_vertex(vl::vec2d(150/2, 0));
+    std::shared_ptr<ConvexDebug> conv1(new ConvexDebug(vl::vec2d(160, 100)));
+    conv1->add_vertex(vl::vec2d(-20, -20));
+    conv1->add_vertex(vl::vec2d(-20, 80));
+    conv1->add_vertex(vl::vec2d(55, -20));
     conv1->update_shape();
     scene.add_object(conv1);
     std::shared_ptr<ConvexDebug> conv2(new ConvexDebug(vl::vec2d(300, 200)));
-    conv2->add_vertex(vl::vec2d(0, 0));
-    conv2->add_vertex(vl::vec2d(0, 20));
-    conv2->add_vertex(vl::vec2d(15, 0));
-    conv2->rot_vel() = 0.00000001;
+    conv2->add_vertex(vl::vec2d(-20, -20));
+    conv2->add_vertex(vl::vec2d(-20, 80));
+    conv2->add_vertex(vl::vec2d(55, -20));
+    conv2->rot_vel() = 2 * 3.14 / 5;
     conv2->update_shape();
     scene.add_object(conv2);
     
     std::shared_ptr<CircleDebug> v(new CircleDebug(vl::vec2d(100, 100), 20));
-    v->vel() = vl::vec2d(25, 10);
-    std::shared_ptr<CircleDebug> v1(new CircleDebug(vl::vec2d(200, 100), 20));
-    //v1->vel() = vl::vec2d(15, 10);
-    v1->rot() = 0.002;
-    std::shared_ptr<CircleDebug> v2(new CircleDebug(vl::vec2d(300, 100), 100));
-    v2->rot() = 0.002;
-    //v2->vel() = vl::vec2d(5, 15);
+    v->vel() = vl::vec2d(10, 0);
 
     scene.add_object(v);
-    scene.add_object(v1);
-    scene.add_object(v2);
-
    
     while (window.isOpen())
     {
@@ -70,16 +61,18 @@ int main()
         scene.update(dt);
         for (const auto& i : scene.collisions()) {
             utils::drawLine(i.cp_a, i.cp_b, window, sf::Color::Red);
-            utils::drawPoint(i.cp_a, window);
-            utils::drawPoint(i.cp_b, window);
+            utils::drawPoint(i.cp_a, window, sf::Color::Black);
+            utils::drawPoint(i.cp_b, window, sf::Color::Black);
         }
 
 
         v->draw(window);
-        v1->draw(window);
-        v2->draw(window);
         conv1->draw(window);
         conv2->draw(window);
+
+        utils::drawPoint(v->pos(), window, sf::Color::Red);
+        utils::drawPoint(conv1->pos(), window, sf::Color::Red);
+        utils::drawPoint(conv2->pos(), window, sf::Color::Red);
 
         window.display();
     }

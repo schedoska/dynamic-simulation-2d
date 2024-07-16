@@ -22,6 +22,7 @@
     <ClInclude Include="CircleDebug.h" />
     <ClInclude Include="circle_object.h" />
     <ClInclude Include="collision_detection.h" />
+    <ClInclude Include="collision_solver.h" />
     <ClInclude Include="ConvexDebug.h" />
     <ClInclude Include="convex_object.h" />
     <ClInclude Include="mat.h" />
@@ -36,6 +37,7 @@
     <ClCompile Include="CircleDebug.cpp" />
     <ClCompile Include="circle_object.cpp" />
     <ClCompile Include="collision_detection.cpp" />
+    <ClCompile Include="collision_solver.cpp" />
     <ClCompile Include="ConvexDebug.cpp" />
     <ClCompile Include="convex_object.cpp" />
     <ClCompile Include="main.cpp" />

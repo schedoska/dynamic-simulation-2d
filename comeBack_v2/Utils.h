@@ -12,7 +12,7 @@ namespace utils {
 
     void drawLine(vl::vec2d start, vl::vec2d end, sf::RenderWindow& window, sf::Color color);
 
-    void drawPoint(vl::vec2d point, sf::RenderWindow& window);
+    void drawPoint(vl::vec2d point, sf::RenderWindow& window, sf::Color color);
 }
 
 #endif

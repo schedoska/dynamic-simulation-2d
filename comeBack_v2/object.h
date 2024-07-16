@@ -26,6 +26,7 @@ namespace ds2
 	private:
 		vl::vec2d _pos;
 		vl::vec2d _vel;
+
 		double _rot;
 		double _rot_vel;
 		double _mass;

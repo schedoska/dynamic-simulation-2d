@@ -1,4 +1,5 @@
 #include "scene.h"
+#include "collision_solver.h"
 
 void ds2::scene::add_object(const std::shared_ptr<circle_object>& circle){
 	_circle_shapes.push_back(circle);
@@ -9,44 +10,19 @@ void ds2::scene::add_object(const std::shared_ptr<convex_object>& convex) {
 }
 
 void ds2::scene::update(const double& dt){
-	for (auto& i : _circle_shapes) {
-		i->update(dt);
-	}
-	for (auto& i : _convex_shapes) {
-		i->update(dt);
-	}
-	
-	_collisions.clear();
-	for (auto& i : _circle_shapes) {
-		for (auto& j : _circle_shapes) {
-			collision_data cd = collision_detection::check(i, j);
-			if (cd.collides) {
-				_collisions.push_back(cd);
-			}
-		}
-	}
+    for (const auto& i : _circle_shapes)
+        i->update(dt);
+    for (const auto& i : _convex_shapes)
+        i->update(dt);
 
-	_collisions.clear();
-	for (auto& i : _circle_shapes) {
-		for (auto& j : _convex_shapes) {
-			collision_data cd = collision_detection::check(j, i);
-			if (cd.collides) {
-				_collisions.push_back(cd);
-			}
-		}
-	}
-
-	int c = 0;
-	for (auto& i : _convex_shapes) {
-		for (auto& j : _convex_shapes) {
-			//if (c >= 2) continue;
-			collision_data cd = collision_detection::check(i, j);
-			if (cd.collides) {
-				_collisions.push_back(cd);
-			}
-			c++;
-		}
-	}
+    for (const auto& cir : _circle_shapes) {
+        for (const auto& conv : _convex_shapes) {
+            collision_data cd = collision_detection::check(conv, cir);
+            if (cd.collides == false) 
+                continue;
+            collision_solver::solve_collision(cd);
+        }
+    }
 }
 
 const std::list<ds2::collision_data>& ds2::scene::collisions() const

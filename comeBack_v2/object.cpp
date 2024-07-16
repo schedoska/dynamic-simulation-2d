@@ -3,6 +3,7 @@
 
 ds2::object::object(){
     _pos = vl::vec2d();
+    _mass = 1;
 }
 
 ds2::object::object(const vl::vec2d& pos) {
