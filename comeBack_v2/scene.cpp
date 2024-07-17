@@ -9,19 +9,27 @@ void ds2::scene::add_object(const std::shared_ptr<convex_object>& convex) {
 	_convex_shapes.push_back(convex);
 }
 
-void ds2::scene::update(const double& dt){
+void ds2::scene::update(const double& dt, sf::RenderWindow& win){
     for (const auto& i : _circle_shapes)
         i->update(dt);
     for (const auto& i : _convex_shapes)
         i->update(dt);
 
+    _collisions.clear();
     for (const auto& cir : _circle_shapes) {
         for (const auto& conv : _convex_shapes) {
             collision_data cd = collision_detection::check(conv, cir);
             if (cd.collides == false) 
                 continue;
-            collision_solver::solve_collision(cd);
+            collision_solver::solve_collision(cd, win);
+            _collisions.push_back(cd);
         }
+    }
+
+    collision_data cd = collision_detection::check(_convex_shapes[0], _convex_shapes[1]);
+    if (cd.collides == true) {
+        collision_solver::solve_collision(cd, win);
+        _collisions.push_back(cd);
     }
 }
 

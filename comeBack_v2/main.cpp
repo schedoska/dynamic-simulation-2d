@@ -18,22 +18,31 @@ int main()
     
     ds2::scene scene;
 
-    std::shared_ptr<ConvexDebug> conv1(new ConvexDebug(vl::vec2d(160, 100)));
-    conv1->add_vertex(vl::vec2d(-20, -20));
-    conv1->add_vertex(vl::vec2d(-20, 80));
-    conv1->add_vertex(vl::vec2d(55, -20));
+    std::shared_ptr<ConvexDebug> conv1(new ConvexDebug(vl::vec2d(460, 100)));
+    conv1->add_vertex(vl::vec2d(-60, -60));
+    conv1->add_vertex(vl::vec2d(-60, 240));
+    conv1->add_vertex(vl::vec2d(160, -60));
     conv1->update_shape();
     scene.add_object(conv1);
-    std::shared_ptr<ConvexDebug> conv2(new ConvexDebug(vl::vec2d(300, 200)));
-    conv2->add_vertex(vl::vec2d(-20, -20));
-    conv2->add_vertex(vl::vec2d(-20, 80));
-    conv2->add_vertex(vl::vec2d(55, -20));
-    conv2->rot_vel() = 2 * 3.14 / 5;
+    //conv1->vel() = vl::vec2d(-10, 0);
+    conv1->mass() = 400;
+    conv1->rot() = 0.0001;
+
+    std::shared_ptr<ConvexDebug> conv2(new ConvexDebug(vl::vec2d(160, 200)));
+    conv2->add_vertex(vl::vec2d(-60, -60));
+    conv2->add_vertex(vl::vec2d(-60, 240));
+    conv2->add_vertex(vl::vec2d(160, -60));
     conv2->update_shape();
     scene.add_object(conv2);
+    conv2->vel() = vl::vec2d(20, 0);
+    conv2->mass() = 100;
+    conv2->rot() = 0.0001;
+    conv2->rot_vel() = -0.4;
     
-    std::shared_ptr<CircleDebug> v(new CircleDebug(vl::vec2d(100, 100), 20));
-    v->vel() = vl::vec2d(10, 0);
+    std::shared_ptr<CircleDebug> v(new CircleDebug(vl::vec2d(480, 500), 70));
+    //v->vel() = vl::vec2d(10, 0);
+    v->rot_vel() = 0.0000001;
+    v->mass() = 400;
 
     scene.add_object(v);
    
@@ -50,7 +59,7 @@ int main()
                 if (event.key.code == sf::Keyboard::Down) conv1->pos() = conv1->pos() + vl::vec2d(0, 9);
                 if (event.key.code == sf::Keyboard::Right) conv1->pos() = conv1->pos() + vl::vec2d(9, 0);
                 if (event.key.code == sf::Keyboard::Left) conv1->pos() = conv1->pos() + vl::vec2d(-9, 0);
-                if (event.key.code == sf::Keyboard::R) conv1->rot() = conv1->rot() + 0.03;
+                if (event.key.code == sf::Keyboard::R) conv1->rot() = conv1->rot() - 0.03;
             }
         }
 
@@ -58,7 +67,7 @@ int main()
         //std::cout << 1.0 / dt << "\n";
         window.clear(sf::Color::White);
 
-        scene.update(dt);
+        scene.update(dt, window);
         for (const auto& i : scene.collisions()) {
             utils::drawLine(i.cp_a, i.cp_b, window, sf::Color::Red);
             utils::drawPoint(i.cp_a, window, sf::Color::Black);

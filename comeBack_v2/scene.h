@@ -6,6 +6,7 @@
 
 #include <vector>
 #include <list>
+#include <SFML/Graphics.hpp>
 
 namespace ds2 
 {
@@ -14,7 +15,7 @@ namespace ds2
 	public:
 		void add_object(const std::shared_ptr<circle_object>& circle);
 		void add_object(const std::shared_ptr<convex_object>& convex);
-		void update(const double& dt);
+		void update(const double& dt, sf::RenderWindow& win);
 
 		const std::list<collision_data>& collisions() const;
 
