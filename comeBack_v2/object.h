@@ -24,6 +24,8 @@ namespace ds2
 		vl::vec2d local (const vl::vec2d& global);
 
 	private:
+		void init();
+
 		vl::vec2d _pos;
 		vl::vec2d _vel;
 

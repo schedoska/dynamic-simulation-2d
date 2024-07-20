@@ -26,11 +26,29 @@ void ds2::scene::update(const double& dt, sf::RenderWindow& win){
         }
     }
 
-    collision_data cd = collision_detection::check(_convex_shapes[0], _convex_shapes[1]);
+    /*collision_data cd = collision_detection::check(_convex_shapes[0], _convex_shapes[1]);
+    if (cd.collides == true) {
+        collision_solver::solve_collision(cd, win);
+        _collisions.push_back(cd);
+    }*/
+
+    collision_data cd = collision_detection::check(_convex_shapes[3], _convex_shapes[0]);
     if (cd.collides == true) {
         collision_solver::solve_collision(cd, win);
         _collisions.push_back(cd);
     }
+    cd = collision_detection::check(_convex_shapes[3], _convex_shapes[1]);
+    if (cd.collides == true) {
+        collision_solver::solve_collision(cd, win);
+        _collisions.push_back(cd);
+    }
+    cd = collision_detection::check(_convex_shapes[3], _convex_shapes[2]);
+    if (cd.collides == true) {
+        collision_solver::solve_collision(cd, win);
+        _collisions.push_back(cd);
+    }
+
+    
 }
 
 const std::list<ds2::collision_data>& ds2::scene::collisions() const

@@ -2,11 +2,11 @@
 #include "mat22.h"
 
 ds2::object::object(){
-    _pos = vl::vec2d();
-    _mass = 1;
+    init();
 }
 
 ds2::object::object(const vl::vec2d& pos) {
+    init();
     _pos = vl::vec2d(pos);
 }
 
@@ -70,6 +70,12 @@ vl::vec2d ds2::object::global(const vl::vec2d& local)
 vl::vec2d ds2::object::local(const vl::vec2d& global)
 {
     return global - pos();
+}
+
+void ds2::object::init()
+{
+    _pos = vl::vec2d();
+    _mass = 1;
 }
 
 

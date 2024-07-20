@@ -17,3 +17,11 @@ const std::vector<vl::vec2d>& ds2::convex_object::vertices() const
 {
 	return _vertices;
 }
+
+void ds2::convex_object::scale(const vl::vec2d& s)
+{
+	for (auto& v : _vertices) {
+		v[0] *= s[0];
+		v[1] *= s[1];
+	}
+}

@@ -18,31 +18,53 @@ int main()
     
     ds2::scene scene;
 
-    std::shared_ptr<ConvexDebug> conv1(new ConvexDebug(vl::vec2d(460, 100)));
-    conv1->add_vertex(vl::vec2d(-60, -60));
-    conv1->add_vertex(vl::vec2d(-60, 240));
-    conv1->add_vertex(vl::vec2d(160, -60));
+    std::shared_ptr<ConvexDebug> conv1(new ConvexDebug(vl::vec2d(100, 700)));
+    conv1->add_vertex(vl::vec2d(0, 0));
+    conv1->add_vertex(vl::vec2d(100, 0));
+    conv1->add_vertex(vl::vec2d(100, 100));
+    conv1->add_vertex(vl::vec2d(0, 100));
     conv1->update_shape();
-    scene.add_object(conv1);
-    //conv1->vel() = vl::vec2d(-10, 0);
-    conv1->mass() = 400;
+    conv1->scale(vl::vec2d(10, 0.5));
+    conv1->mass() = 1e20;
     conv1->rot() = 0.0001;
+    scene.add_object(conv1);
 
-    std::shared_ptr<ConvexDebug> conv2(new ConvexDebug(vl::vec2d(160, 200)));
-    conv2->add_vertex(vl::vec2d(-60, -60));
-    conv2->add_vertex(vl::vec2d(-60, 240));
-    conv2->add_vertex(vl::vec2d(160, -60));
+    std::shared_ptr<ConvexDebug> conv2(new ConvexDebug(vl::vec2d(100, 695)));
+    conv2->add_vertex(vl::vec2d(0, 0));
+    conv2->add_vertex(vl::vec2d(100, 0));
+    conv2->add_vertex(vl::vec2d(100, 100));
+    conv2->add_vertex(vl::vec2d(0, 100));
     conv2->update_shape();
-    scene.add_object(conv2);
-    conv2->vel() = vl::vec2d(20, 0);
-    conv2->mass() = 100;
+    conv2->scale(vl::vec2d(0.5, -4));
+    conv2->mass() = 1e20;
     conv2->rot() = 0.0001;
-    conv2->rot_vel() = -0.4;
+    scene.add_object(conv2);
+
+    std::shared_ptr<ConvexDebug> conv3(new ConvexDebug(vl::vec2d(900, 695)));
+    conv3->add_vertex(vl::vec2d(0, 0));
+    conv3->add_vertex(vl::vec2d(100, 0));
+    conv3->add_vertex(vl::vec2d(100, 100));
+    conv3->add_vertex(vl::vec2d(0, 100));
+    conv3->update_shape();
+    conv3->scale(vl::vec2d(0.5, -4));
+    conv3->mass() = 1e20;
+    conv3->rot() = 0.4;
+    scene.add_object(conv3);
+
+
+
     
-    std::shared_ptr<CircleDebug> v(new CircleDebug(vl::vec2d(480, 500), 70));
-    //v->vel() = vl::vec2d(10, 0);
-    v->rot_vel() = 0.0000001;
-    v->mass() = 400;
+    std::shared_ptr<ConvexDebug> v(new ConvexDebug(vl::vec2d(960, 195)));
+    v->add_vertex(vl::vec2d(-100, -100));
+    v->add_vertex(vl::vec2d(100, -100));
+    v->add_vertex(vl::vec2d(100, 100));
+    v->add_vertex(vl::vec2d(-100, 100));
+    v->update_shape();
+    v->scale(vl::vec2d(0.2, 0.4));
+    v->mass() = 100;
+    v->rot() = 7.2;
+    v->vel() = vl::vec2d(0, 0);
+    scene.add_object(v);
 
     scene.add_object(v);
    
@@ -67,6 +89,7 @@ int main()
         //std::cout << 1.0 / dt << "\n";
         window.clear(sf::Color::White);
 
+        v->vel() += vl::vec2d(0, 1.5);
         scene.update(dt, window);
         for (const auto& i : scene.collisions()) {
             utils::drawLine(i.cp_a, i.cp_b, window, sf::Color::Red);
@@ -78,6 +101,7 @@ int main()
         v->draw(window);
         conv1->draw(window);
         conv2->draw(window);
+        conv3->draw(window);
 
         utils::drawPoint(v->pos(), window, sf::Color::Red);
         utils::drawPoint(conv1->pos(), window, sf::Color::Red);

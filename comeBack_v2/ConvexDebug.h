@@ -10,6 +10,7 @@ public:
 	ConvexDebug(vl::vec2d pos);
 	void draw(sf::RenderWindow& window);
 	void update_shape();
+	void scale(const vl::vec2d& s) override;
 
 private:
 	sf::ConvexShape _shape;

@@ -12,6 +12,7 @@ namespace ds2
 		void add_vertex(const vl::vec2d& v_pos);
 		void clear_vertices();
 		const std::vector<vl::vec2d>& vertices() const;
+		virtual void scale(const vl::vec2d& s);
 
 	private:
 		/* List of points described in object local coordinates(0, 0) here is equal

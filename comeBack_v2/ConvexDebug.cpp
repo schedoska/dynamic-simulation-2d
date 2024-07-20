@@ -24,3 +24,9 @@ void ConvexDebug::update_shape()
 		_shape.setPoint(i, utils::vec2_to_sfml(vl[i]));
 	}
 }
+
+void ConvexDebug::scale(const vl::vec2d& s)
+{
+	convex_object::scale(s);
+	update_shape();
+}
