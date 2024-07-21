@@ -36,3 +36,8 @@ void utils::drawPoint(vl::vec2d point, sf::RenderWindow& window, sf::Color color
 
     window.draw(pointDrawable);
 }
+
+double utils::cross(const vl::vec2d& a, const vl::vec2d& b)
+{
+    return a[0] * b[1] - a[1] * b[0];
+}

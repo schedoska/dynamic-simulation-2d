@@ -23,6 +23,8 @@ namespace ds2
 		vl::vec2d global(const vl::vec2d& local);
 		vl::vec2d local (const vl::vec2d& global);
 
+		double inertia;
+
 	private:
 		void init();
 

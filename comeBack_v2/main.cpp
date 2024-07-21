@@ -27,6 +27,7 @@ int main()
     conv1->scale(vl::vec2d(10, 0.5));
     conv1->mass() = 1e20;
     conv1->rot() = 0.0001;
+    conv1->inertia = 1e30;
     scene.add_object(conv1);
 
     std::shared_ptr<ConvexDebug> conv2(new ConvexDebug(vl::vec2d(100, 695)));
@@ -38,6 +39,7 @@ int main()
     conv2->scale(vl::vec2d(0.5, -4));
     conv2->mass() = 1e20;
     conv2->rot() = 0.0001;
+    conv2->inertia = 1e30;
     scene.add_object(conv2);
 
     std::shared_ptr<ConvexDebug> conv3(new ConvexDebug(vl::vec2d(900, 695)));
@@ -48,25 +50,40 @@ int main()
     conv3->update_shape();
     conv3->scale(vl::vec2d(0.5, -4));
     conv3->mass() = 1e20;
-    conv3->rot() = 0.4;
+    conv3->rot() = 0;// 3.14 / 3.0;
+    conv3->inertia = 1e30;
     scene.add_object(conv3);
 
 
 
     
-    std::shared_ptr<ConvexDebug> v(new ConvexDebug(vl::vec2d(960, 195)));
+    std::shared_ptr<ConvexDebug> v(new ConvexDebug(vl::vec2d(700, 595)));
     v->add_vertex(vl::vec2d(-100, -100));
     v->add_vertex(vl::vec2d(100, -100));
     v->add_vertex(vl::vec2d(100, 100));
     v->add_vertex(vl::vec2d(-100, 100));
     v->update_shape();
-    v->scale(vl::vec2d(0.2, 0.4));
+    v->scale(vl::vec2d(0.2, 1.8));
     v->mass() = 100;
-    v->rot() = 7.2;
-    v->vel() = vl::vec2d(0, 0);
+    v->rot() = 3.14*99;
+    v->vel() = vl::vec2d(-30, 0);
+    v->inertia = (1600 + 129000) * 100 / 12;//800000;
     scene.add_object(v);
 
-    scene.add_object(v);
+
+
+    std::shared_ptr<ConvexDebug> v2(new ConvexDebug(vl::vec2d(300, 100)));
+    v2->add_vertex(vl::vec2d(-100, -100));
+    v2->add_vertex(vl::vec2d(100, -100));
+    v2->add_vertex(vl::vec2d(100, 100));
+    v2->add_vertex(vl::vec2d(-100, 100));
+    v2->update_shape();
+    v2->scale(vl::vec2d(0.5, 0.5));
+    v2->mass() = 10;
+    v2->rot() = 3657;
+    v2->vel() = vl::vec2d(90, 0);
+    v2->inertia = (20000) * 10 / 12;//800000;
+    scene.add_object(v2);
    
     while (window.isOpen())
     {
@@ -89,7 +106,8 @@ int main()
         //std::cout << 1.0 / dt << "\n";
         window.clear(sf::Color::White);
 
-        v->vel() += vl::vec2d(0, 1.5);
+        v->vel() += vl::vec2d(0, 60) * dt;
+        v2->vel() += vl::vec2d(0, 60) * dt;
         scene.update(dt, window);
         for (const auto& i : scene.collisions()) {
             utils::drawLine(i.cp_a, i.cp_b, window, sf::Color::Red);
@@ -97,8 +115,8 @@ int main()
             utils::drawPoint(i.cp_b, window, sf::Color::Black);
         }
 
-
         v->draw(window);
+        v2->draw(window);
         conv1->draw(window);
         conv2->draw(window);
         conv3->draw(window);

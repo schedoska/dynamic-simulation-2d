@@ -48,6 +48,28 @@ void ds2::scene::update(const double& dt, sf::RenderWindow& win){
         _collisions.push_back(cd);
     }
 
+     cd = collision_detection::check(_convex_shapes[4], _convex_shapes[0]);
+    if (cd.collides == true) {
+        collision_solver::solve_collision(cd, win);
+        _collisions.push_back(cd);
+    }
+    cd = collision_detection::check(_convex_shapes[4], _convex_shapes[1]);
+    if (cd.collides == true) {
+        collision_solver::solve_collision(cd, win);
+        _collisions.push_back(cd);
+    }
+    cd = collision_detection::check(_convex_shapes[4], _convex_shapes[2]);
+    if (cd.collides == true) {
+        collision_solver::solve_collision(cd, win);
+        _collisions.push_back(cd);
+    }
+
+    cd = collision_detection::check(_convex_shapes[4], _convex_shapes[3]);
+    if (cd.collides == true) {
+        collision_solver::solve_collision(cd, win);
+        _collisions.push_back(cd);
+    }
+
     
 }
 
