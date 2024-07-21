@@ -208,6 +208,11 @@ namespace vl
         return *this;
     }
 
+    template<typename T>
+    _value cross(const vl::vec<T,2>& a, const vl::vec<T, 2>& b) {
+        return a[0] * b[1] - a[1] * b[0];
+    }
+
     using vec2i = vec<int, 2>;
     using vec2f = vec<float, 2>;
     using vec2d = vec<double, 2>;
