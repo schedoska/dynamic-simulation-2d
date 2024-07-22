@@ -16,10 +16,10 @@ void solve_spring(std::shared_ptr<ds2::object> a, std::shared_ptr<ds2::object> b
     double str = len - dv.len();
     dv.normalize();
 
-    //a->apply_force(dv * str * 4500 - a->vel() * 950, a_loc, dt);
-    b->apply_force(dv * -str * 4500 - b->vel() * 950, b_loc, dt);
+    vl::vec2d delta_vel = dv * (a->vel() - b->vel()).dot(dv);
 
-    std::cout << str << "\n";
+    a->apply_force(dv * str * 4500 - delta_vel * 950 * 1, a_loc, dt);
+    b->apply_force(dv * -str * 4500 + delta_vel * 950 * 1, b_loc, dt);
 }
 
 int main()
@@ -75,7 +75,7 @@ int main()
     std::shared_ptr<ConvexDebug> v = utils::generate_rect(vl::vec2d(550, 580), vl::vec2d(100, 100), 100);
     scene.add_object(v);
     v->rot() = 3.14 * 99;
-    v->vel() = vl::vec2d(-60, 0);
+    //v->vel() = vl::vec2d(-60, 0);
     convexes.push_back(v);
 
     std::shared_ptr<ConvexDebug> v2 = utils::generate_rect(vl::vec2d(300, 580), vl::vec2d(100, 100), 100);
@@ -94,7 +94,7 @@ int main()
                 window.close();
             if (event.type == sf::Event::KeyPressed)
             {                
-                const double stren = 180000;
+                const double stren = 180000/5;
                 if (event.key.code == sf::Keyboard::Up) 
                     v2->apply_force(vl::vec2d(0,-stren),vl::vec2d(0,0), dt);
                 if (event.key.code == sf::Keyboard::Down)
@@ -115,12 +115,13 @@ int main()
         //v2->rot_vel() -= 0.1 * v2->rot_vel();
 
         solve_spring(v, v2, vl::vec2d(), vl::vec2d(), dt, 250);
+        std::cout << v2->vel() << "\n";
 
 
         window.clear(sf::Color::White);
 
-        //v->vel() += vl::vec2d(0, 160) * dt;
-        //v2->vel() += vl::vec2d(0, 160) * dt;
+        v->vel() += vl::vec2d(0, 160) * dt;
+        v2->vel() += vl::vec2d(0, 160) * dt;
 
         scene.update(dt, window);
         for (const auto& i : scene.collisions()) {
