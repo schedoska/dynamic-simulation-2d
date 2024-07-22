@@ -12,7 +12,7 @@ void ds2::collision_solver::solve_collision(const collision_data& cd, sf::Render
 	vl::vec2d dv = cd.cp_a - cd.cp_b;
 	double mass_total = obj_a->mass() + obj_b->mass();
 
-	const double seperation = 1.1;
+	const double seperation = 1;
 	obj_a->pos() += dv * -obj_b->mass() * seperation / mass_total;
 	obj_b->pos() += dv * obj_a->mass() * seperation / mass_total;
 
@@ -52,7 +52,7 @@ void ds2::collision_solver::solve_collision(const collision_data& cd, sf::Render
 
 	
 	/* Friction impulses */
-	vl::vec2d dv_perp = vl::vec2d(dv[1], -dv[0]);
+	/*vl::vec2d dv_perp = vl::vec2d(dv[1], -dv[0]);
 	double fj = 0.05 * vr.dot(dv_perp);
 
 	double Jf = fj / (ma_inv + mb_inv + std::pow(vl::cross(mass_cp_a, dv_perp), 2) / obj_a->inertia +
@@ -61,7 +61,7 @@ void ds2::collision_solver::solve_collision(const collision_data& cd, sf::Render
 	obj_a->vel() += dv_perp * ma_inv * Jf;
 	obj_b->vel() -= dv_perp * mb_inv * Jf;
 	obj_a->rot_vel() += vl::cross(mass_cp_a, dv_perp * Jf) / obj_a->inertia;
-	obj_b->rot_vel() -= vl::cross(mass_cp_b, dv_perp * Jf) / obj_b->inertia;
+	obj_b->rot_vel() -= vl::cross(mass_cp_b, dv_perp * Jf) / obj_b->inertia;*/
 
 	/* Fixes Flickering */
 	if (std::abs(obj_a->vel()[0]) < 5) obj_a->vel()[0] = 0;

@@ -3,6 +3,7 @@
 
 #include "vec2.h"
 #include <SFML/Graphics.hpp>
+#include "ConvexDebug.h"
 
 namespace utils {
     template <typename T>
@@ -15,6 +16,8 @@ namespace utils {
     void drawPoint(vl::vec2d point, sf::RenderWindow& window, sf::Color color);
 
     double cross(const vl::vec2d& a, const vl::vec2d& b);
+
+    std::shared_ptr<ConvexDebug> generate_rect(vl::vec2d pos, vl::vec2d size, double mass);
 }
 
 #endif

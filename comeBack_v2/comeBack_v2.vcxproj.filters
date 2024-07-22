@@ -69,6 +69,9 @@
     <ClInclude Include="collision_solver.h">
       <Filter>Pliki nagłówkowe\ds2</Filter>
     </ClInclude>
+    <ClInclude Include="World.h">
+      <Filter>Pliki nagłówkowe\app</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="circle_object.cpp">
@@ -100,6 +103,9 @@
     </ClCompile>
     <ClCompile Include="collision_solver.cpp">
       <Filter>Pliki źródłowe\ds2</Filter>
+    </ClCompile>
+    <ClCompile Include="World.cpp">
+      <Filter>Pliki źródłowe\app</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

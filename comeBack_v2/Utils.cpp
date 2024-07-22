@@ -41,3 +41,17 @@ double utils::cross(const vl::vec2d& a, const vl::vec2d& b)
 {
     return a[0] * b[1] - a[1] * b[0];
 }
+
+std::shared_ptr<ConvexDebug> utils::generate_rect(vl::vec2d pos, vl::vec2d size, double mass)
+{
+    std::shared_ptr<ConvexDebug> v(new ConvexDebug(pos));
+    v->add_vertex(vl::vec2d(-size[0] / 2.f, -size[1] / 2.f));
+    v->add_vertex(vl::vec2d(size[0] / 2.f, -size[1] / 2.f));
+    v->add_vertex(vl::vec2d(size[0] / 2.f, size[1] / 2.f));
+    v->add_vertex(vl::vec2d(-size[0] / 2.f, size[1] / 2.f));
+    v->update_shape();
+    v->mass() = mass;
+    v->inertia = (size[0] * size[0] + size[1] * size[1]) * mass / 12;
+
+    return v;
+}

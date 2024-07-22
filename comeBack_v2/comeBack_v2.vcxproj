@@ -32,6 +32,7 @@
     <ClInclude Include="Utils.h" />
     <ClInclude Include="vec.h" />
     <ClInclude Include="vec2.h" />
+    <ClInclude Include="World.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CircleDebug.cpp" />
@@ -44,6 +45,7 @@
     <ClCompile Include="object.cpp" />
     <ClCompile Include="scene.cpp" />
     <ClCompile Include="Utils.cpp" />
+    <ClCompile Include="World.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
