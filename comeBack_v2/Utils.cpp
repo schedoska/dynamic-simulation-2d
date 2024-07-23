@@ -55,3 +55,10 @@ std::shared_ptr<ConvexDebug> utils::generate_rect(vl::vec2d pos, vl::vec2d size,
 
     return v;
 }
+
+vl::vec2d utils::rotate(const vl::vec2d& vec, const double& ang)
+{
+    double x = cos(ang) * vec[0] - sin(ang) * vec[1];
+    double y = sin(ang) * vec[0] + cos(ang) * vec[1];
+    return vl::vec2d(x, y);
+}

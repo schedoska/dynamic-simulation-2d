@@ -9,7 +9,15 @@ void ds2::scene::add_object(const std::shared_ptr<convex_object>& convex) {
 	_convex_shapes.push_back(convex);
 }
 
+void ds2::scene::add_joint(joint* j)
+{
+    _joints.push_back(j);
+}
+
 void ds2::scene::update(const double& dt, sf::RenderWindow& win){
+    for (auto i : _joints)
+        i->update(dt);
+
     for (const auto& i : _circle_shapes)
         i->update(dt);
     for (const auto& i : _convex_shapes)

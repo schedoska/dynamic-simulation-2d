@@ -1,5 +1,6 @@
 #include "object.h"
 #include "mat22.h"
+#include "Utils.h"
 
 ds2::object::object(){
     init();
@@ -76,8 +77,8 @@ const double& ds2::object::rot_acc() const
 
 void ds2::object::update(const double& dt)
 {
-    _vel += _acc * dt;
-    _rot_vel += _rot_acc * dt;
+    //_vel += _acc * dt;
+    // _rot_vel += _rot_acc * dt;
 
     _pos += _vel * dt;
     _rot += _rot_vel * dt;
@@ -102,6 +103,7 @@ void ds2::object::apply_force(const vl::vec2d& force, const vl::vec2d& point, co
 {
     _vel += (force / _mass) * dt;
     _rot_vel += (vl::cross(point, local(force) + pos()) / inertia) * dt;
+    //_rot_vel += (vl::cross(point, utils::rotate(force, _rot)) / inertia) * dt;
     //std::cout << (vl::cross(point, local(force) + pos()) / inertia) * dt << "\n";
 }
 

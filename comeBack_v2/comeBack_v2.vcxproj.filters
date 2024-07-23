@@ -72,6 +72,9 @@
     <ClInclude Include="World.h">
       <Filter>Pliki nagłówkowe\app</Filter>
     </ClInclude>
+    <ClInclude Include="joint.h">
+      <Filter>Pliki nagłówkowe\ds2</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="circle_object.cpp">
@@ -106,6 +109,9 @@
     </ClCompile>
     <ClCompile Include="World.cpp">
       <Filter>Pliki źródłowe\app</Filter>
+    </ClCompile>
+    <ClCompile Include="joint.cpp">
+      <Filter>Pliki źródłowe\ds2</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
