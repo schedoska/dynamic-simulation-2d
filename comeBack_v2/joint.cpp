@@ -42,12 +42,18 @@ ds2::spring_joint::spring_joint(
 	const std::shared_ptr<object>& a,
 	const std::shared_ptr<object>& b,
 	vl::vec2d loc_a,
-	vl::vec2d loc_b)
+	vl::vec2d loc_b, 
+	const bool fixed_a,
+	const bool fixed_b)
 	: joint(a, b, loc_a, loc_b)
 {
 	_stiff = 500;
 	_damp = 100;
-	_len = 100;
+	_len = (a->global(loc_a) - b->global(loc_b)).len();
+	_rot_a = a->rot();
+	_rot_b = b->rot();
+	_fixed_a = fixed_a;
+	_fixed_b = fixed_b;
 }
 
 const double& ds2::spring_joint::stiff() const
@@ -89,6 +95,15 @@ void ds2::spring_joint::update(const double& dt)
 	double str = _len - dv.len();
 	dv.normalize();
 
+	if (_fixed_a) {
+		double angle_diff = _rot_a - a->rot();
+		a->rot_vel() += (angle_diff * 75000000 - a->rot_vel() * 3000000) / a->inertia() * dt;
+	}
+	if (_fixed_b) {
+		double angle_diff = _rot_b - b->rot();
+		b->rot_vel() += (angle_diff * 75000000 - b->rot_vel() * 3000000) / a->inertia() * dt;
+	}
+
 	vl::vec2d delta_vel = dv * (a->vel() - b->vel()).dot(dv);
 	a->apply_force(dv * str * _stiff - delta_vel * _damp, _loc_a, dt);
 	b->apply_force(dv * -str * _stiff + delta_vel * _damp, _loc_b, dt);
@@ -105,5 +120,7 @@ ds2::fixed_joint::fixed_joint(
 	_stiff = 20000;
 	_len = 0.0;
 }
+
+
 
 

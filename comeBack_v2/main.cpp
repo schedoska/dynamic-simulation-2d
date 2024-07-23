@@ -44,7 +44,7 @@ void solve_fixed(std::shared_ptr<ds2::object> a, vl::vec2d a_loc, vl::vec2d pt, 
     
 
     double angle_diff = angle - a->rot();
-    a->rot_vel() += (angle_diff * 750000000 - a->rot_vel() * 3000000) / a->inertia * dt;
+    a->rot_vel() += (angle_diff * 750000000 - a->rot_vel() * 3000000) / a->inertia() * dt;
 
     //std::cout << (vl::cross(vl::vec2d(0, -40), vl::vec2d(100, 0) * -0.4)
         // / a->inertia) * dt << "\n";
@@ -56,6 +56,8 @@ void solve_fixed(std::shared_ptr<ds2::object> a, vl::vec2d a_loc, vl::vec2d pt, 
 
 int main()
 {
+
+
     sf::RenderWindow window(sf::VideoMode(1200, 800), "My window");
     window.setFramerateLimit(20);
 
@@ -72,7 +74,7 @@ int main()
     conv1->scale(vl::vec2d(10, 0.5));
     conv1->mass() = 1e20;
     conv1->rot() = 0.0001;
-    conv1->inertia = 1e30;
+    conv1->inertia() = 1e30;
     scene.add_object(conv1);
     convexes.push_back(conv1);
 
@@ -85,7 +87,7 @@ int main()
     conv2->scale(vl::vec2d(0.5, -4));
     conv2->mass() = 1e20;
     conv2->rot() = 0.0001;
-    conv2->inertia = 1e30;
+    conv2->inertia() = 1e30;
     scene.add_object(conv2);
     convexes.push_back(conv2);
 
@@ -98,7 +100,7 @@ int main()
     conv3->scale(vl::vec2d(0.5, -4));
     conv3->mass() = 1e20;
     conv3->rot() = 0;// 3.14 / 3.0;
-    conv3->inertia = 1e30;
+    conv3->inertia() = 1e30;
     scene.add_object(conv3);
     convexes.push_back(conv3);
     // ------------------------------------------------------------------------
@@ -117,17 +119,17 @@ int main()
     scene.add_object(v3);
     convexes.push_back(v3);
 
-    std::shared_ptr<ConvexDebug> v4 = utils::generate_rect(vl::vec2d(800, 440.1), vl::vec2d(100, 100), 100);
+    std::shared_ptr<ConvexDebug> v4 = utils::generate_rect(vl::vec2d(800, 450.1), vl::vec2d(100, 100), 100);
     scene.add_object(v4);
     convexes.push_back(v4);
 
 
-    ds2::spring_joint k(v4, v2, vl::vec2d(), vl::vec2d());
-    k.stiff() = 1000;
-    //scene.add_joint(&k);
+    ds2::spring_joint k(v4, v2, vl::vec2d(0,-20), vl::vec2d(0,20), false, true);
+    k.stiff() = 300;
+    scene.add_joint(&k);
 
     ds2::fixed_joint kk(v4, v2, vl::vec2d(0, -20), vl::vec2d(0, 20));
-    scene.add_joint(&kk);
+    //scene.add_joint(&kk);
 
 
     while (window.isOpen())
@@ -216,7 +218,7 @@ int main()
         //v->vel() += vl::vec2d(0, 160) * dt;
         v2->vel() += vl::vec2d(0, 160) * dt;
         v3->vel() += vl::vec2d(0, 160) * dt;
-        //v4->vel() += vl::vec2d(0, 160) * dt;
+        v4->vel() += vl::vec2d(0, 160) * dt;
 
         
         

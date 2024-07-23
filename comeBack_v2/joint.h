@@ -37,7 +37,9 @@ namespace ds2
 			const std::shared_ptr<object>& a,
 			const std::shared_ptr<object>& b,
 			vl::vec2d loc_a = vl::vec2d(),
-			vl::vec2d loc_b = vl::vec2d());
+			vl::vec2d loc_b = vl::vec2d(),
+			const bool fixed_a = false,
+			const bool fixed_b = false);
 
 		const double& stiff() const;
 		double& stiff();
@@ -52,6 +54,11 @@ namespace ds2
 		double _stiff;
 		double _damp;
 		double _len;
+
+		double _rot_a;
+		double _rot_b;
+		bool _fixed_a;
+		bool _fixed_b;
 	};
 
 	class fixed_joint : public spring_joint
