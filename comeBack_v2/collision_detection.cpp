@@ -4,64 +4,63 @@ ds2::axis_projection_data::axis_projection_data() {
     is_overlaping = true;
 }
 
-ds2::collision_data_2::collision_data_2()
+ds2::collision_data::collision_data()
     : collides(false), cp_a(vl::vec2d()), cp_b(vl::vec2d()) {}
 
-ds2::collision_data_2::collision_data_2(
+ds2::collision_data::collision_data(
     bool _collides,
     const vl::vec2d& _cp_a,
     const vl::vec2d& _cp_b)
     : collides(_collides), cp_a(_cp_a), cp_b(_cp_b) {}
 
-double ds2::collision_data_2::dist() const
+double ds2::collision_data::dist() const
 {
     return (cp_a - cp_b).len();
 }
 
 
-ds2::object_collision_data ds2::collision_detection_2::check(
+ds2::object_collision_data ds2::collision_detection::check(
     const std::shared_ptr<object>& a, 
     const std::shared_ptr<object>& b)
 {
     const shape_group& a_sh = a->shape();
     const shape_group& b_sh = b->shape();
 
-    collision_data_2 cd_min(false, vl::vec2d(0, std::numeric_limits<double>::max()));
+    collision_data cd_max(false, vl::vec2d(0, std::numeric_limits<double>::min()));
 
     for (const auto& a_conv : a_sh.convexes()) {
         for (const auto& b_conv : b_sh.convexes()) {
-            collision_data_2 cd = check_shape(a, b, a_conv, b_conv);
+            collision_data cd = check_shape(a, b, a_conv, b_conv);
             if (cd.collides == false) continue;
-            cd_min = cd.dist() < cd_min.dist() ? cd : cd_min;
+            cd_max = cd.dist() > cd_max.dist() ? cd : cd_max;
         }
     }
     for (const auto& a_conv : a_sh.convexes()) {
         for (const auto& b_circ : b_sh.circles()) {
-            collision_data_2 cd = check_shape(a, b, a_conv, b_circ);
+            collision_data cd = check_shape(a, b, a_conv, b_circ);
             std::swap(cd.cp_a, cd.cp_b);
             if (cd.collides == false) continue;
-            cd_min = cd.dist() < cd_min.dist() ? cd : cd_min;
+            cd_max = cd.dist() > cd_max.dist() ? cd : cd_max;
         }
     }
     for (const auto& a_circ : a_sh.circles()) {
         for (const auto& b_conv : b_sh.convexes()) {
-            collision_data_2 cd = check_shape(b, a, b_conv, a_circ);
+            collision_data cd = check_shape(b, a, b_conv, a_circ);
             if (cd.collides == false) continue;
-            cd_min = cd.dist() < cd_min.dist() ? cd : cd_min;
+            cd_max = cd.dist() > cd_max.dist() ? cd : cd_max;
         }
     }
     for (const auto& a_circ : a_sh.circles()) {
         for (const auto& b_circ : b_sh.circles()) {
-            collision_data_2 cd = check_shape(b, a, b_circ, a_circ);
+            collision_data cd = check_shape(b, a, b_circ, a_circ);
             if (cd.collides == false) continue;
-            cd_min = cd.dist() < cd_min.dist() ? cd : cd_min;
+            cd_max = cd.dist() > cd_max.dist() ? cd : cd_max;
         }
     }
-
-    return object_collision_data(a, b, cd_min);
+    return object_collision_data(a, b, cd_max);
 }
 
-ds2::collision_data_2 ds2::collision_detection_2::check_shape(
+ds2::collision_data ds2::collision_detection::check_shape(
     const std::shared_ptr<object>& a, 
     const std::shared_ptr<object>& b, 
     const convex_shape& a_sh, 
@@ -83,7 +82,7 @@ ds2::collision_data_2 ds2::collision_detection_2::check_shape(
         axis_projection_data apd = project_on_axis(a, b, a_sh, b_sh, axis);
 
         if (!apd.is_overlaping)
-            return collision_data_2(false);
+            return collision_data(false);
         if (apd.penetration < min_overlap) {
             min_overlap = apd.penetration;
             cn = apd.collision_normal;
@@ -94,24 +93,21 @@ ds2::collision_data_2 ds2::collision_detection_2::check_shape(
         min_vec = dv.len() < min_vec.len() ? dv : min_vec;
     }
 
-    //std::cout << min_vec << "\n";
     axis_projection_data apd = project_on_axis(a, b, a_sh, b_sh, min_vec.normalize());
 
     if (!apd.is_overlaping)
-        return collision_data_2(false);
+        return collision_data(false);
     if (apd.penetration < min_overlap) {
         min_overlap = apd.penetration;
         cn = apd.collision_normal;
         cp_b = apd.closest_point;
         cp_a = cp_b + cn * min_overlap;
-        //std::swap(cp_a, cp_b);
     }
     
-    
-    return collision_data_2(true, cp_b, cp_a);
+    return collision_data(true, cp_b, cp_a);
 }
 
-ds2::collision_data_2 ds2::collision_detection_2::check_shape(
+ds2::collision_data ds2::collision_detection::check_shape(
     const std::shared_ptr<object>& a,
     const std::shared_ptr<object>& b,
     const convex_shape& a_sh, 
@@ -131,7 +127,7 @@ ds2::collision_data_2 ds2::collision_detection_2::check_shape(
         vl::vec2d axis = vl::vec2d(edge[1], -edge[0]).normalize();
         axis_projection_data apd = project_on_axis(a, b, a_sh, b_sh, axis);
         if (apd.is_overlaping == false)
-            return collision_data_2(false);
+            return collision_data(false);
 
         if (apd.penetration <= min_overlap) {
             min_overlap = apd.penetration;
@@ -146,7 +142,7 @@ ds2::collision_data_2 ds2::collision_detection_2::check_shape(
         vl::vec2d axis = vl::vec2d(edge[1], -edge[0]).normalize();
         axis_projection_data apd = project_on_axis(b, a, b_sh, a_sh, axis);
         if (apd.is_overlaping == false)
-            return collision_data_2(false);
+            return collision_data(false);
 
         if (apd.penetration <= min_overlap) {
             min_overlap = apd.penetration;
@@ -155,30 +151,30 @@ ds2::collision_data_2 ds2::collision_detection_2::check_shape(
             cpB = cpA + cn * min_overlap;
         }
     }
-    return collision_data_2(true, cpA, cpB);
+    return collision_data(true, cpA, cpB);
 }
 
-ds2::collision_data_2 ds2::collision_detection_2::check_shape(
+ds2::collision_data ds2::collision_detection::check_shape(
     const std::shared_ptr<object>& a, 
     const std::shared_ptr<object>& b, 
     const circle_shape& a_sh, 
     const circle_shape& b_sh)
 {
     if (a == b)
-        return collision_data_2(false);
+        return collision_data(false);
 
     vl::vec2d ab = a->global(a_sh.loc_pos()) - b->global(b_sh.loc_pos());
     double    rr = a_sh.radius() + b_sh.radius();
     if (ab.len() > rr)
-        return collision_data_2(false);
+        return collision_data(false);
 
     ab.normalize();
     vl::vec2d cp_a = ab * -a_sh.radius() + a->global(a_sh.loc_pos());
     vl::vec2d cp_b = ab *  b_sh.radius() + b->global(b_sh.loc_pos());
-    return collision_data_2(true, cp_b, cp_a);
+    return collision_data(true, cp_b, cp_a);
 }
 
-ds2::axis_projection_data ds2::collision_detection_2::project_on_axis(
+ds2::axis_projection_data ds2::collision_detection::project_on_axis(
     const std::shared_ptr<object>& ref, 
     const std::shared_ptr<object>& sec, 
     const convex_shape& ref_sh, 
@@ -188,16 +184,16 @@ ds2::axis_projection_data ds2::collision_detection_2::project_on_axis(
     axis_projection_data apd;
     apd.collision_normal = axis;
 
-    double max_ref = -std::numeric_limits<double>::max();  //usun
-    double min_ref = std::numeric_limits<double>::max();  //usun
+    double max_ref = -std::numeric_limits<double>::max();  
+    double min_ref = std::numeric_limits<double>::max();  
     for (const auto& v : ref_sh.vertices()) {
         double val = axis.dot(ref->global(v));
         max_ref = std::max(val, max_ref);
         min_ref = std::min(val, min_ref);
     }
 
-    double max_sec = -std::numeric_limits<double>::max();  //usun
-    double min_sec = std::numeric_limits<double>::max();  //usun
+    double max_sec = -std::numeric_limits<double>::max();  
+    double min_sec = std::numeric_limits<double>::max();  
     vl::vec2d max_sec_vec, min_sec_vec;
     for (const auto& v : sec_sh.vertices()) {
         vl::vec2d v_glob = sec->global(v);
@@ -235,7 +231,7 @@ ds2::axis_projection_data ds2::collision_detection_2::project_on_axis(
     return apd;
 }
 
-ds2::axis_projection_data ds2::collision_detection_2::project_on_axis(
+ds2::axis_projection_data ds2::collision_detection::project_on_axis(
     const std::shared_ptr<object>& ref, 
     const std::shared_ptr<object>& sec, 
     const convex_shape& ref_sh, 
@@ -245,8 +241,8 @@ ds2::axis_projection_data ds2::collision_detection_2::project_on_axis(
     axis_projection_data apd;
     apd.collision_normal = axis;
 
-    double max_ref = -std::numeric_limits<double>::max();  //usun
-    double min_ref = std::numeric_limits<double>::max();   //usun
+    double max_ref = -std::numeric_limits<double>::max();  
+    double min_ref = std::numeric_limits<double>::max();   
     for (const vl::vec2d& v : ref_sh.vertices()) {
         double val = axis.dot(ref->global(v));
         max_ref = std::max(val, max_ref);
@@ -304,5 +300,5 @@ ds2::axis_projection_data ds2::collision_detection_2::project_on_axis(
 ds2::object_collision_data::object_collision_data(
     const std::weak_ptr<object>& _a,
     const std::weak_ptr<object>& _b,
-    const collision_data_2& _collision_data)
+    const collision_data& _collision_data)
     : a(_a), b(_b), data(_collision_data) {}

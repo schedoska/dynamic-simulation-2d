@@ -14,13 +14,12 @@ void ds2::scene::add_joint(joint* j)
 void ds2::scene::update(const double& dt, sf::RenderWindow& win){
     for (auto i : _joints)
         i->update(dt);
-
     for (auto& i : _objects)
         i->update(dt);
 
     for (auto a = _objects.begin(); a != _objects.end(); ++a) {
         for (auto b = a + 1; b != _objects.end(); ++b) {
-            object_collision_data ocd = collision_detection_2::check(*a, *b);
+            object_collision_data ocd = collision_detection::check(*a, *b);
             if (ocd.data.collides == false) 
                 continue;
             collision_solver::solve_collision(ocd, win);

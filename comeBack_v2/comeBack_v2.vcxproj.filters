@@ -45,19 +45,7 @@
     <ClInclude Include="object.h">
       <Filter>Pliki nagłówkowe\ds2</Filter>
     </ClInclude>
-    <ClInclude Include="circle_object.h">
-      <Filter>Pliki nagłówkowe\ds2</Filter>
-    </ClInclude>
-    <ClInclude Include="convex_object.h">
-      <Filter>Pliki nagłówkowe\ds2</Filter>
-    </ClInclude>
-    <ClInclude Include="CircleDebug.h">
-      <Filter>Pliki nagłówkowe\app</Filter>
-    </ClInclude>
     <ClInclude Include="Utils.h">
-      <Filter>Pliki nagłówkowe\app</Filter>
-    </ClInclude>
-    <ClInclude Include="ConvexDebug.h">
       <Filter>Pliki nagłówkowe\app</Filter>
     </ClInclude>
     <ClInclude Include="scene.h">
@@ -69,33 +57,27 @@
     <ClInclude Include="collision_solver.h">
       <Filter>Pliki nagłówkowe\ds2</Filter>
     </ClInclude>
-    <ClInclude Include="World.h">
-      <Filter>Pliki nagłówkowe\app</Filter>
-    </ClInclude>
     <ClInclude Include="joint.h">
       <Filter>Pliki nagłówkowe\ds2</Filter>
     </ClInclude>
     <ClInclude Include="DebugObject.h">
       <Filter>Pliki nagłówkowe\app</Filter>
     </ClInclude>
+    <ClInclude Include="circle_shape.h">
+      <Filter>Pliki nagłówkowe\ds2</Filter>
+    </ClInclude>
+    <ClInclude Include="convex_shape.h">
+      <Filter>Pliki nagłówkowe\ds2</Filter>
+    </ClInclude>
+    <ClInclude Include="shape_group.h">
+      <Filter>Pliki nagłówkowe\ds2</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="circle_object.cpp">
-      <Filter>Pliki źródłowe\ds2</Filter>
-    </ClCompile>
     <ClCompile Include="object.cpp">
       <Filter>Pliki źródłowe\ds2</Filter>
     </ClCompile>
-    <ClCompile Include="convex_object.cpp">
-      <Filter>Pliki źródłowe\ds2</Filter>
-    </ClCompile>
-    <ClCompile Include="CircleDebug.cpp">
-      <Filter>Pliki źródłowe\app</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
-      <Filter>Pliki źródłowe\app</Filter>
-    </ClCompile>
-    <ClCompile Include="ConvexDebug.cpp">
       <Filter>Pliki źródłowe\app</Filter>
     </ClCompile>
     <ClCompile Include="Utils.cpp">
@@ -110,14 +92,20 @@
     <ClCompile Include="collision_solver.cpp">
       <Filter>Pliki źródłowe\ds2</Filter>
     </ClCompile>
-    <ClCompile Include="World.cpp">
-      <Filter>Pliki źródłowe\app</Filter>
-    </ClCompile>
     <ClCompile Include="joint.cpp">
       <Filter>Pliki źródłowe\ds2</Filter>
     </ClCompile>
     <ClCompile Include="DebugObject.cpp">
       <Filter>Pliki źródłowe\app</Filter>
+    </ClCompile>
+    <ClCompile Include="circle_shape.cpp">
+      <Filter>Pliki źródłowe\ds2</Filter>
+    </ClCompile>
+    <ClCompile Include="convex_shape.cpp">
+      <Filter>Pliki źródłowe\ds2</Filter>
+    </ClCompile>
+    <ClCompile Include="shape_group.cpp">
+      <Filter>Pliki źródłowe\ds2</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

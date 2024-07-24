@@ -1,7 +1,6 @@
 #pragma once
 
-#include "convex_object.h"
-#include "circle_object.h"
+#include "object.h"
 
 namespace ds2
 {
@@ -14,10 +13,10 @@ namespace ds2
 		vl::vec2d collision_normal;
 	};
 
-	struct collision_data_2
+	struct collision_data
 	{
-		collision_data_2();
-		collision_data_2(
+		collision_data();
+		collision_data(
 			bool collides, 
 			const vl::vec2d& cp_a = vl::vec2d(), 
 			const vl::vec2d& cp_b = vl::vec2d());
@@ -33,14 +32,14 @@ namespace ds2
 		object_collision_data(
 			const std::weak_ptr<object>& a,
 			const std::weak_ptr<object>& b,
-			const collision_data_2& collision_data = collision_data_2());
+			const collision_data& collision_data = collision_data());
 
-		collision_data_2 data;
+		collision_data data;
 		std::weak_ptr<object> a;
 		std::weak_ptr<object> b;
 	};
 
-	class collision_detection_2
+	class collision_detection
 	{
 	public:
 		static object_collision_data check(
@@ -48,19 +47,19 @@ namespace ds2
 			const std::shared_ptr<object>& b);
 
 	private:
-		static collision_data_2 check_shape(
+		static collision_data check_shape(
 			const std::shared_ptr<object>& a,
 			const std::shared_ptr<object>& b,
 			const convex_shape& a_sh,
 			const circle_shape& b_sh);
 
-		static collision_data_2 check_shape(
+		static collision_data check_shape(
 			const std::shared_ptr<object>& a,
 			const std::shared_ptr<object>& b,
 			const convex_shape& a_sh,
 			const convex_shape& b_sh);
 
-		static collision_data_2 check_shape(
+		static collision_data check_shape(
 			const std::shared_ptr<object>& a,
 			const std::shared_ptr<object>& b,
 			const circle_shape& a_sh,

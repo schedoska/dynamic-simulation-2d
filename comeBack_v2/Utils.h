@@ -3,7 +3,6 @@
 
 #include "vec2.h"
 #include <SFML/Graphics.hpp>
-#include "ConvexDebug.h"
 
 namespace utils {
     template <typename T>
@@ -17,7 +16,7 @@ namespace utils {
 
     double cross(const vl::vec2d& a, const vl::vec2d& b);
 
-    std::shared_ptr<ConvexDebug> generate_rect(vl::vec2d pos, vl::vec2d size, double mass);
+    //std::shared_ptr<ConvexDebug> generate_rect(vl::vec2d pos, vl::vec2d size, double mass);
 
     vl::vec2d rotate(const vl::vec2d& vec, const double& ang);
 }

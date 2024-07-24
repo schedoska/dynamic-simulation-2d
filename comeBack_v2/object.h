@@ -1,57 +1,9 @@
 #pragma once
-#include "vec2.h"
-#include <vector>
+
+#include "shape_group.h"
 
 namespace ds2
 {
-	// ----------------------------- CIRCLE SHAPE
-	class circle_shape
-	{
-	public:
-		circle_shape(
-			const vl::vec2d& loc_pos = vl::vec2d(), 
-			const double& radius = 1.f);
-		const double& radius() const;
-		double& radius();
-		const vl::vec2d& loc_pos() const;
-		vl::vec2d& loc_pos();
-
-	protected:
-		double _radius;
-		vl::vec2d _loc_pos;
-	};
-
-
-	// ---------------------------- CONVEX SHAPE
-	class convex_shape
-	{
-	public:
-		convex_shape();
-		void add(const vl::vec2d& vertex);
-		void clear();
-		const std::vector<vl::vec2d>& vertices() const;
-		void translate(const vl::vec2d& v);
-
-	protected:
-		std::vector<vl::vec2d> _vertices;
-	};
-
-
-	// ---------------------------- SHAPE GROUP
-	class shape_group
-	{
-	public:
-		void add(const circle_shape& circle);
-		void add(const convex_shape& convex);
-		const std::vector<circle_shape>& circles() const;
-		const std::vector<convex_shape>& convexes() const;
-		void clear();
-
-	private:
-		std::vector<circle_shape> _circles;
-		std::vector<convex_shape> _convexes;
-	};
-
 	class object {
 	public:
 		object();
