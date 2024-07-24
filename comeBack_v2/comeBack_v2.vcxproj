@@ -25,6 +25,7 @@
     <ClInclude Include="collision_solver.h" />
     <ClInclude Include="ConvexDebug.h" />
     <ClInclude Include="convex_object.h" />
+    <ClInclude Include="DebugObject.h" />
     <ClInclude Include="joint.h" />
     <ClInclude Include="mat.h" />
     <ClInclude Include="mat22.h" />
@@ -42,6 +43,7 @@
     <ClCompile Include="collision_solver.cpp" />
     <ClCompile Include="ConvexDebug.cpp" />
     <ClCompile Include="convex_object.cpp" />
+    <ClCompile Include="DebugObject.cpp" />
     <ClCompile Include="joint.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="object.cpp" />

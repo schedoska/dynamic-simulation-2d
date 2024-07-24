@@ -75,6 +75,9 @@
     <ClInclude Include="joint.h">
       <Filter>Pliki nagłówkowe\ds2</Filter>
     </ClInclude>
+    <ClInclude Include="DebugObject.h">
+      <Filter>Pliki nagłówkowe\app</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="circle_object.cpp">
@@ -112,6 +115,9 @@
     </ClCompile>
     <ClCompile Include="joint.cpp">
       <Filter>Pliki źródłowe\ds2</Filter>
+    </ClCompile>
+    <ClCompile Include="DebugObject.cpp">
+      <Filter>Pliki źródłowe\app</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

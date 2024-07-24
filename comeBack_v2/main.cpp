@@ -5,6 +5,7 @@
 #include "scene.h"
 #include "Utils.h"
 #include "joint.h"
+#include "DebugObject.h"
 
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
@@ -56,7 +57,8 @@ void solve_fixed(std::shared_ptr<ds2::object> a, vl::vec2d a_loc, vl::vec2d pt, 
 
 int main()
 {
-
+    int k = 2 > 6 ? 1 : 99;
+    std::cout << k << "\n";
 
     sf::RenderWindow window(sf::VideoMode(1200, 800), "My window");
     window.setFramerateLimit(20);
@@ -75,7 +77,7 @@ int main()
     conv1->mass() = 1e20;
     conv1->rot() = 0.0001;
     conv1->inertia() = 1e30;
-    scene.add_object(conv1);
+    //scene.add_object(conv1);
     convexes.push_back(conv1);
 
     std::shared_ptr<ConvexDebug> conv2(new ConvexDebug(vl::vec2d(100, 699)));
@@ -88,7 +90,7 @@ int main()
     conv2->mass() = 1e20;
     conv2->rot() = 0.0001;
     conv2->inertia() = 1e30;
-    scene.add_object(conv2);
+    //scene.add_object(conv2);
     convexes.push_back(conv2);
 
     std::shared_ptr<ConvexDebug> conv3(new ConvexDebug(vl::vec2d(900, 1699)));
@@ -101,35 +103,66 @@ int main()
     conv3->mass() = 1e20;
     conv3->rot() = 0;// 3.14 / 3.0;
     conv3->inertia() = 1e30;
-    scene.add_object(conv3);
+    //scene.add_object(conv3);
     convexes.push_back(conv3);
     // ------------------------------------------------------------------------
 
     std::shared_ptr<ConvexDebug> v = utils::generate_rect(vl::vec2d(400, 500), vl::vec2d(100, 300), 100);
-    scene.add_object(v);
-    //v->rot() = 3.14 * 99;
-    //v->vel() = vl::vec2d(-60, 0);
+    //scene.add_object(v);
     convexes.push_back(v);
 
     std::shared_ptr<ConvexDebug> v2 = utils::generate_rect(vl::vec2d(800, 400), vl::vec2d(100, 100), 100);
     scene.add_object(v2);
     convexes.push_back(v2);
 
-    std::shared_ptr<ConvexDebug> v3 = utils::generate_rect(vl::vec2d(550, 400), vl::vec2d(100, 100), 500);
-    scene.add_object(v3);
-    convexes.push_back(v3);
+    
+    ds2::convex_shape cs;
+    cs.add(vl::vec2d(-50, -50));
+    cs.add(vl::vec2d(50, -50));
+    cs.add(vl::vec2d(50, 50));
+    cs.add(vl::vec2d(-50, 50));
 
-    std::shared_ptr<ConvexDebug> v4 = utils::generate_rect(vl::vec2d(800, 450.1), vl::vec2d(100, 100), 100);
-    scene.add_object(v4);
-    convexes.push_back(v4);
+    ds2::convex_shape cs2;
+    cs2.add(vl::vec2d(-50, -50));
+    cs2.add(vl::vec2d(50, -50));
+    cs2.add(vl::vec2d(50, 50));
+    cs2.add(vl::vec2d(-50, 50));
+    cs2.translate(vl::vec2d(100, 0));
 
+    ds2::convex_shape cs4;
+    cs4.add(vl::vec2d(-50, -50));
+    cs4.add(vl::vec2d(50, -50));
+    cs4.add(vl::vec2d(50, 50));
+    cs4.add(vl::vec2d(-50, 50));
+    cs4.translate(vl::vec2d(100, 100));
 
-    ds2::spring_joint k(v4, v2, vl::vec2d(0,-20), vl::vec2d(0,20), false, true);
-    k.stiff() = 300;
-    scene.add_joint(&k);
+    ds2::circle_shape cs3;
+    cs3.radius() = 50;
+    cs3.loc_pos() = vl::vec2d(-0, -50);
 
-    ds2::fixed_joint kk(v4, v2, vl::vec2d(0, -20), vl::vec2d(0, 20));
-    //scene.add_joint(&kk);
+    std::shared_ptr<DebugObject> dob(new DebugObject(vl::vec2d(500, 300)));
+    dob->mass() = 1000;
+    dob->inertia() = (100 * 100 + 100 * 100) * 1000 / 12;
+    dob->shape().add(cs);
+    dob->shape().add(cs2);
+    dob->shape().add(cs3);
+    dob->shape().add(cs4);
+    dob->update_shape();
+
+    std::shared_ptr<DebugObject> dob2(new DebugObject(vl::vec2d(660, 600)));
+    dob2->mass() = 100;
+    dob2->inertia() = (100 * 100 + 100 * 100) * 100 / 12;
+    dob2->shape().add(cs3);
+    dob2->update_shape();
+
+    scene.add_object(dob);
+    scene.add_object(dob2);
+
+    //dob.rot() = 3.14 / 4;
+
+    
+    
+
 
 
     while (window.isOpen())
@@ -143,41 +176,34 @@ int main()
                 window.close();
             if (event.type == sf::Event::KeyPressed)
             {                
-                const double stren = 180000/5;
+                const double stren = 180000 / 10;
                 if (event.key.code == sf::Keyboard::Up) 
-                    v2->apply_force(vl::vec2d(0,-stren),vl::vec2d(0,0), dt);
+                    dob2->apply_force(vl::vec2d(0,-stren),vl::vec2d(0,0), dt);
                 if (event.key.code == sf::Keyboard::Down)
-                    v2->apply_force(vl::vec2d(0, stren), vl::vec2d(0, 0), dt);
+                    dob2->apply_force(vl::vec2d(0, stren), vl::vec2d(0, 0), dt);
                 if (event.key.code == sf::Keyboard::Right)
-                    v2->apply_force(vl::vec2d(stren, 0), vl::vec2d(0, 0), dt);
+                    dob2->apply_force(vl::vec2d(stren, 0), vl::vec2d(0, 0), dt);
                 if (event.key.code == sf::Keyboard::Left)
-                    v2->apply_force(vl::vec2d(-stren, 0), vl::vec2d(0, 0), dt);
+                    dob2->apply_force(vl::vec2d(-stren, 0), vl::vec2d(0, 0), dt);
+
+                /*const double speed = 10;
+                if (event.key.code == sf::Keyboard::Up)
+                    dob2->pos() += vl::vec2d(0, -speed);
+                if (event.key.code == sf::Keyboard::Down)
+                    dob2->pos() += vl::vec2d(0, speed);
+                if (event.key.code == sf::Keyboard::Right)
+                    dob2->pos() += vl::vec2d(speed, 0);
+                if (event.key.code == sf::Keyboard::Left)
+                    dob2->pos() += vl::vec2d(-speed, 0);
+                if (event.key.code == sf::Keyboard::R)
+                    dob2->rot() += 0.1;*/
+
             }
         }
 
 
 
-        /*vl::vec2d force = vl::vec2d(1000, 0);
-        v->pos() += (force / v->mass()) * dt;
-        v->rot_vel() += (vl::cross(vl::vec2d(0,-100), force)
-            / v->inertia) * dt;
-
-        v->pos() += (force * -1.0 / v->mass()) * dt;
-        v->rot_vel() += (vl::cross(vl::vec2d(0, -40), force * -1.0)
-            / v->inertia) * dt;*/
-
         
-
-        //std::cout << v2->pos() << v2->local(vl::vec2d(300, 250)) << "\n";
-
-        //v2->apply_force(dd * 100 - v2->vel() * 10, vl::vec2d(50, 0), dt);
-        //v2->rot_vel() -= 0.1 * v2->rot_vel();
-
-        //solve_spring(v, v2, vl::vec2d(), vl::vec2d(), dt, 250);
-        //solve_spring(v2, v3, vl::vec2d(), vl::vec2d(), dt, 150);
-        //solve_spring(v2, v3, vl::vec2d(), vl::vec2d(), dt, 150);
-
-        // v2 = vl::vec2d(550, 400)
 
         window.clear(sf::Color::White);
 
@@ -185,53 +211,29 @@ int main()
         double diff = 0.3 - v->rot_vel();
         v->rot_vel() += diff * 1;
 
-        //std::cout << (v->global(vl::vec2d(0, -100)) - v2->global(vl::vec2d(-50, 0))).len() << "\n";
-        //solve_spring(v, v2, vl::vec2d(0, -100), vl::vec2d(-50, 0), dt, 400);
-        utils::drawLine(v->global(vl::vec2d(0, -100)), v2->global(vl::vec2d(-50, 0)), window, sf::Color::Red);
-
-        //std::cout << v->rot_vel() << "\n";
-
-        std::cout << v2->vel().len() << " " << v2->rot_vel() << "\n";
-
-        /*solve_spring(v, vl::vec2d(), vl::vec2d(250, 250), dt, 150);
-        solve_spring(v, v2, vl::vec2d(), vl::vec2d(), dt, 150);
-        solve_spring(v2, v3, vl::vec2d(), vl::vec2d(), dt, 150);
-        solve_spring(v3, v4, vl::vec2d(), vl::vec2d(), dt, 150);
-        solve_spring(v4, vl::vec2d(), vl::vec2d(700, 250), dt, 150);
-
-        utils::drawPoint(vl::vec2d(250, 250), window, sf::Color::Black);
-        utils::drawPoint(v->pos(), window, sf::Color::Black);
-        utils::drawPoint(v2->pos(), window, sf::Color::Black);
-        utils::drawPoint(v3->pos(), window, sf::Color::Black);
-        utils::drawPoint(v4->pos(), window, sf::Color::Black);
-        utils::drawPoint(vl::vec2d(700, 250), window, sf::Color::Black);
-
-        utils::drawLine(vl::vec2d(250, 250), v->pos(), window, sf::Color::Red);
-        utils::drawLine(v->pos(), v2->pos(), window, sf::Color::Red);
-        utils::drawLine(v2->pos(), v3->pos(), window, sf::Color::Red);
-        utils::drawLine(v3->pos(), v4->pos(), window, sf::Color::Red);
-        utils::drawLine(v4->pos(), vl::vec2d(700, 250), window, sf::Color::Red);*/
-
-
-
-
         //v->vel() += vl::vec2d(0, 160) * dt;
-        v2->vel() += vl::vec2d(0, 160) * dt;
-        v3->vel() += vl::vec2d(0, 160) * dt;
-        v4->vel() += vl::vec2d(0, 160) * dt;
+        //v2->vel() += vl::vec2d(0, 160) * dt;
+
+        //dob->vel() += vl::vec2d(0, 160) * dt;
+        //dob2->vel() += vl::vec2d(0, -160) * dt;
+
+
+        ds2::object_collision_data ocd = ds2::collision_detection_2::check(dob2, dob);
+
+        //dob->rot() = -0.5;
+        //dob2->rot() = 0.01;
+        dob->draw(window);
+        dob2->draw(window);
+
+        utils::drawLine(ocd.data.cp_a, ocd.data.cp_b, window, sf::Color::Magenta);
 
         
-        
-
-        //v3->apply_force(vl::vec2d(-1000, 0), vl::vec2d(25, -25), dt);
-        utils::drawPoint(v3->global(vl::vec2d(0, -40)), window, sf::Color::Black);
-
 
         scene.update(dt, window);
         for (const auto& i : scene.collisions()) {
-            utils::drawLine(i.cp_a, i.cp_b, window, sf::Color::Red);
-            utils::drawPoint(i.cp_a, window, sf::Color::Black);
-            utils::drawPoint(i.cp_b, window, sf::Color::Black);
+            utils::drawLine(i.data.cp_a, i.data.cp_b, window, sf::Color::Red);
+            utils::drawPoint(i.data.cp_a, window, sf::Color::Black);
+            utils::drawPoint(i.data.cp_b, window, sf::Color::Black);
         }
 
         for (auto& i : convexes)
@@ -243,6 +245,8 @@ int main()
 
         utils::drawPoint(vl::vec2d(300, 250), window, sf::Color::Black);
         //utils::drawLine(vl::vec2d(300, 250), v2->global(vl::vec2d(50, 0)), window, sf::Color::Red);
+
+        utils::drawPoint(dob->pos(), window, sf::Color::Red);
 
         window.display();
     }

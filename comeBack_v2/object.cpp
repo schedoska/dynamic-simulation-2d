@@ -65,6 +65,16 @@ const double& ds2::object::inertia() const
     return _inertia;
 }
 
+ds2::shape_group& ds2::object::shape()
+{
+    return _shape;
+}
+
+const ds2::shape_group& ds2::object::shape() const
+{
+    return _shape;
+}
+
 void ds2::object::update(const double& dt)
 {
     //_vel += _acc * dt;
@@ -104,26 +114,9 @@ void ds2::object::init()
     _inertia = 1;
 }
 
-ds2::shape::shape(const vl::vec2d& loc_pos)
-    : _loc_pos(loc_pos) {}
+ds2::circle_shape::circle_shape(const vl::vec2d& loc_pos, const double& radius)
+    : _loc_pos(loc_pos), _radius(radius) {}
 
-ds2::shape::~shape() {}
-
-const vl::vec2d& ds2::shape::loc_pos() const
-{
-    return _loc_pos;
-}
-
-vl::vec2d& ds2::shape::loc_pos()
-{
-    return _loc_pos;
-}
-
-ds2::circle_shape::circle_shape(const vl::vec2d& loc_pos)
-    : ds2::shape(loc_pos)
-{
-
-}
 
 const double& ds2::circle_shape::radius() const
 {
@@ -135,8 +128,17 @@ double& ds2::circle_shape::radius()
     return _radius;
 }
 
-ds2::convex_shape::convex_shape(const vl::vec2d& loc_pos)
-    : shape(loc_pos) {}
+const vl::vec2d& ds2::circle_shape::loc_pos() const
+{
+    return _loc_pos;
+}
+
+vl::vec2d& ds2::circle_shape::loc_pos()
+{
+    return _loc_pos;
+}
+
+ds2::convex_shape::convex_shape() {}
 
 void ds2::convex_shape::add(const vl::vec2d& vertex)
 {
@@ -151,6 +153,11 @@ void ds2::convex_shape::clear()
 const std::vector<vl::vec2d>& ds2::convex_shape::vertices() const
 {
     return _vertices;
+}
+
+void ds2::convex_shape::translate(const vl::vec2d& v)
+{
+    for (vl::vec2d& i : _vertices) i += v;
 }
 
 void ds2::shape_group::add(const circle_shape& circle)

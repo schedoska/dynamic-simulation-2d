@@ -3,13 +3,13 @@
 #include <chrono>
 #include <thread>
 
-void ds2::collision_solver::solve_collision(const collision_data& cd, sf::RenderWindow& win)
+void ds2::collision_solver::solve_collision(const object_collision_data& cd, sf::RenderWindow& win)
 {
-	std::shared_ptr<object> obj_a = cd.a.lock();
+	std::shared_ptr<object> obj_a = cd.a.lock(); 
 	std::shared_ptr<object> obj_b = cd.b.lock();
 
 	/* Moving two object away from eachother */
-	vl::vec2d dv = cd.cp_a - cd.cp_b;
+	vl::vec2d dv = cd.data.cp_a - cd.data.cp_b;
 	double mass_total = obj_a->mass() + obj_b->mass();
 
 	const double seperation = 1;
@@ -17,11 +17,11 @@ void ds2::collision_solver::solve_collision(const collision_data& cd, sf::Render
 	obj_b->pos() += dv * obj_a->mass() * seperation / mass_total;
 
 	/* Compute new object speed */
-	vl::vec2d mass_cp_a = cd.cp_a - obj_a->pos();
+	vl::vec2d mass_cp_a = cd.data.cp_a - obj_a->pos();
 	vl::vec2d mass_cp_a_norm = mass_cp_a;
 	mass_cp_a_norm.normalize();
 
-	vl::vec2d mass_cp_b = cd.cp_b - obj_b->pos();
+	vl::vec2d mass_cp_b = cd.data.cp_b - obj_b->pos();
 	vl::vec2d mass_cp_b_norm = mass_cp_b;
 	mass_cp_b_norm.normalize();
 
