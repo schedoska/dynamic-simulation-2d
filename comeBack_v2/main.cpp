@@ -4,6 +4,7 @@
 #include "Utils.h"
 #include "joint.h"
 #include "DebugObject.h"
+#include "rectangle_shape.h"
 
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
@@ -56,7 +57,7 @@ void solve_fixed(std::shared_ptr<ds2::object> a, vl::vec2d a_loc, vl::vec2d pt, 
 int main()
 {
     sf::RenderWindow window(sf::VideoMode(1200, 800), "My window");
-    window.setFramerateLimit(20);
+    window.setFramerateLimit(30);
 
     sf::Clock clock;
     std::vector<std::shared_ptr<DebugObject>> objects;
@@ -124,7 +125,7 @@ int main()
     cs4.translate(vl::vec2d(100, 100));
 
     ds2::circle_shape cs3;
-    cs3.radius() = 25;
+    cs3.radius() = 50;
     cs3.loc_pos() = vl::vec2d(-0, -50);
 
     std::shared_ptr<DebugObject> dob(new DebugObject(vl::vec2d(500, 300)));
@@ -138,11 +139,14 @@ int main()
     dob->update_shape();
     dob->rot_vel() = 0.3;
 
+    ds2::rectangle_shape rs(vl::vec2d(300, 30));
+    //rs.set_size(vl::vec2d(30, 300));
+
     std::shared_ptr<DebugObject> dob2(new DebugObject(vl::vec2d(660, 600)));
     dob2->mass() = 100;
-    dob2->inertia() = (100 * 100 + 100 * 100) * 100 / 12;
+    dob2->inertia() = (100 * 100 + 100 * 100) * 1000 / 12;
     cs3.loc_pos() = vl::vec2d(0, 0);
-    dob2->shape().add(cs3);
+    dob2->shape().add(rs);
     dob2->update_shape();
     
 
@@ -171,13 +175,13 @@ int main()
             {                
                 const double stren = 180000 / 4;
                 if (event.key.code == sf::Keyboard::Up) 
-                    dob2->apply_force(vl::vec2d(0,-stren),vl::vec2d(0,0), dt);
+                    dob2->apply_force(vl::vec2d(0,-stren),vl::vec2d(0,-10), dt);
                 if (event.key.code == sf::Keyboard::Down)
-                    dob2->apply_force(vl::vec2d(0, stren), vl::vec2d(0, 0), dt);
+                    dob2->apply_force(vl::vec2d(0, stren), vl::vec2d(0, 10), dt);
                 if (event.key.code == sf::Keyboard::Right)
-                    dob2->apply_force(vl::vec2d(stren, 0), vl::vec2d(0, 0), dt);
+                    dob2->apply_force(vl::vec2d(stren, 0), vl::vec2d(10, 0), dt);
                 if (event.key.code == sf::Keyboard::Left)
-                    dob2->apply_force(vl::vec2d(-stren, 0), vl::vec2d(0, 0), dt);
+                    dob2->apply_force(vl::vec2d(-stren, 0), vl::vec2d(-10, 0), dt);
 
                 /*const double speed = 10;
                 if (event.key.code == sf::Keyboard::Up)
@@ -203,6 +207,8 @@ int main()
         dob->vel() += vl::vec2d(0, 160) * dt;
         dob2->vel() += vl::vec2d(0, 160) * dt;
 
+        //dob2->rot_vel() = 0.05;
+
 
 
 
@@ -217,6 +223,11 @@ int main()
         {
             i->draw(window);
             utils::drawPoint(i->pos(), window, sf::Color::Red);
+
+            double x = cos(i->rot()) * 0 - sin(i->rot()) * -1;
+            double y = sin(i->rot()) * 0 + cos(i->rot()) * -1;
+            vl::vec2d rot = vl::vec2d(x, y) * 20;
+            utils::drawLine(i->pos(), i->pos() + rot, window, sf::Color::Magenta);
         }
 
         window.display();

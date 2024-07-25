@@ -1,9 +1,5 @@
 #include "collision_detection.h"
 
-ds2::axis_projection_data::axis_projection_data() {
-    is_overlaping = true;
-}
-
 ds2::collision_data::collision_data()
     : collides(false), cp_a(vl::vec2d()), cp_b(vl::vec2d()) {}
 

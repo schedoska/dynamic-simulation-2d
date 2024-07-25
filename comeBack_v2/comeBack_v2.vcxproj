@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="axis_projection_data.h" />
     <ClInclude Include="circle_shape.h" />
     <ClInclude Include="collision_detection.h" />
     <ClInclude Include="collision_solver.h" />
@@ -28,6 +29,7 @@
     <ClInclude Include="mat.h" />
     <ClInclude Include="mat22.h" />
     <ClInclude Include="object.h" />
+    <ClInclude Include="rectangle_shape.h" />
     <ClInclude Include="scene.h" />
     <ClInclude Include="shape_group.h" />
     <ClInclude Include="Utils.h" />
@@ -35,6 +37,7 @@
     <ClInclude Include="vec2.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="axis_projection_data.cpp" />
     <ClCompile Include="circle_shape.cpp" />
     <ClCompile Include="collision_detection.cpp" />
     <ClCompile Include="collision_solver.cpp" />
@@ -43,6 +46,7 @@
     <ClCompile Include="joint.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="object.cpp" />
+    <ClCompile Include="rectangle_shape.cpp" />
     <ClCompile Include="scene.cpp" />
     <ClCompile Include="shape_group.cpp" />
     <ClCompile Include="Utils.cpp" />

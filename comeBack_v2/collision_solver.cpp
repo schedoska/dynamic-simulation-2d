@@ -12,7 +12,7 @@ void ds2::collision_solver::solve_collision(const object_collision_data& cd, sf:
 	vl::vec2d dv = cd.data.cp_a - cd.data.cp_b;
 	double mass_total = obj_a->mass() + obj_b->mass();
 
-	const double seperation = 1;
+	const double seperation = 1.4;
 	obj_a->pos() += dv * -obj_b->mass() * seperation / mass_total;
 	obj_b->pos() += dv * obj_a->mass() * seperation / mass_total;
 
@@ -37,7 +37,7 @@ void ds2::collision_solver::solve_collision(const object_collision_data& cd, sf:
 	vl::vec2d vel_cp_a = obj_a->vel() + mass_cp_a_perp * obj_a->rot_vel() * mass_cp_a.len();
 	vl::vec2d vel_cp_b = obj_b->vel() + mass_cp_b_perp * obj_b->rot_vel() * mass_cp_b.len();
 	vl::vec2d vr = vel_cp_b - vel_cp_a;
-	double vj = 1.6 * vr.dot(dv);
+	double vj = 1.4 * vr.dot(dv);
 
 	double ma_inv = 1.0 / obj_a->mass();
 	double mb_inv = 1.0 / obj_b->mass();
@@ -53,7 +53,7 @@ void ds2::collision_solver::solve_collision(const object_collision_data& cd, sf:
 	
 	/* Friction impulses */
 	vl::vec2d dv_perp = vl::vec2d(dv[1], -dv[0]);
-	double fj = 0.05 * vr.dot(dv_perp);
+	double fj = 0.1 * vr.dot(dv_perp);
 
 	double Jf = fj / (ma_inv + mb_inv + std::pow(vl::cross(mass_cp_a, dv_perp), 2) / obj_a->inertia() +
 		std::pow(vl::cross(mass_cp_b, dv_perp), 2) / obj_b->inertia());
