@@ -14,32 +14,17 @@ void ds2::concave_shape::clear()
 ds2::shape_group ds2::concave_shape::generate_group()
 {
 	shape_group sg;
-	
 	const std::vector<vl::vec2d>& vl = _vertices;
-	int size = vl.size();
+	size_t size = vl.size();
 	int f_id = 2;
 	int b_id = size;
 
-	auto loop = [](auto a, auto n) { return ((a % n) + n) % n; };
-
-	/*vl::vec2d c = _vertices[forw];
-	vl::vec2d f1 = _vertices[loop(forw + 1, size)];
-	vl::vec2d b3 = _vertices[loop(forw - 3, size)];
-	vl::vec2d b2 = _vertices[forw - 2];
-	vl::vec2d b1 = _vertices[forw - 1];
-
-	if (contains(b1 - b2, b3 - b2, c - b2) &&
-		contains(f1 - c, b1 - c, b2 - c) &&
-		intersects(c, b2) == 4) 
-	{
-		std::cout << "start: " << b2 << " end: " << c << "\n";
-	}*/
-
 	bool f_turn = true;
-
 	int l = 0;	// linker index
 	int b = 1;	// back index
 	int c = 2;	// candidate index
+
+	auto loop = [](auto a, auto n) { return ((a % n) + n) % n; };
 
 	while( true )
 	{
@@ -58,38 +43,24 @@ ds2::shape_group ds2::concave_shape::generate_group()
 
 		if (contains(vl[lf1] - vl[l], vl[lb1] - vl[l], vl[c] - vl[l]) &&
 			contains(vl[cf1] - vl[c], vl[cb1] - vl[c], vl[l] - vl[c]) &&
-			intersects(vl[c], vl[l]) == 4)
+			intersects(vl[c], vl[l]) == 4) 
 		{
 			convex_shape tr;
 			tr.add(vl[l]); tr.add(vl[b]); tr.add(vl[c]);
-			std::cout << "DODAJE: " << vl[l] << " " << vl[b] << " " << vl[c] << "\n";
 			sg.add(tr);
 			b = l;
 			l = c;
 			c = f_turn ? --b_id : ++f_id;
 			f_turn = !f_turn;
-			std::cout << b_id << " " << f_id << "\n";
 		}
-		else
+		else 
 		{
-			if (f_turn) {
-				c = --b_id;
-				--f_id;
-			}
-			else {
-				c = ++f_id;
-				++b_id;
-			}
-
+			if (f_turn) { c = --b_id; --f_id; }
+			else { c = ++f_id; ++b_id; }
 			f_turn = !f_turn;
 			std::swap(b, l);
-			std::cout << "DODAJE: " << vl[l] << " " << vl[b] << " " << vl[c] << "\n";
 		}
 	}
-
-
-
-
 	return sg;
 }
 
