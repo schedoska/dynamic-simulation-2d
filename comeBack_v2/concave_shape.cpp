@@ -72,7 +72,18 @@ ds2::shape_group ds2::concave_shape::generate_group()
 		}
 		else
 		{
-			c = f_turn ? --b_id : ++f_id;
+			if (f_turn) {
+				c = --b_id;
+				--f_id;
+			}
+			else {
+				c = ++f_id;
+				++b_id;
+			}
+
+			f_turn = !f_turn;
+			std::swap(b, l);
+			std::cout << "DODAJE: " << vl[l] << " " << vl[b] << " " << vl[c] << "\n";
 		}
 	}
 

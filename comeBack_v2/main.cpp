@@ -143,7 +143,7 @@ int main()
     ds2::rectangle_shape rs(vl::vec2d(300, 30));
     //rs.set_size(vl::vec2d(30, 300));
 
-    std::shared_ptr<DebugObject> dob2(new DebugObject(vl::vec2d(660, 600)));
+    std::shared_ptr<DebugObject> dob2(new DebugObject(vl::vec2d(760, 500)));
     dob2->mass() = 100;
     dob2->inertia() = (100 * 100 + 100 * 100) * 1000 / 12;
     cs3.loc_pos() = vl::vec2d(0, 0);
@@ -158,13 +158,15 @@ int main()
 
     //dob.rot() = 3.14 / 4;    
     ds2::concave_shape s;
-    s.add(vl::vec2d(-40, -40));
-    s.add(vl::vec2d(40, -40));
-    s.add(vl::vec2d(60, 30));
-    s.add(vl::vec2d(120, 40));
-    //s.add(vl::vec2d(120, 120));
-    s.add(vl::vec2d(-90, 120));
+    s.add(vl::vec2d(100, 100));
+    s.add(vl::vec2d(-100, 100));
+    s.add(vl::vec2d(-100, -100));
+    s.add(vl::vec2d(-60, -100));
+    s.add(vl::vec2d(-60, 60));
+    s.add(vl::vec2d(100, 60));
+
     dob2->shape() = s.generate_group();
+    //dob2->shape().translate(vl::vec2d(-60, -120));
     dob2->update_shape();
 
 
@@ -211,7 +213,7 @@ int main()
         //v->rot_vel() += diff * 1;
 
         dob->vel() += vl::vec2d(0, 160) * dt;
-        //dob2->vel() += vl::vec2d(0, 160) * dt;
+        dob2->vel() += vl::vec2d(0, 160) * dt;
 
         //dob2->rot_vel() = 0.05;
 
