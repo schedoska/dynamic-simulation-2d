@@ -23,6 +23,7 @@
     <ClInclude Include="circle_shape.h" />
     <ClInclude Include="collision_detection.h" />
     <ClInclude Include="collision_solver.h" />
+    <ClInclude Include="concave_shape.h" />
     <ClInclude Include="convex_shape.h" />
     <ClInclude Include="DebugObject.h" />
     <ClInclude Include="joint.h" />
@@ -41,6 +42,7 @@
     <ClCompile Include="circle_shape.cpp" />
     <ClCompile Include="collision_detection.cpp" />
     <ClCompile Include="collision_solver.cpp" />
+    <ClCompile Include="concave_shape.cpp" />
     <ClCompile Include="convex_shape.cpp" />
     <ClCompile Include="DebugObject.cpp" />
     <ClCompile Include="joint.cpp" />

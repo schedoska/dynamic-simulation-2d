@@ -78,6 +78,9 @@
     <ClInclude Include="rectangle_shape.h">
       <Filter>Pliki nagłówkowe\ds2</Filter>
     </ClInclude>
+    <ClInclude Include="concave_shape.h">
+      <Filter>Pliki nagłówkowe\ds2</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="object.cpp">
@@ -117,6 +120,9 @@
       <Filter>Pliki źródłowe\ds2</Filter>
     </ClCompile>
     <ClCompile Include="rectangle_shape.cpp">
+      <Filter>Pliki źródłowe\ds2</Filter>
+    </ClCompile>
+    <ClCompile Include="concave_shape.cpp">
       <Filter>Pliki źródłowe\ds2</Filter>
     </ClCompile>
   </ItemGroup>

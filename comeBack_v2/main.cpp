@@ -5,6 +5,7 @@
 #include "joint.h"
 #include "DebugObject.h"
 #include "rectangle_shape.h"
+#include "concave_shape.h"
 
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
@@ -155,11 +156,16 @@ int main()
     objects.push_back(dob);
     objects.push_back(dob2);
 
-    //dob.rot() = 3.14 / 4;
-
-    
-    
-
+    //dob.rot() = 3.14 / 4;    
+    ds2::concave_shape s;
+    s.add(vl::vec2d(-40, -40));
+    s.add(vl::vec2d(40, -40));
+    s.add(vl::vec2d(60, 30));
+    s.add(vl::vec2d(120, 40));
+    //s.add(vl::vec2d(120, 120));
+    s.add(vl::vec2d(-90, 120));
+    dob2->shape() = s.generate_group();
+    dob2->update_shape();
 
 
     while (window.isOpen())
@@ -205,7 +211,7 @@ int main()
         //v->rot_vel() += diff * 1;
 
         dob->vel() += vl::vec2d(0, 160) * dt;
-        dob2->vel() += vl::vec2d(0, 160) * dt;
+        //dob2->vel() += vl::vec2d(0, 160) * dt;
 
         //dob2->rot_vel() = 0.05;
 

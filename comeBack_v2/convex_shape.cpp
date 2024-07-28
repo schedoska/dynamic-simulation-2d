@@ -21,3 +21,4 @@ void ds2::convex_shape::translate(const vl::vec2d& v)
 {
     for (vl::vec2d& i : _vertices) i += v;
 }
+
