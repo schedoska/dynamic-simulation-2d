@@ -1,9 +1,12 @@
 #pragma once
 
 #include "shape_group.h"
+#include "Utils.h"
 
 namespace ds2
 {
+	using segment = std::pair<size_t, size_t>;	// indexes of vertices
+
 	class concave_shape
 	{
 	public:
@@ -13,9 +16,9 @@ namespace ds2
 		const std::vector<vl::vec2d>& vertices() const;
 
 	//private:
-		int intersects(
-			const vl::vec2d& start_a,
-			const vl::vec2d& end_a);
+		utils::segments_relation intersects(
+			const std::vector<segment>& s_list,
+			const segment& s);
 
 		bool contains(
 			const vl::vec2d& min,

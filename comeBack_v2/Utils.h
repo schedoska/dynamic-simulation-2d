@@ -8,9 +8,6 @@ namespace utils {
     template <typename T>
     inline sf::Vector2f vec2_to_sfml(const vl::vec<T, 2>& v);
 
-    template <typename T>
-    bool is_in_bounds(const T& value, const T& low, const T& high);
-
     float RadToDegrees(const float radians);
 
     void drawLine(vl::vec2d start, vl::vec2d end, sf::RenderWindow& window, sf::Color color);
@@ -25,10 +22,15 @@ namespace utils {
 
     double angle(const vl::vec2d& ref, const vl::vec2d& sec);
 
-    bool intersects(
+    enum segments_relation { none, intetsects, same };
+
+    segments_relation check_relation(
         const vl::vec2d& start_a,
         const vl::vec2d& end_a,
         const vl::vec2d& start_b,
         const vl::vec2d& end_b);
+
+    template<typename T>
+    inline bool is_in_range(const T& val, T, T);
 }
 #endif

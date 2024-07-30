@@ -1,5 +1,5 @@
 #include "concave_shape.h"
-#include "Utils.h"
+#include <queue>
 
 void ds2::concave_shape::add(const vl::vec2d& v)
 {
@@ -16,49 +16,66 @@ ds2::shape_group ds2::concave_shape::generate_group()
 	shape_group sg;
 	const std::vector<vl::vec2d>& vl = _vertices;
 	size_t size = vl.size();
-	int f_id = 2;
-	int b_id = size;
 
-	bool f_turn = true;
-	int l = 0;	// linker index
-	int b = 1;	// back index
-	int c = 2;	// candidate index
+	std::vector<segment> ins_seg;
+	std::vector<segment> out_seg;
+	for (int i = 0; i < size; ++i) {
+		out_seg.push_back({ i, (i + 1) % size });
+	}
 
-	auto loop = [](auto a, auto n) { return ((a % n) + n) % n; };
+	auto loop = [](int a, int n) { return ((a % n) + n) % n; };
 
-	while( true )
+	std::queue<segment> to_check;
+	
+	segment s(0, 1);
+	to_check.push(s);
+
+	while (!to_check.empty()) 
 	{
-		size_t lb1 = loop(l - 1, size);		// 1 back to linker
-		size_t lf1 = loop(l + 1, size);		// 1 forward to linker
-		size_t cb1 = loop(c - 1, size);		// 1 back to candidate 
-		size_t cf1 = loop(c + 1, size);		// 1 forward to candidate 
+		segment base = to_check.front();
+		to_check.pop();
 
-		if (b_id - f_id < 2) {
-			convex_shape tr;
-			tr.add(vl[l]); tr.add(vl[b]); tr.add(vl[c]);
-			std::cout << "DODAJE: " << vl[l] << " " << vl[b] << " " << vl[c] << "\n";
-			sg.add(tr);
-			break;
-		}
+		size_t b = base.first;
+		size_t b_b1 = loop(b - 1, size);
+		size_t b_f1 = loop(b + 1, size);
 
-		if (contains(vl[lf1] - vl[l], vl[lb1] - vl[l], vl[c] - vl[l]) &&
-			contains(vl[cf1] - vl[c], vl[cb1] - vl[c], vl[l] - vl[c]) &&
-			intersects(vl[c], vl[l]) == 4) 
+		size_t l = base.second;
+		size_t l_b1 = loop(l - 1, size);
+		size_t l_f1 = loop(l + 1, size);
+
+		for (size_t c = 0; c < size; ++c)
 		{
+			if (utils::cross(vl[l] - vl[b], vl[c] - vl[b]) <= 0)	
+				continue;
+			if (!contains(vl[b_f1] - vl[b], vl[b_b1] - vl[b], vl[c] - vl[b]))
+				continue;
+			if (!contains(vl[l_f1] - vl[l], vl[l_b1] - vl[l], vl[c] - vl[l]))
+				continue;
+
+			utils::segments_relation sr_b = intersects(out_seg, { b, c });
+			utils::segments_relation sr_l = intersects(out_seg, { l, c });
+			if (sr_b == utils::intetsects) 
+				continue;
+			if (sr_l == utils::intetsects)
+				continue;
+
+			if (intersects(ins_seg, { b, c }) == utils::intetsects)
+				continue;
+			if (intersects(ins_seg, { l, c }) == utils::intetsects)
+				continue;
+
 			convex_shape tr;
-			tr.add(vl[l]); tr.add(vl[b]); tr.add(vl[c]);
+			tr.add(vl[b]); tr.add(vl[l]); tr.add(vl[c]);
 			sg.add(tr);
-			b = l;
-			l = c;
-			c = f_turn ? --b_id : ++f_id;
-			f_turn = !f_turn;
-		}
-		else 
-		{
-			if (f_turn) { c = --b_id; --f_id; }
-			else { c = ++f_id; ++b_id; }
-			f_turn = !f_turn;
-			std::swap(b, l);
+
+			if (sr_b != utils::same) {
+				ins_seg.push_back({ b,c });
+				to_check.push({ b,c });
+			}
+			if (sr_l != utils::same) {
+				ins_seg.push_back({ c,l });
+				to_check.push({ c,l });
+			}			
 		}
 	}
 	return sg;
@@ -69,17 +86,23 @@ const std::vector<vl::vec2d>& ds2::concave_shape::vertices() const
 	return _vertices;
 }
 
-int ds2::concave_shape::intersects(
-	const vl::vec2d& start_a, 
-	const vl::vec2d& end_a)
+utils::segments_relation ds2::concave_shape::intersects(
+	const std::vector<segment>& s_list, 
+	const segment& s)
 {
+	const std::vector<vl::vec2d>& vl = _vertices;
 	int count = 0;
-	size_t s = _vertices.size();
-	for (size_t i = 0; i < s; ++i) {
-		if (utils::intersects(
-			start_a, end_a, _vertices[i], _vertices[(i + 1) % s])) count++;
+
+	for (const auto& it : s_list) {
+		utils::segments_relation sr;
+		sr = utils::check_relation(vl[it.first], vl[it.second], vl[s.first], vl[s.second]);
+
+		if (sr == utils::same) 
+			return utils::same;
+		if (sr == utils::intetsects)
+			++count;
 	}
-	return count;
+	return count == 0 ? utils::none : utils::intetsects;
 }
 
 bool ds2::concave_shape::contains(
@@ -89,5 +112,7 @@ bool ds2::concave_shape::contains(
 {
 	double r = utils::angle(min, max);
 	double a = utils::angle(min, v);
-	return a < r;
+	if (a > 4.0 * std::acos(0.0) - 0.001) a = 0;
+
+	return a <= r;
 }

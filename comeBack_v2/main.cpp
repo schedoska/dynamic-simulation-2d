@@ -158,12 +158,17 @@ int main()
 
     //dob.rot() = 3.14 / 4;    
     ds2::concave_shape s;
-    s.add(vl::vec2d(100, 100));
-    s.add(vl::vec2d(-100, 100));
     s.add(vl::vec2d(-100, -100));
-    s.add(vl::vec2d(-60, -100));
-    s.add(vl::vec2d(-60, 60));
-    s.add(vl::vec2d(100, 60));
+    s.add(vl::vec2d(0, -40));
+    s.add(vl::vec2d(100, -100));
+    s.add(vl::vec2d(40, 0));
+    s.add(vl::vec2d(100, 100));
+    s.add(vl::vec2d(0, 40));
+    s.add(vl::vec2d(-100, 100));
+    s.add(vl::vec2d(-40, 0));
+
+
+
 
     dob2->shape() = s.generate_group();
     //dob2->shape().translate(vl::vec2d(-60, -120));
@@ -213,7 +218,7 @@ int main()
         //v->rot_vel() += diff * 1;
 
         dob->vel() += vl::vec2d(0, 160) * dt;
-        dob2->vel() += vl::vec2d(0, 160) * dt;
+        //dob2->vel() += vl::vec2d(0, 160) * dt;
 
         //dob2->rot_vel() = 0.05;
 

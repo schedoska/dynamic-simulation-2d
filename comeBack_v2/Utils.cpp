@@ -6,9 +6,11 @@ inline sf::Vector2f utils::vec2_to_sfml(const vl::vec<T, 2>& v) {
 }
 
 template<typename T>
-bool utils::is_in_bounds(const T& value, const T& low, const T& high)
+inline bool utils::is_in_range(const T& val, T r1, T r2)
 {
-    return !(value < low) && (value < high);
+    if (r1 > r2) std::swap(r1, r2);
+    if (val > r1 && val < r2) return true;
+    else return false;
 }
 
 float utils::RadToDegrees(const float radians)
@@ -78,7 +80,7 @@ double utils::angle(const vl::vec2d& ref, const vl::vec2d& sec)
     return angle > 0 ? angle : 4.0 * std::acos(0.0) + angle;
 }
 
-bool utils::intersects(
+utils::segments_relation utils::check_relation(
     const vl::vec2d& start_a, 
     const vl::vec2d& end_a, 
     const vl::vec2d& start_b, 
@@ -88,7 +90,22 @@ bool utils::intersects(
     double a2 = utils::cross(end_a - start_a, start_b - start_a);
     double b1 = utils::cross(end_b - start_b, end_a - start_b);
     double b2 = utils::cross(end_b - start_b, start_a - start_b);
-    //std::cout << a1 << " " << a2 << " " << b1 << " " << b2 << " " << "\n";
-    //std::cout << ((a1 * a2 <= 0) && (b1 * b2 <= 0) ? true : false) << "\n";
-    return (a1 * a2 <= 0) && (b1 * b2 <= 0) ? true : false;
+
+    if (a1 == 0 && a1 == 0 && b1 == 0 && b2 == 0) {
+        vl::vec2d dir = end_a - start_a;
+        double s_a = dir.dot(start_a);
+        double e_a = dir.dot(end_a);
+        double s_b = dir.dot(start_b);
+        double e_b = dir.dot(end_b);
+        if ((s_a == s_b && e_a == e_b) || (s_a == e_b && e_a == s_b))
+            return utils::same;
+        if (is_in_range(s_a, s_b, e_b) || is_in_range(e_a, s_b, e_b))
+            return utils::intetsects;
+        if (is_in_range(s_b, s_a, e_a) || is_in_range(e_b, s_a, e_a))
+            return utils::intetsects;
+        return utils::none;
+    }
+    if (a1 * a2 < 0 && b1 * b2 < 0) 
+        return utils::intetsects;                              
+    return utils::none;
 }

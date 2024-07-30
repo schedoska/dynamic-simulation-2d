@@ -30,6 +30,8 @@ namespace vl
         const vec<T, N>& operator+=(const vec<T, N>& v);
         const vec<T, N>& operator-=(const vec<T, N>& v);
 
+        bool operator==(const vec<T, N>&) const;
+
         //vec<T, N>& operator=(const vec<T, N>& v) = default;
 
         template<typename S>
@@ -125,6 +127,14 @@ namespace vl
             _data[i] -= v._data[i];
         }
         return *this;
+    }
+
+    template<typename T, std::size_t N>
+    inline bool vec<T, N>::operator==(const vec<T, N>& v) const
+    {
+        for (size_t i = 0; i < N; ++i)
+            if (_data[i] != v._data[i]) return false;
+        return true;
     }
 
     template<typename T, std::size_t N>
