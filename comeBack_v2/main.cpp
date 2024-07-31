@@ -129,7 +129,7 @@ int main()
     cs3.radius() = 50;
     cs3.loc_pos() = vl::vec2d(-0, -50);
 
-    std::shared_ptr<DebugObject> dob(new DebugObject(vl::vec2d(500, 300)));
+    std::shared_ptr<DebugObject> dob(new DebugObject(vl::vec2d(400, 300)));
     dob->mass() = 100;
     dob->inertia() = (100 * 100 + 100 * 100) * 500 / 12;
     dob->shape().add(cs);
@@ -158,15 +158,15 @@ int main()
 
     //dob.rot() = 3.14 / 4;    
     ds2::concave_shape s;
-    s.add(vl::vec2d(-100, -100));
-    s.add(vl::vec2d(0, -40));
-    s.add(vl::vec2d(100, -100));
-    s.add(vl::vec2d(40, 0));
-    s.add(vl::vec2d(100, 100));
-    s.add(vl::vec2d(0, 40));
-    s.add(vl::vec2d(-100, 100));
-    s.add(vl::vec2d(-40, 0));
-
+    s.add(vl::vec2d(-30, -100));
+    s.add(vl::vec2d(30, -100));
+    s.add(vl::vec2d(30, -30));
+    s.add(vl::vec2d(90, -30));
+    s.add(vl::vec2d(90, -100));
+    s.add(vl::vec2d(120, -100));
+    s.add(vl::vec2d(120, 100));
+    s.add(vl::vec2d(-120, 100));
+    s.add(vl::vec2d(-120, -130));
 
 
 
