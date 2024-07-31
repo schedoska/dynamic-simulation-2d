@@ -9,8 +9,6 @@ ds2::delaunay::delaunay(const std::vector<vl::vec2d>& vertices)
 
 void ds2::delaunay::edge_flip(std::vector<triangle>& tr_l)
 {
-	std::cout << tr_l.size() << "\n";
-
 	std::map<segment, bool> marked;		// standarized index order
 	std::stack<segment> to_check;		// standarized index order
 
@@ -25,10 +23,11 @@ void ds2::delaunay::edge_flip(std::vector<triangle>& tr_l)
 		}
 	}
 
-	for (int qq = 0; qq < 14; qq++)
+	while (!to_check.empty())
 	{
 		segment s = to_check.top();
 		to_check.pop();
+		marked[s] = false;
 
 		// vector of found adj to edge triangles :
 		// first	-> index of triangle
@@ -44,28 +43,31 @@ void ds2::delaunay::edge_flip(std::vector<triangle>& tr_l)
 		}
 		if (adj.size() != 2) continue;
 
-		const triangle& tr_a = tr_l[adj[0].first];	// triangle a;
-		const triangle& tr_b = tr_l[adj[1].first];	// triangle b;
-		const size_t tr_a_v = adj[0].second;		// local index of opposite vertex a
-		const size_t tr_b_v = adj[1].second;		// local index of opposite vertex b
+		triangle& tr_a = tr_l[adj[0].first];	// triangle a;
+		triangle& tr_b = tr_l[adj[1].first];	// triangle b;
+		const size_t tr_a_v = adj[0].second;	// local index of opposite vertex a
+		const size_t tr_b_v = adj[1].second;	// local index of opposite vertex b
 
-		std::cout << "EDGE: " << s.first << " " << s.second << "\n";
-		std::cout << "TRIANGLE_1: " << tr_a[0] << " " << tr_a[1] << " " << tr_a[2] << "\n";
-		std::cout << "TRIANGLE_2: " << tr_b[0] << " " << tr_b[1] << " " << tr_b[2] << "\n";
-		std::cout << "TR_1 oppo: " << tr_a[tr_a_v] << "\n";
-		std::cout << "TR_2 oppo: " << tr_b[tr_b_v] << "\n";
-		bool ass=is_legal(tr_a, tr_a_v, tr_b[tr_b_v]);
-		//is_legal(tr_b, tr_b_v, tr_a[tr_a_v]);
-		std::cout << ass << "\n\n";
+		if (is_legal(tr_a, tr_a_v, tr_b[tr_b_v])) continue;
+		triangle new_tr_a = { s.first,  tr_b[tr_b_v], tr_a[tr_a_v] };
+		triangle new_tr_b = { s.second, tr_a[tr_a_v], tr_b[tr_b_v] };
 
+		auto push_to_check = [&](size_t& a, size_t& b)
+		{
+			segment s_ch = { a, b };
+			std_seg(s_ch);
+			if (marked[s_ch] == true) return;
+			to_check.push(s_ch);
+			marked[s_ch] = true;
+		};
+		push_to_check(s.first, tr_b[tr_b_v]);
+		push_to_check(s.first, tr_a[tr_a_v]);
+		push_to_check(s.second, tr_b[tr_b_v]);
+		push_to_check(s.second, tr_a[tr_a_v]);
+
+		tr_a = std::move(new_tr_a);
+		tr_b = std::move(new_tr_b);
 	}
-
-
-
-
-
-
-	std::cout << to_check.size() << "\n";
 }
 
 /* Convert segment to standirezed order - smaller index first */
@@ -95,8 +97,8 @@ bool ds2::delaunay::is_legal(const triangle& tr, const size_t& b_loc, const size
 	vl::vec2d C = vl[tr[(b_loc + 2) % 3]];
 	vl::vec2d D = vl[d_id];
 
-	std::cout << tr[b_loc] << " " << tr[(b_loc + 1) % 3] << " " << tr[(b_loc + 2) % 3] << "\n";
-	std::cout << "D: " << d_id << "\n";
+	//std::cout << tr[b_loc] << " " << tr[(b_loc + 1) % 3] << " " << tr[(b_loc + 2) % 3] << "\n";
+	//std::cout << "D: " << d_id << "\n";
 
 	auto x = [](const vl::vec2d& v) {return v[0]; };
 	auto y = [](const vl::vec2d& v) {return v[1]; };
