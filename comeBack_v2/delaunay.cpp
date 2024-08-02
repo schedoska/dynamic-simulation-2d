@@ -3,9 +3,7 @@
 #include <stack>
 
 ds2::delaunay::delaunay(const std::vector<vl::vec2d>& vertices)
-	: _vertices(vertices)
-{
-}
+	: _vertices(vertices) {}
 
 void ds2::delaunay::edge_flip(std::vector<triangle>& tr_l)
 {
@@ -25,11 +23,12 @@ void ds2::delaunay::edge_flip(std::vector<triangle>& tr_l)
 
 	while (!to_check.empty())
 	{
+		std::cout << to_check.size() << "\n";
 		segment s = to_check.top();
 		to_check.pop();
 		marked[s] = false;
 
-		// vector of found adj to edge triangles :
+		// vector of found adj to edge triangles:
 		// first	-> index of triangle
 		// second	-> index of the opposite vertex
 		std::vector<std::pair<size_t, size_t>> adj;
@@ -60,8 +59,8 @@ void ds2::delaunay::edge_flip(std::vector<triangle>& tr_l)
 			to_check.push(s_ch);
 			marked[s_ch] = true;
 		};
-		push_to_check(s.first, tr_b[tr_b_v]);
-		push_to_check(s.first, tr_a[tr_a_v]);
+		push_to_check(s.first,  tr_b[tr_b_v]);
+		push_to_check(s.first,  tr_a[tr_a_v]);
 		push_to_check(s.second, tr_b[tr_b_v]);
 		push_to_check(s.second, tr_a[tr_a_v]);
 
@@ -96,9 +95,6 @@ bool ds2::delaunay::is_legal(const triangle& tr, const size_t& b_loc, const size
 	vl::vec2d A = vl[tr[(b_loc + 1) % 3]];
 	vl::vec2d C = vl[tr[(b_loc + 2) % 3]];
 	vl::vec2d D = vl[d_id];
-
-	//std::cout << tr[b_loc] << " " << tr[(b_loc + 1) % 3] << " " << tr[(b_loc + 2) % 3] << "\n";
-	//std::cout << "D: " << d_id << "\n";
 
 	auto x = [](const vl::vec2d& v) {return v[0]; };
 	auto y = [](const vl::vec2d& v) {return v[1]; };

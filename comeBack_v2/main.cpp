@@ -10,6 +10,9 @@
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 #include <cstdlib>
+#include <random>
+
+#include <opencv2/opencv.hpp>
 
 void solve_spring(std::shared_ptr<ds2::object> a, std::shared_ptr<ds2::object> b,
     vl::vec2d a_loc, vl::vec2d b_loc, double dt, double len)
@@ -147,6 +150,7 @@ int main()
     dob2->mass() = 100;
     dob2->inertia() = (100 * 100 + 100 * 100) * 1000 / 12;
     cs3.loc_pos() = vl::vec2d(0, 0);
+    rs.translate({ 0,50 });
     dob2->shape().add(rs);
     dob2->update_shape();
     
@@ -165,14 +169,58 @@ int main()
     s.add(vl::vec2d(90, -100));
     s.add(vl::vec2d(120, -100));
     s.add(vl::vec2d(120, 100));
-    s.add(vl::vec2d(-120, 100));
-    s.add(vl::vec2d(-120, -130));
+    s.add(vl::vec2d(-0, 100));
+    //s.add(vl::vec2d(-120, -130));
 
+    dob2->shape() = s.generate_shape_group(ds2::triangulation::delaunay);
+    //dob2->shape().translate(vl::vec2d(-300, -150));
 
-
-    dob2->shape() = s.generate_group();
-    //dob2->shape().translate(vl::vec2d(-60, -120));
+    //rs.translate({ 10,50 });
+    //dob2->shape().translate({ -5,-50 });
+    dob2->shape().translate_to_centroid();
     dob2->update_shape();
+    std::cout << "AREA: " << dob2->shape().centroid() << "\n";
+
+
+    /*s.add(vl::vec2d(-100, -150));
+    s.add(vl::vec2d(-60, -150));
+    s.add(vl::vec2d(0, -50));
+    s.add(vl::vec2d(60, -150));
+    s.add(vl::vec2d(100, -150));
+    s.add(vl::vec2d(30, -0));
+    s.add(vl::vec2d(30, 60));
+    s.add(vl::vec2d(-30, 60));
+    s.add(vl::vec2d(-30, -0));*/
+
+
+    /*
+    cv::Mat image = cv::imread("C:\\Users\\chedo\\OneDrive\\Pulpit\\obj.png");
+    //Prepare the image for findContours
+    cv::cvtColor(image, image, cv::ColorConversionCodes::COLOR_BGR2GRAY);
+    cv::threshold(image, image, 128, 255, cv::THRESH_BINARY);
+    //Find the contours. Use the contourOutput Mat so the original image doesn't get overwritten
+    std::vector<std::vector<cv::Point> > contours;
+    cv::Mat contourOutput = image.clone();
+    cv::findContours(contourOutput, contours, cv::RETR_LIST, cv::CHAIN_APPROX_NONE);
+    cv::waitKey(0);
+
+    std::cout << contours[0].size() << "\n";
+    std::vector<vl::vec2d> pts;// = { vl::vec2d(100,100) };
+
+    for (int k = contours[0].size() - 1; k >= 0; k -= 10) {
+        cv::Point cp = contours[0][k];
+        pts.push_back(vl::vec2d(cp.x, cp.y));
+        s.add(vl::vec2d(cp.x, cp.y));
+    }
+
+    
+
+    sf::Texture tx;
+    tx.loadFromFile("C:\\Users\\chedo\\OneDrive\\Pulpit\\obj.png");
+
+    sf::Sprite sp;
+    sp.setTexture(tx);
+    */
 
 
     while (window.isOpen())
@@ -195,35 +243,14 @@ int main()
                     dob2->apply_force(vl::vec2d(stren, 0), vl::vec2d(10, 0), dt);
                 if (event.key.code == sf::Keyboard::Left)
                     dob2->apply_force(vl::vec2d(-stren, 0), vl::vec2d(-10, 0), dt);
-
-                /*const double speed = 10;
-                if (event.key.code == sf::Keyboard::Up)
-                    dob2->pos() += vl::vec2d(0, -speed);
-                if (event.key.code == sf::Keyboard::Down)
-                    dob2->pos() += vl::vec2d(0, speed);
-                if (event.key.code == sf::Keyboard::Right)
-                    dob2->pos() += vl::vec2d(speed, 0);
-                if (event.key.code == sf::Keyboard::Left)
-                    dob2->pos() += vl::vec2d(-speed, 0);
-                if (event.key.code == sf::Keyboard::R)
-                    dob2->rot() += 0.1;*/
-
             }
         }
 
         window.clear(sf::Color::White);
-
-        //solve_spring(v, vl::vec2d(), vl::vec2d(400, 500.1), dt, 0.1);
-        //double diff = 0.3 - v->rot_vel();
-        //v->rot_vel() += diff * 1;
+        //window.draw(sp);
 
         dob->vel() += vl::vec2d(0, 160) * dt;
-        //dob2->vel() += vl::vec2d(0, 160) * dt;
-
-        //dob2->rot_vel() = 0.05;
-
-
-
+        dob2->vel() += vl::vec2d(0, 160) * dt;
 
         scene.update(dt, window);
         for (const auto& i : scene.collisions()) {
@@ -242,6 +269,8 @@ int main()
             vl::vec2d rot = vl::vec2d(x, y) * 20;
             utils::drawLine(i->pos(), i->pos() + rot, window, sf::Color::Magenta);
         }
+
+        //for (auto i : pts) utils::drawPoint(i, window, sf::Color::Red);
 
         window.display();
     }

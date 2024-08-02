@@ -23,3 +23,13 @@ vl::vec2d& ds2::circle_shape::loc_pos()
 {
     return _loc_pos;
 }
+
+double ds2::circle_shape::area() const
+{
+    return std::acos(-1) * std::pow(_radius, 2);
+}
+
+vl::vec2d ds2::circle_shape::centroid() const
+{
+    return vl::vec2d(0,0);
+}

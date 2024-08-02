@@ -6,8 +6,8 @@
 
 namespace ds2
 {
-	//using segment = std::pair<size_t, size_t>;	// indexes of vertices
-
+	enum class triangulation { expanding, delaunay };
+		
 	class concave_shape
 	{
 		using segment	= std::pair<size_t, size_t>;	// indexes of _vertices
@@ -16,12 +16,12 @@ namespace ds2
 	public:
 		void add(const vl::vec2d& v);
 		void clear();
-		shape_group generate_group();
+		shape_group generate_shape_group(triangulation mode);
 		const std::vector<vl::vec2d>& vertices() const;
 
 	private:
-		//void delaunay_edge_flip(std::vector<triangle>& sg);
 		std::vector<triangle> triangulate();
+		void make_clockwise(std::vector<triangle>& tr_l);
 
 		utils::segments_relation intersects(
 			const std::vector<segment>& s_list,

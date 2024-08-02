@@ -15,13 +15,16 @@ void ds2::concave_shape::clear()
 	_vertices.clear();
 }
 
-ds2::shape_group ds2::concave_shape::generate_group()
+ds2::shape_group ds2::concave_shape::generate_shape_group(triangulation mode)
 {
 	const std::vector<vl::vec2d>& vl = _vertices;
 	std::vector<triangle> tr_l = triangulate();
-	//delaunay_edge_flip(tr_l);
-	delaunay del(vl);
-	del.edge_flip(tr_l);
+
+	if (mode == triangulation::delaunay) {
+		delaunay del(vl);
+		del.edge_flip(tr_l);
+		make_clockwise(tr_l);
+	}
 
 	shape_group sg;
 
@@ -113,6 +116,15 @@ std::vector<ds2::concave_shape::triangle> ds2::concave_shape::triangulate()
 		}
 	}
 	return tr_l;
+}
+
+void ds2::concave_shape::make_clockwise(std::vector<triangle>& tr_l)
+{
+	const std::vector<vl::vec2d>& vl = _vertices;
+	for (auto& tr : tr_l) {
+		double a = vl::cross(vl[tr[1]] - vl[tr[0]], vl[tr[2]] - vl[tr[0]]);
+		if (a < 0) std::swap(tr[1], tr[2]);
+	}
 }
 
 utils::segments_relation ds2::concave_shape::intersects(

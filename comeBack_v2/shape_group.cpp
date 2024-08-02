@@ -33,3 +33,28 @@ void ds2::shape_group::translate(const vl::vec2d& v)
     for (auto& i : _circles)
         i.loc_pos() += v;
 }
+
+void ds2::shape_group::translate_to_centroid()
+{
+    translate(centroid() * -1.0);
+}
+
+double ds2::shape_group::area() const
+{
+    double a(0.0);
+    for (const auto& i : _convexes) a += i.area();
+    for (const auto& i : _circles ) a += i.area();
+    return a;
+}
+
+vl::vec2d ds2::shape_group::centroid() const
+{
+    vl::vec2d c_m = { 0,0 };
+    for (const auto& i : _convexes)
+        c_m += i.centroid() * i.area();
+    for (const auto& i : _circles)
+        c_m += i.centroid() * i.area();
+
+    const double a = area();
+    return c_m / a;
+}
