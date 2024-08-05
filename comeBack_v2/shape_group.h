@@ -20,6 +20,7 @@ namespace ds2
 
 		double area() const override;
 		vl::vec2d centroid() const override;
+		double second_moment_area() const override;
 
 	private:
 		std::vector<circle_shape> _circles;

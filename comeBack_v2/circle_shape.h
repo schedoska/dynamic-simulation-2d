@@ -19,6 +19,7 @@ namespace ds2
 		vl::vec2d& loc_pos();
 
 		double area() const override;
+		double second_moment_area() const override;
 		vl::vec2d centroid() const override;
 
 	protected:

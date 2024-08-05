@@ -77,7 +77,7 @@ int main()
     std::shared_ptr<DebugObject> wall_1(new DebugObject(vl::vec2d(100, 400)));
     wall_1->shape().add(block);
     wall_1->update_shape();
-    wall_1->mass() = 1e30;
+    wall_1->set_mass(1e30);
     wall_1->inertia() = 1e30;
     objects.push_back(wall_1);
     scene.add_object(wall_1);
@@ -85,7 +85,7 @@ int main()
     std::shared_ptr<DebugObject> wall_2(new DebugObject(vl::vec2d(1000, 400)));
     wall_2->shape().add(block);
     wall_2->update_shape();
-    wall_2->mass() = 1e30;
+    wall_2->set_mass(1e30);
     wall_2->inertia() = 1e30;
     objects.push_back(wall_2);
     scene.add_object(wall_2);
@@ -100,7 +100,7 @@ int main()
     std::shared_ptr<DebugObject> wall_3(new DebugObject(vl::vec2d(550, 700)));
     wall_3->shape().add(block_2);
     wall_3->update_shape();
-    wall_3->mass() = 1e30;
+    wall_3->set_mass(1e30);
     wall_3->inertia() = 1e30;
     objects.push_back(wall_3);
     scene.add_object(wall_3);
@@ -133,7 +133,7 @@ int main()
     cs3.loc_pos() = vl::vec2d(-0, -50);
 
     std::shared_ptr<DebugObject> dob(new DebugObject(vl::vec2d(400, 300)));
-    dob->mass() = 100;
+    dob->set_mass(100);
     dob->inertia() = (100 * 100 + 100 * 100) * 500 / 12;
     dob->shape().add(cs);
     dob->shape().add(cs2);
@@ -143,16 +143,13 @@ int main()
     dob->update_shape();
     dob->rot_vel() = 0.3;
 
-    ds2::rectangle_shape rs(vl::vec2d(300, 30));
+    ds2::rectangle_shape rs(vl::vec2d(90, 190));
     //rs.set_size(vl::vec2d(30, 300));
 
     std::shared_ptr<DebugObject> dob2(new DebugObject(vl::vec2d(760, 500)));
-    dob2->mass() = 100;
+    dob2->set_mass(100);
     dob2->inertia() = (100 * 100 + 100 * 100) * 1000 / 12;
     cs3.loc_pos() = vl::vec2d(0, 0);
-    rs.translate({ 0,50 });
-    dob2->shape().add(rs);
-    dob2->update_shape();
     
 
     scene.add_object(dob);
@@ -160,7 +157,7 @@ int main()
     objects.push_back(dob);
     objects.push_back(dob2);
 
-    //dob.rot() = 3.14 / 4;    
+    /*
     ds2::concave_shape s;
     s.add(vl::vec2d(-30, -100));
     s.add(vl::vec2d(30, -100));
@@ -171,57 +168,25 @@ int main()
     s.add(vl::vec2d(120, 100));
     s.add(vl::vec2d(-0, 100));
     //s.add(vl::vec2d(-120, -130));
-
-    dob2->shape() = s.generate_shape_group(ds2::triangulation::delaunay);
-    //dob2->shape().translate(vl::vec2d(-300, -150));
-
-    //rs.translate({ 10,50 });
-    //dob2->shape().translate({ -5,-50 });
-    dob2->shape().translate_to_centroid();
-    dob2->update_shape();
-    std::cout << "AREA: " << dob2->shape().centroid() << "\n";
-
-
-    /*s.add(vl::vec2d(-100, -150));
-    s.add(vl::vec2d(-60, -150));
-    s.add(vl::vec2d(0, -50));
-    s.add(vl::vec2d(60, -150));
-    s.add(vl::vec2d(100, -150));
-    s.add(vl::vec2d(30, -0));
-    s.add(vl::vec2d(30, 60));
-    s.add(vl::vec2d(-30, 60));
-    s.add(vl::vec2d(-30, -0));*/
-
-
-    /*
-    cv::Mat image = cv::imread("C:\\Users\\chedo\\OneDrive\\Pulpit\\obj.png");
-    //Prepare the image for findContours
-    cv::cvtColor(image, image, cv::ColorConversionCodes::COLOR_BGR2GRAY);
-    cv::threshold(image, image, 128, 255, cv::THRESH_BINARY);
-    //Find the contours. Use the contourOutput Mat so the original image doesn't get overwritten
-    std::vector<std::vector<cv::Point> > contours;
-    cv::Mat contourOutput = image.clone();
-    cv::findContours(contourOutput, contours, cv::RETR_LIST, cv::CHAIN_APPROX_NONE);
-    cv::waitKey(0);
-
-    std::cout << contours[0].size() << "\n";
-    std::vector<vl::vec2d> pts;// = { vl::vec2d(100,100) };
-
-    for (int k = contours[0].size() - 1; k >= 0; k -= 10) {
-        cv::Point cp = contours[0][k];
-        pts.push_back(vl::vec2d(cp.x, cp.y));
-        s.add(vl::vec2d(cp.x, cp.y));
-    }
-
-    
-
-    sf::Texture tx;
-    tx.loadFromFile("C:\\Users\\chedo\\OneDrive\\Pulpit\\obj.png");
-
-    sf::Sprite sp;
-    sp.setTexture(tx);
     */
 
+    ds2::concave_shape s;
+    s.add(vl::vec2d(0, 0));
+    s.add(vl::vec2d(100, 100));
+    s.add(vl::vec2d(0, 100));
+
+    //dob2->shape() = s.generate_shape_group(ds2::triangulation::delaunay);
+    //dob2->shape().translate(vl::vec2d(-300, -150));
+
+
+    //dob2->shape().translate_to_centroid();
+    rs.translate({ 45,0 });
+    dob2->shape().add(rs);
+    rs.translate({ -90,0 });
+    dob2->shape().add(rs);
+    dob2->adjust_inertia();
+    dob2->update_shape();
+    std::cout << "AREA: " << dob2->shape().second_moment_area() / dob2->shape().area() << "\n";
 
     while (window.isOpen())
     {

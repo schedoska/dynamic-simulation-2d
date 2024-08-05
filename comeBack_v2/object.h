@@ -13,7 +13,6 @@ namespace ds2
 		const vl::vec2d& pos() const;
 		vl::vec2d& vel();
 		const vl::vec2d& vel() const;
-		double& mass();
 		const double& mass() const;
 		double& rot();
 		const double& rot() const;
@@ -31,6 +30,11 @@ namespace ds2
 			const vl::vec2d& force, 
 			const vl::vec2d& point, 
 			const double& dt);
+
+		/* Computes and sets inertia value using object mass and area of shape group */
+		void adjust_inertia();
+		void set_mass(const double& mass, bool adjust_inertia = true);
+		void set_density(const double& den, bool adjust_inertia = true);
 
 	private:
 		void init();

@@ -58,3 +58,17 @@ vl::vec2d ds2::shape_group::centroid() const
     const double a = area();
     return c_m / a;
 }
+
+double ds2::shape_group::second_moment_area() const
+{
+    double j_z(0.0);
+    for (const auto& i : _convexes) {
+        double d = i.centroid().len();
+        j_z += i.second_moment_area();
+    }
+    for (const auto& i : _circles) {
+        double d = i.centroid().len();
+        j_z += i.second_moment_area();
+    }
+    return j_z;
+}

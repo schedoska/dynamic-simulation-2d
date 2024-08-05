@@ -17,6 +17,7 @@ namespace ds2
 
 		double area() const override;
 		vl::vec2d centroid() const override;
+		double second_moment_area() const override;
 
 	protected:
 		std::vector<vl::vec2d> _vertices;

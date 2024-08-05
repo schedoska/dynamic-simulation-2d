@@ -27,10 +27,6 @@ const vl::vec2d& ds2::object::vel() const {
     return _vel;
 }
 
-double& ds2::object::mass() {
-    return _mass;
-}
-
 const double& ds2::object::mass() const {
     return _mass;
 }
@@ -77,9 +73,6 @@ const ds2::shape_group& ds2::object::shape() const
 
 void ds2::object::update(const double& dt)
 {
-    //_vel += _acc * dt;
-    // _rot_vel += _rot_acc * dt;
-
     _pos += _vel * dt;
     _rot += _rot_vel * dt;
 }
@@ -105,6 +98,24 @@ void ds2::object::apply_force(const vl::vec2d& force, const vl::vec2d& point, co
     _rot_vel += (vl::cross(point, local(force) + pos()) / _inertia) * dt;
     //_rot_vel += (vl::cross(point, utils::rotate(force, _rot)) / inertia) * dt;
     //std::cout << (vl::cross(point, local(force) + pos()) / inertia) * dt << "\n";
+}
+
+void ds2::object::adjust_inertia()
+{
+    double sh_j = _shape.second_moment_area() / _shape.area();
+    _inertia = sh_j * _mass;
+}
+
+void ds2::object::set_mass(const double& mass, bool _adjust_inertia)
+{
+    _mass = mass;
+    if (_adjust_inertia) adjust_inertia();
+}
+
+void ds2::object::set_density(const double& den, bool _adjust_inertia)
+{
+    _mass = den * _shape.area();
+    if (_adjust_inertia) adjust_inertia();
 }
 
 void ds2::object::init()

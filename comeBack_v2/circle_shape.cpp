@@ -29,7 +29,13 @@ double ds2::circle_shape::area() const
     return std::acos(-1) * std::pow(_radius, 2);
 }
 
+double ds2::circle_shape::second_moment_area() const
+{
+    const double d = _loc_pos.len();
+    return std::pow(_radius, 2) / 2.0 + std::pow(d, 2);
+}
+
 vl::vec2d ds2::circle_shape::centroid() const
 {
-    return vl::vec2d(0,0);
+    return _loc_pos;
 }
