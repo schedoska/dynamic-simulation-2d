@@ -223,10 +223,18 @@ namespace vl
         return a[0] * b[1] - a[1] * b[0];
     }
 
+    template<typename T>
+    vl::vec<T, 2> rotate(const vl::vec<T, 2>& v, const _value& rad) {
+        double x = cos(rad) * v[0] - sin(rad) * v[1];
+        double y = sin(rad) * v[0] + cos(rad) * v[1];
+        return { x,y };
+    }
+
     using vec2i = vec<int, 2>;
     using vec2f = vec<float, 2>;
     using vec2d = vec<double, 2>;
 }
+
 
 template<typename T, std::size_t N>
 std::ostream& operator <<(std::ostream& out, const vl::vec<T, N>& v) {

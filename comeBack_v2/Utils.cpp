@@ -80,6 +80,13 @@ double utils::angle(const vl::vec2d& ref, const vl::vec2d& sec)
     return angle > 0 ? angle : 4.0 * std::acos(0.0) + angle;
 }
 
+double utils::angle2(const vl::vec2d& ref, const vl::vec2d& sec)
+{
+    double dot = ref.dot(sec);
+    double det = utils::cross(ref, sec);
+    return std::atan2(det, dot);
+}
+
 utils::segments_relation utils::check_relation(
     const vl::vec2d& start_a, 
     const vl::vec2d& end_a, 

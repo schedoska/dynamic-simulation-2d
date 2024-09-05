@@ -23,7 +23,6 @@ void ds2::delaunay::edge_flip(std::vector<triangle>& tr_l)
 
 	while (!to_check.empty())
 	{
-		std::cout << to_check.size() << "\n";
 		segment s = to_check.top();
 		to_check.pop();
 		marked[s] = false;

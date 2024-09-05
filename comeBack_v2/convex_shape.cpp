@@ -63,3 +63,14 @@ double ds2::convex_shape::second_moment_area() const
     return ((j_x + j_y) / 12.0);
 }
 
+const ds2::rect ds2::convex_shape::box(const vl::vec2d& pos, const double& rot) const
+{
+    constexpr double dmax = std::numeric_limits<double>::max();
+    rect box = { {dmax, dmax}, -dmax, -dmax };
+
+    for (auto& i : _vertices) {
+        box.expand(vl::rotate(i, rot) + pos);
+    }
+    return box;
+}
+

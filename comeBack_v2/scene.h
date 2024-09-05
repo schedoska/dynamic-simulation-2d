@@ -23,6 +23,10 @@ namespace ds2
 		std::list<object_collision_data> _collisions;
 		std::vector<std::shared_ptr<object>> _objects;
 		std::list<joint*> _joints;
+
+		inline bool overlaping_layers(
+			const std::shared_ptr<object>& a,
+			const std::shared_ptr<object>& b);
 	};
 }
 

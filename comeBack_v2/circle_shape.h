@@ -14,9 +14,9 @@ namespace ds2
 			const double& radius = 1.f);
 
 		const double& radius() const;
-		double& radius();
+		void set_radius(const double& radius);
 		const vl::vec2d& loc_pos() const;
-		vl::vec2d& loc_pos();
+		void set_loc_pos(const vl::vec2d& pos);
 
 		double area() const override;
 		double second_moment_area() const override;

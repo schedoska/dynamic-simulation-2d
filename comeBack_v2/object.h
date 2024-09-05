@@ -23,12 +23,23 @@ namespace ds2
 		shape_group& shape();
 		const shape_group& shape() const;
 
+		int& layer_min();
+		const int& layer_min() const;
+		int& layer_max();
+		const int& layer_max() const;
+		void set_layer_range(const int& min, const int& max);
+
 		virtual void update(const double& dt);
 		vl::vec2d global(const vl::vec2d& local);
 		vl::vec2d local (const vl::vec2d& global);
+
 		void apply_force(
 			const vl::vec2d& force, 
 			const vl::vec2d& point, 
+			const double& dt);
+		void apply_force_local(
+			const vl::vec2d& force,
+			const vl::vec2d& point,
 			const double& dt);
 
 		/* Computes and sets inertia value using object mass and area of shape group */
@@ -37,7 +48,7 @@ namespace ds2
 		void set_density(const double& den, bool adjust_inertia = true);
 
 	private:
-		void init();
+		inline void init();
 
 		vl::vec2d _pos;
 		vl::vec2d _vel;
@@ -46,5 +57,8 @@ namespace ds2
 		double _rot_vel;
 		double _mass;
 		shape_group _shape;
+
+		int _layer_min;
+		int _layer_max;
 	};
 }

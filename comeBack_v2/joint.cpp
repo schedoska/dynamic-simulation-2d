@@ -1,8 +1,9 @@
 #include "joint.h"
+#include "Utils.h"
 
 ds2::joint::joint(
-	const std::shared_ptr<ds2::object>& obj_a,
-	const std::shared_ptr<ds2::object>& obj_b,
+	object* obj_a,
+	object* obj_b,
 	vl::vec2d loc_a, 
 	vl::vec2d loc_b)
 	: _obj_a(obj_a), _obj_b(obj_b), _loc_a(loc_a), _loc_b(loc_b)
@@ -28,64 +29,27 @@ vl::vec2d& ds2::joint::loc_b()
 	return _loc_b;
 }
 
-std::weak_ptr<ds2::object> ds2::joint::obj_a()
+ds2::object* ds2::joint::obj_a()
 {
 	return _obj_a;
 }
 
-std::weak_ptr<ds2::object> ds2::joint::obj_b()
+ds2::object* ds2::joint::obj_b()
 {
 	return _obj_b;
 }
 
-ds2::spring_joint::spring_joint(
-	const std::shared_ptr<object>& a,
-	const std::shared_ptr<object>& b,
-	vl::vec2d loc_a,
-	vl::vec2d loc_b, 
-	const bool fixed_a,
-	const bool fixed_b)
-	: joint(a, b, loc_a, loc_b)
+void ds2::joint::update(const double& dt)
 {
-	_stiff = 500;
-	_damp = 100;
-	_len = (a->global(loc_a) - b->global(loc_b)).len();
-	_rot_a = a->rot();
-	_rot_b = b->rot();
-	_fixed_a = fixed_a;
-	_fixed_b = fixed_b;
+	
 }
 
-const double& ds2::spring_joint::stiff() const
+inline double ds2::joint::loc_distance() const
 {
-	return _stiff;
+	return (_obj_a->global(_loc_a) - _obj_b->global(_loc_b)).len();
 }
 
-double& ds2::spring_joint::stiff()
-{
-	return _stiff;
-}
-
-const double& ds2::spring_joint::damp() const
-{
-	return _damp;
-}
-
-double& ds2::spring_joint::damp()
-{
-	return _damp;
-}
-
-const double& ds2::spring_joint::len() const
-{
-	return _len;
-}
-
-double& ds2::spring_joint::len()
-{
-	return _len;
-}
-
+/*
 void ds2::spring_joint::update(const double& dt)
 {
 	std::shared_ptr<object> a = obj_a().lock();
@@ -120,7 +84,103 @@ ds2::fixed_joint::fixed_joint(
 	_stiff = 20000;
 	_len = 0.0;
 }
+*/
 
+ds2::spring::spring(object* a, object* b, vl::vec2d loc_a, vl::vec2d loc_b)
+	: joint(a, b, loc_a, loc_b)
+{
+	_length = loc_distance();
+	brace();
+}
 
+ds2::spring::spring(object* a, object* b, const double& strength, const double& damping, vl::vec2d loc_a, vl::vec2d loc_b)
+	: joint(a, b, loc_a, loc_b), _strength(strength), _damping(damping)
+{
+	_length = loc_distance();
+}
 
+void ds2::spring::update(const double& dt)
+{
+	vl::vec2d dv = _obj_a->global(_loc_a) - _obj_b->global(_loc_b);
+	double dist = dv.len();
+	dv.normalize();
+	dv *= _strength * (dist - _length) + _damping * (_obj_a->vel() - _obj_b->vel()).dot(dv);
 
+	_obj_a->apply_force(dv * -1.0, _loc_a, dt);
+	_obj_b->apply_force(dv, _loc_b, dt);
+}
+
+void ds2::spring::brace()
+{
+	//_strength = 27000;
+	//_damping = 220;
+	_strength = 7700;
+	_damping = 200;
+}
+
+const double& ds2::spring::length() const
+{
+	return _length;
+}
+
+double& ds2::spring::length()
+{
+	return _length;
+}
+
+const double& ds2::spring::strength() const
+{
+	return _strength;
+}
+
+double& ds2::spring::strength()
+{
+	return _strength;
+}
+
+const double& ds2::spring::damping() const
+{
+	return _damping;
+}
+
+double& ds2::spring::damping()
+{
+	return _damping;
+}
+
+ds2::fixed_joint::fixed_joint(object* a, object* b, vl::vec2d loc_a, vl::vec2d loc_b)
+	: joint(a, b, loc_a, loc_b)
+{
+}
+
+void ds2::fixed_joint::update(const double& dt)
+{
+	double tm = _obj_a->mass() + _obj_b->mass();
+	vl::vec2d cpos =
+		_obj_a->global(_loc_a) * _obj_a->mass() +
+		_obj_b->global(_loc_b) * _obj_b->mass();
+	cpos /= tm;
+
+	const double ang_w = 0.1;
+	const double pos_w = 0.1;
+
+	vl::vec2d a1 = _obj_a->global(_loc_a) - _obj_a->pos();
+	vl::vec2d a2 = cpos - _obj_a->pos();
+	double a_dang = utils::angle2(a1, a2) * ang_w;
+	_obj_a->rot() += a_dang;
+	_obj_a->rot_vel() += (a_dang / dt) * 1;
+
+	vl::vec2d b1 = _obj_b->global(_loc_b) - _obj_b->pos();
+	vl::vec2d b2 = cpos - _obj_b->pos();
+	double b_dang = utils::angle2(b1, b2) * ang_w;
+	_obj_b->rot() += b_dang;
+	_obj_b->rot_vel() += (b_dang / dt) * 1;
+
+	vl::vec2d a_dpos = (cpos - _obj_a->global(_loc_a)) * pos_w;
+	_obj_a->pos() += a_dpos;
+	_obj_a->vel() += (a_dpos / dt) * 1;
+
+	vl::vec2d b_dpos = (cpos - _obj_b->global(_loc_b)) * pos_w;
+	_obj_b->pos() += b_dpos;
+	_obj_b->vel() += (b_dpos / dt) * 1;
+}

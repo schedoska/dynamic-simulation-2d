@@ -18,6 +18,13 @@ void DebugObject::draw(sf::RenderWindow& window)
 		i.setRotation(utils::RadToDegrees(rot()));
 		window.draw(i);
 	}
+	/*
+	ds2::rect b = shape().box(pos(), rot());
+	utils::drawLine(b.pos, b.pos + vl::vec2d(b.w, 0), window, sf::Color::Red);
+	utils::drawLine(b.pos + vl::vec2d(b.w, 0), b.pos + vl::vec2d(b.w, b.h), window, sf::Color::Red);
+	utils::drawLine(b.pos + vl::vec2d(b.w, b.h), b.pos + vl::vec2d(0, b.h), window, sf::Color::Red);
+	utils::drawLine(b.pos + vl::vec2d(0, b.h), b.pos, window, sf::Color::Red);
+	*/
 }
 
 void DebugObject::update_shape()

@@ -10,6 +10,7 @@ namespace ds2
 	class shape_group : public shape
 	{
 	public:
+		shape_group();
 		void add(const circle_shape& circle);
 		void add(const convex_shape& convex);
 		const std::vector<circle_shape>& circles() const;
@@ -21,6 +22,7 @@ namespace ds2
 		double area() const override;
 		vl::vec2d centroid() const override;
 		double second_moment_area() const override;
+		const rect box(const vl::vec2d& pos, const double& rot) const override;
 
 	private:
 		std::vector<circle_shape> _circles;

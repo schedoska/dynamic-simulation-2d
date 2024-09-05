@@ -21,6 +21,7 @@ namespace utils {
     vl::vec2d rotate(const vl::vec2d& vec, const double& ang);
 
     double angle(const vl::vec2d& ref, const vl::vec2d& sec);
+    double angle2(const vl::vec2d& ref, const vl::vec2d& sec);
 
     enum segments_relation { none, intetsects, same };
 

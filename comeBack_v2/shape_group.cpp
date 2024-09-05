@@ -1,5 +1,8 @@
 #include "shape_group.h"
 
+ds2::shape_group::shape_group()
+{}
+
 void ds2::shape_group::add(const circle_shape& circle)
 {
     _circles.push_back(circle);
@@ -31,7 +34,7 @@ void ds2::shape_group::translate(const vl::vec2d& v)
     for (auto& i : _convexes)
         i.translate(v);
     for (auto& i : _circles)
-        i.loc_pos() += v;
+        i.set_loc_pos(i.loc_pos() + v);
 }
 
 void ds2::shape_group::translate_to_centroid()
@@ -72,3 +75,14 @@ double ds2::shape_group::second_moment_area() const
     }
     return j_z;
 }
+
+const ds2::rect ds2::shape_group::box(const vl::vec2d& pos, const double& rot) const
+{
+    constexpr double dmax = std::numeric_limits<double>::max();
+    rect box = { {dmax, dmax}, -dmax, -dmax };
+
+    for (const auto& i : _convexes)
+        box.expand(i.box(pos, rot));
+    return box;
+}
+
