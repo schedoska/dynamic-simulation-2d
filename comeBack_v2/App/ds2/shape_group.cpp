@@ -86,3 +86,9 @@ const ds2::rect ds2::shape_group::box(const vl::vec2d& pos, const double& rot) c
     return box;
 }
 
+void ds2::shape_group::scale(const vl::vec2d& scale)
+{
+    for (auto& i : _convexes) i.scale(scale);
+    for (auto& i : _circles)  i.scale(scale);
+}
+

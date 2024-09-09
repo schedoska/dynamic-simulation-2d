@@ -2,11 +2,14 @@
 #define UTILS_HH
 
 #include "vec2.h"
-#include <SFML/Graphics.hpp> 
+#include <SFML/Graphics.hpp>
 
 namespace utils {
     template <typename T>
     inline sf::Vector2f vec2_to_sfml(const vl::vec<T, 2>& v);
+
+    vl::vec2d sfml_to_vec2d(const sf::Vector2f& v);
+    vl::vec2d sfml_to_vec2d(const sf::Vector2i& v);
 
     float RadToDegrees(const float radians);
 

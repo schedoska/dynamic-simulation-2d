@@ -5,6 +5,16 @@ inline sf::Vector2f utils::vec2_to_sfml(const vl::vec<T, 2>& v) {
     return sf::Vector2f(v[0], v[1]);
 }
 
+vl::vec2d utils::sfml_to_vec2d(const sf::Vector2f& v)
+{
+    return vl::vec2d(v.x, v.y);
+}
+
+vl::vec2d utils::sfml_to_vec2d(const sf::Vector2i& v)
+{
+    return vl::vec2d(v.x, v.y);
+}
+
 template<typename T>
 inline bool utils::is_in_range(const T& val, T r1, T r2)
 {

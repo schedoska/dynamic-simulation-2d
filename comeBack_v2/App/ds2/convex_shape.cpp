@@ -74,3 +74,11 @@ const ds2::rect ds2::convex_shape::box(const vl::vec2d& pos, const double& rot) 
     return box;
 }
 
+void ds2::convex_shape::scale(const vl::vec2d& scale)
+{
+    for (auto& i : _vertices) {
+        i[0] *= scale[0];
+        i[1] *= scale[1];
+    }
+}
+

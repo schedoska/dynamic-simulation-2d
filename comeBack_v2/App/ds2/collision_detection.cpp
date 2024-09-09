@@ -14,10 +14,9 @@ double ds2::collision_data::dist() const
     return (cp_a - cp_b).len();
 }
 
-
 ds2::object_collision_data ds2::collision_detection::check(
-    const std::shared_ptr<object>& a, 
-    const std::shared_ptr<object>& b)
+    object* a,
+    object* b)
 {
     const shape_group& a_sh = a->shape();
     const shape_group& b_sh = b->shape();
@@ -57,8 +56,8 @@ ds2::object_collision_data ds2::collision_detection::check(
 }
 
 ds2::collision_data ds2::collision_detection::check_shape(
-    const std::shared_ptr<object>& a, 
-    const std::shared_ptr<object>& b, 
+    object* a,
+    object* b,
     const convex_shape& a_sh, 
     const circle_shape& b_sh)
 {
@@ -73,7 +72,7 @@ ds2::collision_data ds2::collision_detection::check_shape(
     vl::vec2d min_vec(0, std::numeric_limits<double>::max()); 
 
     for (int i = 0; i < a_size; ++i) {
-        vl::vec2d edge = a->global(a_list[(i + 1) % a_size]) - a->global(a_list[i]);
+        vl::vec2d edge = a->global(a_list[(i + 1) % a_size]) - a->global(a_list[i]); 
         vl::vec2d axis = vl::vec2d(edge[1], -edge[0]).normalize();
         axis_projection_data apd = project_on_axis(a, b, a_sh, b_sh, axis);
 
@@ -104,8 +103,8 @@ ds2::collision_data ds2::collision_detection::check_shape(
 }
 
 ds2::collision_data ds2::collision_detection::check_shape(
-    const std::shared_ptr<object>& a,
-    const std::shared_ptr<object>& b,
+    object* a,
+    object* b,
     const convex_shape& a_sh, 
     const convex_shape& b_sh)
 {
@@ -151,8 +150,8 @@ ds2::collision_data ds2::collision_detection::check_shape(
 }
 
 ds2::collision_data ds2::collision_detection::check_shape(
-    const std::shared_ptr<object>& a, 
-    const std::shared_ptr<object>& b, 
+    object* a,
+    object* b,
     const circle_shape& a_sh, 
     const circle_shape& b_sh)
 {
@@ -171,8 +170,8 @@ ds2::collision_data ds2::collision_detection::check_shape(
 }
 
 ds2::axis_projection_data ds2::collision_detection::project_on_axis(
-    const std::shared_ptr<object>& ref, 
-    const std::shared_ptr<object>& sec, 
+    const object* ref,
+    const object* sec,
     const convex_shape& ref_sh, 
     const convex_shape& sec_sh, 
     const vl::vec2d& axis)
@@ -228,8 +227,8 @@ ds2::axis_projection_data ds2::collision_detection::project_on_axis(
 }
 
 ds2::axis_projection_data ds2::collision_detection::project_on_axis(
-    const std::shared_ptr<object>& ref, 
-    const std::shared_ptr<object>& sec, 
+    const object* ref,
+    const object* sec,
     const convex_shape& ref_sh, 
     const circle_shape& sec_sh, 
     const vl::vec2d& axis)
@@ -294,7 +293,7 @@ ds2::axis_projection_data ds2::collision_detection::project_on_axis(
 }
 
 ds2::object_collision_data::object_collision_data(
-    const std::weak_ptr<object>& _a,
-    const std::weak_ptr<object>& _b,
+    object* _a,
+    object* _b,
     const collision_data& _collision_data)
     : a(_a), b(_b), data(_collision_data) {}

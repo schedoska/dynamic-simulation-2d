@@ -13,7 +13,7 @@ namespace ds2
 	class scene
 	{
 	public:
-		void add_object(const std::shared_ptr<object>& object);
+		void add_object(object* object);
 		void add_joint(joint* j);
 		void update(const double& dt, sf::RenderWindow& win);
 
@@ -21,12 +21,12 @@ namespace ds2
 
 	private:
 		std::list<object_collision_data> _collisions;
-		std::vector<std::shared_ptr<object>> _objects;
+		std::vector<object*> _objects;
 		std::list<joint*> _joints;
 
 		inline bool overlaping_layers(
-			const std::shared_ptr<object>& a,
-			const std::shared_ptr<object>& b);
+			const object* a,
+			const object* b);
 	};
 }
 

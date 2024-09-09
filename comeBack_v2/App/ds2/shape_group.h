@@ -23,6 +23,7 @@ namespace ds2
 		vl::vec2d centroid() const override;
 		double second_moment_area() const override;
 		const rect box(const vl::vec2d& pos, const double& rot) const override;
+		void scale(const vl::vec2d& scale) override;
 
 	private:
 		std::vector<circle_shape> _circles;

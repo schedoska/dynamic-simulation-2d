@@ -30,8 +30,8 @@ namespace ds2
 		void set_layer_range(const int& min, const int& max);
 
 		virtual void update(const double& dt);
-		vl::vec2d global(const vl::vec2d& local);
-		vl::vec2d local (const vl::vec2d& global);
+		vl::vec2d global(const vl::vec2d& local) const;
+		vl::vec2d local (const vl::vec2d& global) const;
 
 		void apply_force(
 			const vl::vec2d& force, 
@@ -62,3 +62,4 @@ namespace ds2
 		int _layer_max;
 	};
 }
+

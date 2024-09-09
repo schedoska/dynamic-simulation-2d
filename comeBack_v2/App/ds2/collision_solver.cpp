@@ -5,8 +5,8 @@
 
 void ds2::collision_solver::solve_collision(const object_collision_data& cd, sf::RenderWindow& win)
 {
-	std::shared_ptr<object> obj_a = cd.a.lock(); 
-	std::shared_ptr<object> obj_b = cd.b.lock();
+	object* obj_a = cd.a; 
+	object* obj_b = cd.b;
 
 	/* Moving two object away from eachother */
 	vl::vec2d dv = cd.data.cp_a - cd.data.cp_b;

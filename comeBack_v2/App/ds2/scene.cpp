@@ -1,7 +1,7 @@
 #include "scene.h"
 #include "collision_solver.h"
 
-void ds2::scene::add_object(const std::shared_ptr<object>& object)
+void ds2::scene::add_object(object* object)
 {
     _objects.push_back(object);
 }
@@ -39,7 +39,7 @@ const std::list<ds2::object_collision_data>& ds2::scene::collisions() const
 	return _collisions;
 }
 
-inline bool ds2::scene::overlaping_layers(const std::shared_ptr<object>& a, const std::shared_ptr<object>& b)
+inline bool ds2::scene::overlaping_layers(const object* a, const object* b)
 {
     return a->layer_min() <= b->layer_max() && b->layer_min() <= a->layer_max();
 }

@@ -24,6 +24,7 @@ namespace ds2
 		/* Second moment of area - used to calculate inertia */
 		virtual double second_moment_area() const = 0;	
 		virtual const rect box(const vl::vec2d& pos, const double& rot) const;
+		virtual void scale(const vl::vec2d& scale) = 0;
 
 	protected:
 	};

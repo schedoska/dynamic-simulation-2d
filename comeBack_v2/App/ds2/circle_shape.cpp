@@ -43,3 +43,10 @@ vl::vec2d ds2::circle_shape::centroid() const
     return _loc_pos;
 }
 
+void ds2::circle_shape::scale(const vl::vec2d& scale)
+{
+    _loc_pos[0] *= scale[0];
+    _loc_pos[1] *= scale[1];
+    _radius *= std::max(scale[0], scale[1]);
+}
+

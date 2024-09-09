@@ -103,14 +103,14 @@ void ds2::object::update(const double& dt)
     _rot += _rot_vel * dt;
 }
 
-vl::vec2d ds2::object::global(const vl::vec2d& local)
+vl::vec2d ds2::object::global(const vl::vec2d& local) const
 {
     double x = cos(_rot) * local[0] - sin(_rot) * local[1] + _pos[0];
     double y = sin(_rot) * local[0] + cos(_rot) * local[1] + _pos[1];
     return vl::vec2d(x, y);
 }
 
-vl::vec2d ds2::object::local(const vl::vec2d& global)
+vl::vec2d ds2::object::local(const vl::vec2d& global) const
 {
     vl::vec2d v = global - pos();
     //double x = cos(-_rot) * v[0] - sin(-_rot) * v[1];

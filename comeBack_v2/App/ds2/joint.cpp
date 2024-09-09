@@ -148,12 +148,18 @@ double& ds2::spring::damping()
 	return _damping;
 }
 
-ds2::fixed_joint::fixed_joint(object* a, object* b, vl::vec2d loc_a, vl::vec2d loc_b)
-	: joint(a, b, loc_a, loc_b)
+ds2::hinge_joint::hinge_joint(
+	object* a, 
+	object* b, 
+	vl::vec2d loc_a, 
+	vl::vec2d loc_b,
+	const double& beta)
+	: joint(a, b, loc_a, loc_b), _beta(beta)
 {
 }
 
-void ds2::fixed_joint::update(const double& dt)
+/*
+void ds2::hinge_joint::update(const double& dt)
 {
 	double tm = _obj_a->mass() + _obj_b->mass();
 	vl::vec2d cpos =
@@ -161,26 +167,94 @@ void ds2::fixed_joint::update(const double& dt)
 		_obj_b->global(_loc_b) * _obj_b->mass();
 	cpos /= tm;
 
-	const double ang_w = 0.1;
-	const double pos_w = 0.1;
-
 	vl::vec2d a1 = _obj_a->global(_loc_a) - _obj_a->pos();
 	vl::vec2d a2 = cpos - _obj_a->pos();
-	double a_dang = utils::angle2(a1, a2) * ang_w;
+	double a_dang = utils::angle2(a1, a2) * _beta;
 	_obj_a->rot() += a_dang;
 	_obj_a->rot_vel() += (a_dang / dt) * 1;
 
 	vl::vec2d b1 = _obj_b->global(_loc_b) - _obj_b->pos();
 	vl::vec2d b2 = cpos - _obj_b->pos();
-	double b_dang = utils::angle2(b1, b2) * ang_w;
+	double b_dang = utils::angle2(b1, b2) * _beta;
 	_obj_b->rot() += b_dang;
 	_obj_b->rot_vel() += (b_dang / dt) * 1;
 
-	vl::vec2d a_dpos = (cpos - _obj_a->global(_loc_a)) * pos_w;
+	vl::vec2d a_dpos = (cpos - _obj_a->global(_loc_a)) * _beta;
 	_obj_a->pos() += a_dpos;
 	_obj_a->vel() += (a_dpos / dt) * 1;
 
-	vl::vec2d b_dpos = (cpos - _obj_b->global(_loc_b)) * pos_w;
+	vl::vec2d b_dpos = (cpos - _obj_b->global(_loc_b)) * _beta;
 	_obj_b->pos() += b_dpos;
 	_obj_b->vel() += (b_dpos / dt) * 1;
+}
+*/
+
+void ds2::hinge_joint::update(const double& dt)
+{
+	double tm = _obj_a->mass() + _obj_b->mass();
+	vl::vec2d cpos =
+		_obj_a->global(_loc_a) * _obj_a->mass() +
+		_obj_b->global(_loc_b) * _obj_b->mass();
+	cpos /= tm;
+
+	vl::vec2d a1 = _obj_a->global(_loc_a) - _obj_a->pos();
+	vl::vec2d a2 = cpos - _obj_a->pos();
+	double a_dang = utils::angle2(a1, a2) * _beta;
+	_obj_a->rot() += a_dang;
+	_obj_a->rot_vel() += (a_dang / dt) * 1;
+
+	vl::vec2d b1 = _obj_b->global(_loc_b) - _obj_b->pos();
+	vl::vec2d b2 = cpos - _obj_b->pos();
+	double b_dang = utils::angle2(b1, b2) * _beta;
+	_obj_b->rot() += b_dang;
+	_obj_b->rot_vel() += (b_dang / dt) * 1;
+
+	vl::vec2d a_dpos = (cpos - _obj_a->global(_loc_a)) * _beta;
+	_obj_a->pos() += a_dpos;
+	_obj_a->vel() += (a_dpos / dt) * 1;
+
+	vl::vec2d b_dpos = (cpos - _obj_b->global(_loc_b)) * _beta;
+	_obj_b->pos() += b_dpos;
+	_obj_b->vel() += (b_dpos / dt) * 1;
+}
+
+const double& ds2::hinge_joint::beta() const
+{
+	return _beta;
+}
+
+double& ds2::hinge_joint::beta()
+{
+	return _beta;
+}
+
+ds2::motor_joint::motor_joint(
+	object* a,
+	object* b,
+	const double& speed,
+	vl::vec2d loc_a,
+	vl::vec2d loc_b,
+	const double& beta)
+	: hinge_joint(a, b, loc_a, loc_b, beta), _speed(speed)
+{
+	_torque = 300;
+}
+
+void ds2::motor_joint::update(const double& dt)
+{
+	hinge_joint::update(dt);
+
+	vl::vec2d d = _obj_b->pos() - _obj_b->global(_loc_b);
+	d.normalize();
+	vl::vec2d perp = { -d[1], d[0] };
+
+	if (std::abs(perp.dot(_obj_b->vel())) < _speed)
+	{
+		_obj_b->apply_force_local({ 0, _torque }, _loc_b + vl::vec2d(100, 0), dt);
+		_obj_b->apply_force_local({ 0, -_torque }, _loc_b - vl::vec2d(100, 0), dt);
+	}
+	else {
+		_obj_b->apply_force_local({ 0, -_torque }, _loc_b + vl::vec2d(100, 0), dt);
+		_obj_b->apply_force_local({ 0, _torque }, _loc_b - vl::vec2d(100, 0), dt);
+	}
 }

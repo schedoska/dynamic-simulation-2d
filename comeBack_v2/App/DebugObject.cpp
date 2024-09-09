@@ -1,5 +1,5 @@
 #include "DebugObject.h"
-#include "Utils.h"
+#include "ds2/Utils.h"
 
 DebugObject::DebugObject(vl::vec2d pos)
 	: object(pos)
@@ -37,7 +37,7 @@ void DebugObject::update_shape()
 		sf::ConvexShape cs;
 		cs.setFillColor(sf::Color::Transparent);
 		cs.setOutlineThickness(2);
-		cs.setOutlineColor(sf::Color::Blue);
+		cs.setOutlineColor(sf::Color::White);
 		cs.setPointCount(vert.size());
 		for (int i = 0; i < vert.size(); i++) {
 			cs.setPoint(i, utils::vec2_to_sfml(vert[i]));
@@ -48,7 +48,7 @@ void DebugObject::update_shape()
 		sf::CircleShape cs;
 		cs.setFillColor(sf::Color::Transparent);
 		cs.setOutlineThickness(2);
-		cs.setOutlineColor(sf::Color::Blue);
+		cs.setOutlineColor(sf::Color::White);
 		cs.setRadius(i.radius());
 
 		vl::vec2d offset = i.loc_pos() * -1.f + vl::vec2d(i.radius(), i.radius());

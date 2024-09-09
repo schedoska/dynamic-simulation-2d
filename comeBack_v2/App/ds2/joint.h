@@ -65,14 +65,38 @@ namespace ds2
 		double _damping;
 	};
 
-	class fixed_joint : public joint
+	class hinge_joint : public joint
 	{
 	public:
-		fixed_joint(
-			object* a, 
+		hinge_joint(
+			object* a,
 			object* b,
 			vl::vec2d loc_a = vl::vec2d(),
-			vl::vec2d loc_b = vl::vec2d());
+			vl::vec2d loc_b = vl::vec2d(),
+			const double& beta = 0.1);
+
 		void update(const double& dt) override;
+		const double& beta() const;
+		double& beta();
+
+	private:
+		double _beta;
+	};
+
+	class motor_joint : public hinge_joint
+	{
+	public:	
+		motor_joint(
+			object* a,
+			object* b,
+			const double& speed,
+			vl::vec2d loc_a = vl::vec2d(),
+			vl::vec2d loc_b = vl::vec2d(),
+			const double& beta = 0.1);
+
+		void update(const double& dt) override;
+		
+		double _speed;
+		double _torque;
 	};
 }
