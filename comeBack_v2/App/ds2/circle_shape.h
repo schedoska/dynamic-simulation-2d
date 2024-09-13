@@ -22,6 +22,7 @@ namespace ds2
 		double second_moment_area() const override;
 		vl::vec2d centroid() const override;
 		void scale(const vl::vec2d& scale) override;
+		void rotate(const double& rad) override;
 
 	protected:
 		double _radius;

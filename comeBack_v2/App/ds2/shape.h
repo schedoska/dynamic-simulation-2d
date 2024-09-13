@@ -25,6 +25,7 @@ namespace ds2
 		virtual double second_moment_area() const = 0;	
 		virtual const rect box(const vl::vec2d& pos, const double& rot) const;
 		virtual void scale(const vl::vec2d& scale) = 0;
+		virtual void rotate(const double& rad) = 0;
 
 	protected:
 	};

@@ -29,6 +29,12 @@ float utils::RadToDegrees(const float radians)
     return (radians * 180.0) / m_pi;
 }
 
+float utils::DegreesToRad(const float& degrees)
+{
+    const double m_pi = acos(-1);
+    return degrees * m_pi / 180.0;
+}
+
 void utils::drawLine(vl::vec2d start, vl::vec2d end, sf::RenderWindow& window, sf::Color color)
 {
     static sf::RectangleShape line;
@@ -79,6 +85,13 @@ vl::vec2d utils::rotate(const vl::vec2d& vec, const double& ang)
     double x = cos(ang) * vec[0] - sin(ang) * vec[1];
     double y = sin(ang) * vec[0] + cos(ang) * vec[1];
     return vl::vec2d(x, y);
+}
+
+sf::Vector2f utils::rotate(const sf::Vector2f& vec, const double& ang)
+{
+    double x = cos(ang) * vec.x - sin(ang) * vec.y;
+    double y = sin(ang) * vec.x + cos(ang) * vec.y;
+    return sf::Vector2f(x, y);
 }
 
 double utils::angle(const vl::vec2d& ref, const vl::vec2d& sec)

@@ -50,3 +50,8 @@ void ds2::circle_shape::scale(const vl::vec2d& scale)
     _radius *= std::max(scale[0], scale[1]);
 }
 
+void ds2::circle_shape::rotate(const double& rad)
+{
+    _loc_pos = vl::rotate(_loc_pos, rad);
+}
+

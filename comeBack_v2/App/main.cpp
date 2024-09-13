@@ -21,9 +21,9 @@
 int main()
 {
     sf::RenderWindow window;
-    window.create(sf::VideoMode(900, 600), "Fdf", sf::Style::Default);
+    window.create(sf::VideoMode(1500, 1000), "Fdf", sf::Style::Default);
 
-    window.setFramerateLimit(60);
+    window.setFramerateLimit(40);
     sf::Clock deltaClock;
 
     app a(&window);

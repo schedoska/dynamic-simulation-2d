@@ -12,6 +12,7 @@ namespace utils {
     vl::vec2d sfml_to_vec2d(const sf::Vector2i& v);
 
     float RadToDegrees(const float radians);
+    float DegreesToRad(const float& degrees);
 
     void drawLine(vl::vec2d start, vl::vec2d end, sf::RenderWindow& window, sf::Color color);
 
@@ -22,6 +23,7 @@ namespace utils {
     //std::shared_ptr<ConvexDebug> generate_rect(vl::vec2d pos, vl::vec2d size, double mass);
 
     vl::vec2d rotate(const vl::vec2d& vec, const double& ang);
+    sf::Vector2f rotate(const sf::Vector2f& vec, const double& ang);
 
     double angle(const vl::vec2d& ref, const vl::vec2d& sec);
     double angle2(const vl::vec2d& ref, const vl::vec2d& sec);
@@ -36,5 +38,7 @@ namespace utils {
 
     template<typename T>
     inline bool is_in_range(const T& val, T, T);
+
+
 }
 #endif

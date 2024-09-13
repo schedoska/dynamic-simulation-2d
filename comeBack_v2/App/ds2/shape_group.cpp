@@ -92,3 +92,9 @@ void ds2::shape_group::scale(const vl::vec2d& scale)
     for (auto& i : _circles)  i.scale(scale);
 }
 
+void ds2::shape_group::rotate(const double& rad)
+{
+    for (auto& i : _convexes) i.rotate(rad);
+    for (auto& i : _circles)  i.rotate(rad);
+}
+

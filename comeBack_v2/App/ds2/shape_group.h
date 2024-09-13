@@ -24,6 +24,7 @@ namespace ds2
 		double second_moment_area() const override;
 		const rect box(const vl::vec2d& pos, const double& rot) const override;
 		void scale(const vl::vec2d& scale) override;
+		void rotate(const double& rad) override;
 
 	private:
 		std::vector<circle_shape> _circles;

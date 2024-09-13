@@ -82,3 +82,10 @@ void ds2::convex_shape::scale(const vl::vec2d& scale)
     }
 }
 
+void ds2::convex_shape::rotate(const double& rad)
+{
+    for (auto& i : _vertices) {
+        i = vl::rotate(i, rad);
+    }
+}
+

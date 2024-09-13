@@ -45,12 +45,6 @@ void app::update(const sf::Time& dt)
 {
 	ImGui::SFML::Update(*_window, dt);
 
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-		sf::Vector2i p = sf::Mouse::getPosition(*_window);
-		vl::vec2d vlp = utils::sfml_to_vec2d(p);
-		body_at(vlp);
-	}
-
 	bh.update(_window);
 
 	ImGui::Begin("Hello, world!");

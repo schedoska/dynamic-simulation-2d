@@ -4,150 +4,191 @@
 
 body_handler::body_handler()
 {
-	_target = nullptr;
-	_is_stretching = false;
+	_active = false;
 
-	for (auto &i : _corners) {
-		i.setFillColor(body_handler_conf::corner_color);
-		i.setRadius(body_handler_conf::corner_radius);
-		i.setOrigin(
-			body_handler_conf::corner_radius,
-			body_handler_conf::corner_radius);
+	for (auto& i : _stretchers) {
+		i.setFillColor(sf::Color::Black);
+		i.setRadius(10);
+		i.setOrigin(10, 10);
 	}
-	for (auto &i : _borders) {
-		i.setFillColor(body_handler_conf::border_color);
-	}
+	_border.setFillColor(sf::Color::Transparent);
+	_border.setOutlineColor(sf::Color::Red);
+	_border.setOutlineThickness(3);
+
+	_rotator.setFillColor(sf::Color::Black);
+	_rotator.setRadius(10);
+	_rotator.setOrigin(10, 10);
 }
 
 void body_handler::update(const sf::Window* window)
 {
-	if (_target == nullptr) return;
-	update_corner_border_pos();
-	update_corner_border_input(window);
+	bool clicked = sf::Mouse::isButtonPressed(sf::Mouse::Left);
+	sf::Vector2f mouse_pos = static_cast<sf::Vector2f>(sf::Mouse::getPosition(*window));
 
-	//if (_is_stretching) stretch_box(window);
+	if (!clicked && _active) 
+		_active = false;
+
+	if (_active) {
+		update_active(mouse_pos);
+		update_handlers_pos();
+		return;
+	}
+
+	for (int i = handler::top; i != handler::rotator; ++i) {
+		handler h = static_cast<handler>(i);
+		bool contains = _stretchers[i].getGlobalBounds().contains(mouse_pos);
+		if (contains && !_active) {
+			_current_handler = h;
+			_active = true;
+		}
+	}
+	if (borders_contains(mouse_pos) && !_active) {
+		_current_handler = handler::position;
+		_active = true;
+		_grab_pos = mouse_pos - _border.getPosition();
+	}
+
+	update_handlers_pos();
 }
 
 void body_handler::draw(sf::RenderWindow* window)
 {
-	for (const auto &i : _borders) window->draw(i);
-	for (const auto &i : _corners) window->draw(i);
+	window->draw(_border);
+	window->draw(_rotator);
+	for (const auto& i : _stretchers) window->draw(i);
 }
 
 void body_handler::set_target(body* target)
 {
 	_target = target;
-	_box = _target->shape().box(_target->pos(), _target->rot());
+	_border.setPosition(500, 500);
+	_border.setSize(sf::Vector2f(200,100));
+	_border.setOrigin(100, 50);
+	_border.setRotation(15);
 }
 
-void body_handler::update_corner_border_pos()
+void body_handler::update_handlers_pos()
 {
-	ds2::rect box = _box;
+	double w2 = _border.getSize().x / 2.0;
+	double h2 = _border.getSize().y / 2.0;
+	double r = 10;
 
-	const sf::Vector2f tl = utils::vec2_to_sfml(box.pos);
-	const sf::Vector2f tr = utils::vec2_to_sfml(box.pos + vl::vec2d(box.w, 0));
-	const sf::Vector2f br = utils::vec2_to_sfml(box.pos + vl::vec2d(box.w, box.h));
-	const sf::Vector2f bl = utils::vec2_to_sfml(box.pos + vl::vec2d(0, box.h));
-	_corners[handler_type::top_left_corner - 4].setPosition(tl);
-	_corners[handler_type::top_right_corner - 4].setPosition(tr);
-	_corners[handler_type::bottom_right_corner - 4].setPosition(br);
-	_corners[handler_type::bottom_left_corner - 4].setPosition(bl);
+	_stretchers[handler::top].setOrigin(r, h2 + r);
+	_stretchers[handler::right].setOrigin(-w2 + r, r);
+	_stretchers[handler::bottom].setOrigin(r, -h2 + r);
+	_stretchers[handler::left].setOrigin(w2 + r, r);
 
-	constexpr double bw = body_handler_conf::border_width; // Border width
-	_borders[handler_type::top_border].setPosition(tl - sf::Vector2f(0, bw / 2.0));
-	_borders[handler_type::top_border].setSize(sf::Vector2f(box.w, bw));
-	_borders[handler_type::bottom_border].setPosition(bl - sf::Vector2f(0, bw / 2.0));
-	_borders[handler_type::bottom_border].setSize(sf::Vector2f(box.w, bw));
+	_stretchers[handler::top_left].setOrigin(w2 + r, h2 + r);
+	_stretchers[handler::top_right].setOrigin(-w2 + r, h2 + r);
+	_stretchers[handler::bottom_right].setOrigin(-w2 + r, -h2 + r);
+	_stretchers[handler::bottom_left].setOrigin(w2 + r, -h2 + r);
 
-	_borders[handler_type::left_border].setPosition(tl - sf::Vector2f(bw / 2.0, 0));
-	_borders[handler_type::left_border].setSize(sf::Vector2f(bw, box.h));
-	_borders[handler_type::right_border].setPosition(tr - sf::Vector2f(bw / 2.0, 0));
-	_borders[handler_type::right_border].setSize(sf::Vector2f(bw, box.h));
+	for (auto& i : _stretchers) {
+		i.setPosition(_border.getPosition());
+		i.setRotation(_border.getRotation());
+	}
+
+	sf::Vector2f size = _border.getSize();
+	_border.setOrigin(size.x / 2.0, size.y / 2.0);
+
+	_rotator.setOrigin(r, h2 + 40 + r);
+	_rotator.setPosition(_border.getPosition());
+	_rotator.setRotation(_border.getRotation());
 }
 
-void body_handler::update_corner_border_input(const sf::Window* window)
+void body_handler::update_active(const sf::Vector2f& mouse_pos)
 {
-	sf::Vector2f mouse_pos = (sf::Vector2f) sf::Mouse::getPosition(*window);
-	bool clicked = sf::Mouse::isButtonPressed(sf::Mouse::Left);
-
-	if (!clicked) _is_stretching = false;
-	if (_is_stretching) {
-		stretch_box(window);
+	if (_current_handler == handler::position) {
+		_border.setPosition(mouse_pos - _grab_pos);
 		return;
 	}
 
-	for (size_t i = 0; i < 4; ++i ) {
-		sf::FloatRect fr = _corners[i].getGlobalBounds();
-		if (fr.contains(mouse_pos)) {
-			_corners[i].setFillColor(body_handler_conf::corner_hover_color);
-			if (clicked && !_is_stretching) {
-				_is_stretching = true;
-				_handler = (handler_type)(i + 4);
-			}
-		}
-		else {
-			_corners[i].setFillColor(body_handler_conf::corner_color);
-		}
-	}
-	for (size_t i = 0; i < 4; ++i) {
-		sf::FloatRect fr = _borders[i].getGlobalBounds();
-		if (fr.contains(mouse_pos)) {
-			_borders[i].setFillColor(body_handler_conf::border_hover_color);
-			if (clicked && !_is_stretching) {
-				_is_stretching = true;
-				_handler = (handler_type)(i);
-			}
-		}
-		else {
-			_borders[i].setFillColor(body_handler_conf::border_color);
-		}
+	sf::Vector2f loc_mouse_pos = mouse_pos - _border.getPosition();
+	vl::vec2d lmpv = utils::sfml_to_vec2d(loc_mouse_pos);
+	vl::vec2d hnv = vl::rotate(vl::vec2d(0, 1), utils::DegreesToRad(_border.getRotation()));
+	vl::vec2d wnv = vl::rotate(vl::vec2d(1, 0), utils::DegreesToRad(_border.getRotation()));
+	double h_val = hnv.dot(lmpv);
+	double w_val = wnv.dot(lmpv);
+
+	auto stretch = [=](handler h, const sf::Vector2f& v) {
+		_stretchers[h].setOrigin(v);
+		stretch_border(h);
+	};
+
+	switch (_current_handler)
+	{
+	case handler::top:
+		stretch(handler::top, sf::Vector2f(10, -h_val + 10));
+		break;
+	case handler::bottom:
+		stretch(handler::bottom, sf::Vector2f(10, -h_val + 10));
+		break;
+	case handler::right:
+		stretch(handler::right, sf::Vector2f(-w_val + 10, 10));
+		break;
+	case handler::left:
+		stretch(handler::left, sf::Vector2f(-w_val + 10, 10));
+		break;
+	case handler::top_left:
+		stretch(handler::top, sf::Vector2f(10, -h_val + 10));
+		stretch(handler::left, sf::Vector2f(-w_val + 10, 10));
+		break;
+	case handler::top_right:
+		stretch(handler::top, sf::Vector2f(10, -h_val + 10));
+		stretch(handler::right, sf::Vector2f(-w_val + 10, 10));
+		break;
+	case handler::bottom_right:
+		stretch(handler::bottom, sf::Vector2f(10, -h_val + 10));
+		stretch(handler::right, sf::Vector2f(-w_val + 10, 10));
+		break;
+	case handler::bottom_left:
+		stretch(handler::bottom, sf::Vector2f(10, -h_val + 10));
+		stretch(handler::left, sf::Vector2f(-w_val + 10, 10));
+		break;
 	}
 }
 
-void body_handler::stretch_box(const sf::Window* window)
+void body_handler::stretch_border(handler h)
 {
-	sf::Vector2f mouse_pos = (sf::Vector2f)sf::Mouse::getPosition(*window);
-	ds2::rect temp = _box;
-	double td = _box.pos[1] - mouse_pos.y;
-	double ld = _box.pos[0] - mouse_pos.x;
-	double rd = mouse_pos.x - (_box.pos[0] + _box.w);
-	double bd = mouse_pos.y - (_box.pos[1] + _box.h);
+	sf::Vector2f hv = _stretchers[handler::top].getOrigin() - _stretchers[handler::bottom].getOrigin();
+	sf::Vector2f wv = _stretchers[handler::right].getOrigin() - _stretchers[handler::left].getOrigin();
+	sf::Vector2f size_new = sf::Vector2f(utils::sfml_to_vec2d(wv).len(), utils::sfml_to_vec2d(hv).len());
 
-	switch (_handler) {
-	case handler_type::top_border:
-		_box.pos[1] -= td;
-		_box.h += td;
-		break;
-	case handler_type::right_border:
-		_box.w += rd;
-		break;
-	case handler_type::bottom_border:
-		_box.h += bd;
-		break;
-	case handler_type::left_border:
-		_box.pos[0] -= ld;
-		_box.w += ld;
-		break;
-	case handler_type::top_left_corner:
-		_box.pos -= vl::vec2d(ld, td);
-		_box.h += td;
-		_box.w += ld;
-		break;
-	case handler_type::top_right_corner:
-		_box.pos[1] -= td;
-		_box.h += td;
-		_box.w += rd;
-		break;
-	case handler_type::bottom_right_corner:
-		_box.w += rd;
-		_box.h += bd;
-		break;
-	case handler_type::bottom_left_corner:
-		_box.pos[0] -= ld;
-		_box.w += ld;
-		_box.h += bd;
-		break;
+	sf::Vector2f size_diff = size_new - _border.getSize();
+	_border.setSize(size_new);
+
+	sf::Vector2f sdr = utils::rotate(size_diff, 0.0174532925 * _border.getRotation());
+	if (h == handler::top || h == handler::left) {
+		_border.setPosition(_border.getPosition() - (float)0.5 * sdr);
 	}
-	if (_box.h < body_handler_conf::min_body_size ||
-		_box.w < body_handler_conf::min_body_size) _box = temp;
+	else {
+		_border.setPosition(_border.getPosition() + (float)0.5 * sdr);
+	}
 }
+
+bool body_handler::borders_contains(const sf::Vector2f& v)
+{
+	vl::vec2d origin_offset = { 10,10 };
+
+	auto get_vec2d = [=](handler h) {
+		sf::Vector2f v = _stretchers[h].getGlobalBounds().getPosition();
+		return utils::sfml_to_vec2d(v);
+	};
+	vl::vec2d vs2d[4] = { 
+		get_vec2d(handler::top_left) + origin_offset, 
+		get_vec2d(handler::top_right) + origin_offset,
+		get_vec2d(handler::bottom_right) + origin_offset,
+		get_vec2d(handler::bottom_left) + origin_offset
+	};
+	vl::vec2d v2d = utils::sfml_to_vec2d(v);
+
+	for (size_t i = 0; i < 4; ++i) {
+		vl::vec2d dp = vs2d[(i + 1) % 4] - vs2d[i];
+		vl::vec2d dv = v2d - vs2d[i];
+		double s = vl::cross(dp, dv);
+		if (s < 0) return false;
+	}
+	return true;
+}
+
+
