@@ -40,6 +40,9 @@ private:
 	void update_active(const sf::Vector2f& mouse_pos);
 	void stretch_border(handler h);
 	bool borders_contains(const sf::Vector2f& v);
+	double snap_angle(const double& rad, const int n);
+
+	void set_target();			// adjust target to fit the border
 };
 
 namespace body_handler_conf 

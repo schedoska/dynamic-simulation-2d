@@ -25,12 +25,13 @@ void body_handler::update(const sf::Window* window)
 	bool clicked = sf::Mouse::isButtonPressed(sf::Mouse::Left);
 	sf::Vector2f mouse_pos = static_cast<sf::Vector2f>(sf::Mouse::getPosition(*window));
 
-	if (!clicked && _active) 
+	if (!clicked && _active) {
 		_active = false;
-
-	if (_active) {
+	}
+	else if (_active) {
 		update_active(mouse_pos);
 		update_handlers_pos();
+		set_target();
 		return;
 	}
 
@@ -42,12 +43,16 @@ void body_handler::update(const sf::Window* window)
 			_active = true;
 		}
 	}
+	bool contains_rotator = _rotator.getGlobalBounds().contains(mouse_pos);
+	if (contains_rotator && !_active) {
+		_current_handler = handler::rotator;
+		_active = true;
+	}
 	if (borders_contains(mouse_pos) && !_active) {
 		_current_handler = handler::position;
 		_active = true;
 		_grab_pos = mouse_pos - _border.getPosition();
 	}
-
 	update_handlers_pos();
 }
 
@@ -102,6 +107,13 @@ void body_handler::update_active(const sf::Vector2f& mouse_pos)
 		_border.setPosition(mouse_pos - _grab_pos);
 		return;
 	}
+	else if (_current_handler == handler::rotator) {
+		vl::vec2d dv = utils::sfml_to_vec2d(mouse_pos) - utils::sfml_to_vec2d(_border.getPosition());
+		vl::vec2d ref = { 0, -1 };
+		double ang = utils::angle(ref, dv);
+		ang = snap_angle(ang, 8);
+		_border.setRotation(utils::RadToDegrees(ang));
+	}
 
 	sf::Vector2f loc_mouse_pos = mouse_pos - _border.getPosition();
 	vl::vec2d lmpv = utils::sfml_to_vec2d(loc_mouse_pos);
@@ -115,35 +127,37 @@ void body_handler::update_active(const sf::Vector2f& mouse_pos)
 		stretch_border(h);
 	};
 
+	constexpr double min_b = 20;	// minimal border size dimension
+	constexpr double r = 10;		// radius of stretrcher handler
 	switch (_current_handler)
 	{
 	case handler::top:
-		stretch(handler::top, sf::Vector2f(10, -h_val + 10));
+		stretch(handler::top, sf::Vector2f(10, -std::min(h_val, -min_b) + r));
 		break;
 	case handler::bottom:
-		stretch(handler::bottom, sf::Vector2f(10, -h_val + 10));
+		stretch(handler::bottom, sf::Vector2f(10, -std::max(h_val, min_b) + r));
 		break;
 	case handler::right:
-		stretch(handler::right, sf::Vector2f(-w_val + 10, 10));
+		stretch(handler::right, sf::Vector2f(-std::max(w_val, min_b) + r, r));
 		break;
 	case handler::left:
-		stretch(handler::left, sf::Vector2f(-w_val + 10, 10));
+		stretch(handler::left, sf::Vector2f(-std::min(w_val, -min_b) + r, r));
 		break;
 	case handler::top_left:
-		stretch(handler::top, sf::Vector2f(10, -h_val + 10));
-		stretch(handler::left, sf::Vector2f(-w_val + 10, 10));
+		stretch(handler::top, sf::Vector2f(10, -std::min(h_val, -min_b) + r));
+		stretch(handler::left, sf::Vector2f(-std::min(w_val, -min_b) + r, r));
 		break;
 	case handler::top_right:
-		stretch(handler::top, sf::Vector2f(10, -h_val + 10));
-		stretch(handler::right, sf::Vector2f(-w_val + 10, 10));
+		stretch(handler::top, sf::Vector2f(10, -std::min(h_val, -min_b) + r));
+		stretch(handler::right, sf::Vector2f(-std::max(w_val, min_b) + r, r));
 		break;
 	case handler::bottom_right:
-		stretch(handler::bottom, sf::Vector2f(10, -h_val + 10));
-		stretch(handler::right, sf::Vector2f(-w_val + 10, 10));
+		stretch(handler::bottom, sf::Vector2f(10, -std::max(h_val, min_b) + r));
+		stretch(handler::right, sf::Vector2f(-std::max(w_val, min_b) + r, r));
 		break;
 	case handler::bottom_left:
-		stretch(handler::bottom, sf::Vector2f(10, -h_val + 10));
-		stretch(handler::left, sf::Vector2f(-w_val + 10, 10));
+		stretch(handler::bottom, sf::Vector2f(10, -std::max(h_val, min_b) + r));
+		stretch(handler::left, sf::Vector2f(-std::min(w_val, -min_b) + r, r));
 		break;
 	}
 }
@@ -189,6 +203,30 @@ bool body_handler::borders_contains(const sf::Vector2f& v)
 		if (s < 0) return false;
 	}
 	return true;
+}
+
+double body_handler::snap_angle(const double& rad, const int n)
+{
+	const double m_pi = acos(-1);
+	double step = (2.0 * m_pi / n);
+	double norm = (2.0 * rad + step) / (4.0 * m_pi);
+	return (int)(norm * n) * step;
+}
+
+void body_handler::set_target()
+{
+	ds2::rect tb = _target->shape().box(_target->pos(), 0);
+	sf::Vector2f b_size = _border.getSize();
+	vl::vec2d s = { b_size.x / tb.w, b_size.y / tb.h };
+	_target->shape().scale(s);
+	_target->rot() = utils::DegreesToRad(_border.getRotation());
+
+	vl::vec2d gc = tb.pos + vl::vec2d(tb.w, tb.h) * 0.5;
+	vl::vec2d gcmc = gc - _target->pos();
+	gcmc = vl::rotate(gcmc, _target->rot());
+	_target->pos() = utils::sfml_to_vec2d(_border.getPosition()) - gcmc;
+
+	_target->update_shape();
 }
 
 
