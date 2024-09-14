@@ -29,9 +29,13 @@ app::app(sf::RenderWindow* window)
 	//b->shape().add(block);
 	b->shape() = s.generate_shape_group(ds2::triangulation::delaunay);
 	b->update_shape();
-	b->pos() = { 200,200 };
+	b->pos() = { 250,200 };
+	b->rot() = 0.3;
+
+	body* b2 = new body(*b);
 
 	_bodies.push_back(b);
+	_bodies.push_back(b2);
 
 	bh.set_target(b);
 }
@@ -44,6 +48,17 @@ app::~app()
 void app::update(const sf::Time& dt)
 {
 	ImGui::SFML::Update(*_window, dt);
+
+	sf::Vector2f mouse_pos = (sf::Vector2f)sf::Mouse::getPosition(*_window);
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
+		body* b = body_at(utils::sfml_to_vec2d(mouse_pos));
+		if (bh._target == nullptr) {
+			bh.set_target(b);
+		}
+		else if (b == nullptr){
+			bh.set_target(nullptr);
+		}
+	}
 
 	bh.update(_window);
 

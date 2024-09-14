@@ -24,9 +24,9 @@ public:
 	void draw(sf::RenderWindow* window);
 
 	void set_target(body* target);
+	body* _target;
 
 private:
-	body* _target;
 
 	handler _current_handler;
 	bool _active;
@@ -42,22 +42,22 @@ private:
 	bool borders_contains(const sf::Vector2f& v);
 	double snap_angle(const double& rad, const int n);
 
-	void set_target();			// adjust target to fit the border
+	void set_target();	// adjust target to fit the border
+	void set_border();	// adjust border to fir target	
 };
 
-namespace body_handler_conf 
+namespace handler_conf 
 {
-	constexpr float corner_radius = 4;
+	constexpr float handler_radius = 8;
 	constexpr float border_width = 4;
-	constexpr float center_radius = 6;
 
-	const sf::Color corner_color = sf::Color::Green;
-	const sf::Color corner_hover_color = sf::Color(2, 2, 2);
+	const sf::Color handler_color = sf::Color::Green;
+	const sf::Color handler_hover_color = sf::Color(2, 2, 2);
 	const sf::Color border_color = sf::Color::Red;
-	const sf::Color border_hover_color = sf::Color(2, 2, 2);
-	const sf::Color center_color = sf::Color::Red;
-	const sf::Color center_hover_color = sf::Color(2, 2, 2);
+	const sf::Color border_hover_color = sf::Color::Blue;
 
-	constexpr float min_body_size = 20;
+	constexpr float min_border_size = 50;
+	constexpr float rotator_top_dist = 40;
+	constexpr float border_margin = 20;
 }
 
