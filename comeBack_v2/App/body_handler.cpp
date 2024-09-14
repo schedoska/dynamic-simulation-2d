@@ -111,7 +111,8 @@ void body_handler::update_active(const sf::Vector2f& mouse_pos)
 		vl::vec2d dv = utils::sfml_to_vec2d(mouse_pos) - utils::sfml_to_vec2d(_border.getPosition());
 		vl::vec2d ref = { 0, -1 };
 		double ang = utils::angle(ref, dv);
-		ang = snap_angle(ang, 8);
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
+			ang = snap_angle(ang, 8);
 		_border.setRotation(utils::RadToDegrees(ang));
 	}
 
