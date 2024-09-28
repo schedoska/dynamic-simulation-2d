@@ -24,10 +24,13 @@ public:
 	void draw(sf::RenderWindow* window);
 
 	void set_target(body* target);
-	body* _target;
+	body* target() const;
+
+	void set_border();	// adjust border to fit target	
 
 private:
 
+	body* _target;
 	handler _current_handler;
 	bool _active;
 	sf::Vector2f _grab_pos;		// realtive to border center
@@ -43,7 +46,6 @@ private:
 	double snap_angle(const double& rad, const int n);
 
 	void set_target();	// adjust target to fit the border
-	void set_border();	// adjust border to fir target	
 };
 
 namespace handler_conf 

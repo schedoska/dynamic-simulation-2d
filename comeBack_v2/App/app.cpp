@@ -25,7 +25,7 @@ app::app(sf::RenderWindow* window)
 	s.add(vl::vec2d(-0, 100));
 	s.add(vl::vec2d(-120, -130));
 
-	body *b = new body();
+	body *b = new body("Blok 1");
 	//b->shape().add(block);
 	b->shape() = s.generate_shape_group(ds2::triangulation::delaunay);
 	b->update_shape();
@@ -38,6 +38,7 @@ app::app(sf::RenderWindow* window)
 	_bodies.push_back(b2);
 
 	bh.set_target(b);
+	oc_ui.set_target(&bh);
 }
 
 app::~app()
@@ -52,7 +53,7 @@ void app::update(const sf::Time& dt)
 	sf::Vector2f mouse_pos = (sf::Vector2f)sf::Mouse::getPosition(*_window);
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
 		body* b = body_at(utils::sfml_to_vec2d(mouse_pos));
-		if (bh._target == nullptr) {
+		if (bh.target() == nullptr) {
 			bh.set_target(b);
 		}
 		else if (b == nullptr){
@@ -62,16 +63,16 @@ void app::update(const sf::Time& dt)
 
 	bh.update(_window);
 
-	ImGui::Begin("Hello, world!");
-	static float g = 0;
-	ImGui::SliderFloat("Some value", &g, 0.0f, 100.0f);
-	ImGui::End();
+	
 }
 
 void app::draw()
 {
 	for (auto& b : _bodies) b->draw(*_window);
 	bh.draw(_window);
+	oc_ui.draw();
+
+	//ImGui::ShowDemoWindow();
 
 	ImGui::SFML::Render(*_window);
 }

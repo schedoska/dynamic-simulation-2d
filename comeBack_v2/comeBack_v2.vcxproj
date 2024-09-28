@@ -51,6 +51,8 @@
     <ClInclude Include="App\ds2\vec.h" />
     <ClInclude Include="App\ds2\vec2.h" />
     <ClInclude Include="App\body_handler.h" />
+    <ClInclude Include="App\object_conf_ui.h" />
+    <ClInclude Include="App\polygon_tool.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App\app.cpp" />
@@ -79,6 +81,8 @@
     <ClCompile Include="App\ds2\shape_group.cpp" />
     <ClCompile Include="App\ds2\Utils.cpp" />
     <ClCompile Include="App\body_handler.cpp" />
+    <ClCompile Include="App\object_conf_ui.cpp" />
+    <ClCompile Include="App\polygon_tool.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

@@ -1,13 +1,11 @@
 #pragma once
 
-#include "imgui.h"
-#include "imgui-SFML.h"
-
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 
 #include "body.h"
 #include "body_handler.h"
+#include "object_conf_ui.h"
 
 class app
 {
@@ -25,5 +23,6 @@ private:
 	body* body_at(const vl::vec2d& scene_pos);
 
 	body_handler bh;
+	object_conf_ui oc_ui;
 };
 

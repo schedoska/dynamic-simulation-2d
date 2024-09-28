@@ -85,6 +85,11 @@ void body_handler::set_target(body* target)
 	_border.setRotation(15);
 }
 
+body* body_handler::target() const
+{
+	return _target;
+}
+
 void body_handler::update_handlers_pos()
 {
 	double w2 = _border.getSize().x / 2.0;
@@ -245,6 +250,7 @@ void body_handler::set_target()
 	gcmc = vl::rotate(gcmc, _target->rot());
 	_target->pos() = utils::sfml_to_vec2d(_border.getPosition()) - gcmc;
 	_target->update_shape();
+	_target->adjust_inertia();
 }
 
 void body_handler::set_border()
@@ -259,6 +265,7 @@ void body_handler::set_border()
 	_border.setOrigin(0.5f * _border.getSize());
 	_border.setRotation(utils::RadToDegrees(_target->rot()));
 	_border.setPosition(utils::vec2_to_sfml(_target->pos() + gcmc));
+	update_handlers_pos();
 }
 
 

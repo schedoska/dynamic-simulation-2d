@@ -1,7 +1,8 @@
 #include "Body.h"
 #include "ds2/Utils.h"
 
-body::body()
+body::body(const std::string& name)
+	: _name(name)
 {
 	set_color(sf::Color(2, 205, 219));
 }
@@ -28,6 +29,16 @@ void body::set_color(const sf::Color& color)
 const sf::Color& body::color() const
 {
 	return _color;
+}
+
+void body::set_name(const std::string& name)
+{
+	_name = name;
+}
+
+const std::string& body::name() const
+{
+	return _name;
 }
 
 void body::update_shape()
