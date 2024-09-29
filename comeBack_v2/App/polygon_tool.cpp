@@ -1,6 +1,9 @@
 #include "polygon_tool.h"
 #include "ds2/Utils.h"
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 polygon_tool::polygon_tool()
 	: _active(false)
 {
@@ -21,18 +24,23 @@ void polygon_tool::update(const sf::Window* window)
 
 	static bool prev_clkd = false;
 	bool clkd = sf::Mouse::isButtonPressed(sf::Mouse::Left);
-	bool snapped = false;
+	bool snapped_start = false;
 	_snap_pos = static_cast<sf::Vector2f>(sf::Mouse::getPosition(*window));
 
+	if (_vertices.size() > 0) {
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) {
+			_snap_pos = snapped_vh_line(_vertices.back(), _snap_pos);
+		}
+	}
 	if (_vertices.size() > 2) {
 		double snap_dist = utils::sfml_to_vec2d(_snap_pos - _vertices[0]).len();
 		if (snap_dist < polygon_tool_conf::snap_len) {
 			_snap_pos = _vertices[0];
-			snapped = true;
+			snapped_start = true;
 		}
 	}
 	if (clkd && !prev_clkd) {
-		if (snapped)
+		if (snapped_start)
 			create_shape();
 		else
 			_vertices.push_back(_snap_pos);
@@ -51,16 +59,15 @@ void polygon_tool::draw(sf::RenderWindow* window)
 		window->draw(_start_vx_shape);
 		return;
 	}
-	else {
-		draw_line(_vertices[size - 1], _snap_pos, polygon_tool_conf::active_line_color, window);
-		_vx_shape.setPosition(_snap_pos);
-		window->draw(_vx_shape);
-	}
 
 	// draw lines
 	for (size_t i = 1; i < _vertices.size(); ++i) {
 		draw_line(_vertices[i - 1], _vertices[i], polygon_tool_conf::line_color, window);
 	}
+	// draw currently active line
+	draw_line(_vertices[size - 1], _snap_pos, polygon_tool_conf::active_line_color, window);
+	_vx_shape.setPosition(_snap_pos);
+	window->draw(_vx_shape);
 	// draw vertices
 	_start_vx_shape.setPosition(_vertices[0]);
 	window->draw(_start_vx_shape);
@@ -106,4 +113,22 @@ void polygon_tool::draw_line(
 
 	line.setFillColor(color);
 	window->draw(line);
+}
+
+sf::Vector2f polygon_tool::snapped_vh_line(const sf::Vector2f& beg, const sf::Vector2f& end)
+{
+	vl::vec2d u = { 0, -1 };
+	vl::vec2d dv = utils::sfml_to_vec2d(end - beg);
+	vl::vec2d fin;
+	double max_dot = -std::numeric_limits<double>::max();
+
+	for (size_t i = 0; i < 4; ++i) {
+		double d = u.dot(dv);
+		if (d > max_dot) {
+			max_dot = d;
+			fin = u * d;
+		}
+		u = vl::rotate(u, M_PI_2);
+	}
+	return utils::vec2_to_sfml(fin) + beg;
 }

@@ -29,7 +29,7 @@ public:
 	void set_border();	// adjust border to fit target	
 
 private:
-
+	bool eql_axis_mode;	// used with circles, equal scaling in both axis
 	body* _target;
 	handler _current_handler;
 	bool _active;

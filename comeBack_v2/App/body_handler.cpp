@@ -75,14 +75,12 @@ void body_handler::set_target(body* target)
 {
 	_target = target;
 	if (_target == nullptr) return;
+
+	// Decide wheter to use equal axis scling mode
+	eql_axis_mode = _target->shape().circles().size() > 0 ? true : false;
 	set_border();
 	update_handlers_pos();
 	return;
-
-	_border.setPosition(500, 500);
-	_border.setSize(sf::Vector2f(200,100));
-	_border.setOrigin(100, 50);
-	_border.setRotation(15);
 }
 
 body* body_handler::target() const
@@ -142,43 +140,56 @@ void body_handler::update_active(const sf::Vector2f& mouse_pos)
 	vl::vec2d wnv = vl::rotate(vl::vec2d(1, 0), utils::DegreesToRad(_border.getRotation()));
 	double h_val = hnv.dot(lmpv);
 	double w_val = wnv.dot(lmpv);
+	
+	double h_val_xx = h_val;
+	double w_val_xx = w_val;
+	if (eql_axis_mode) {
+		double avg_val = (std::abs(h_val) + std::abs(w_val)) / 2.0;
+		h_val_xx = avg_val * (double)((h_val > 0) - (h_val < 0));
+		w_val_xx = avg_val * (double)((w_val > 0) - (w_val < 0));
+	}
 
-	auto stretch = [=](handler h, const sf::Vector2f& v) {
+	auto stretch = [=](handler h, const sf::Vector2f& v, bool b = true) {
+		if (!b) return;
 		_stretchers[h].setOrigin(v);
 		stretch_border(h);
 	};
 
 	constexpr double min_b = handler_conf::min_border_size;	// minimal border size dimension
-	constexpr double r	   = handler_conf::handler_radius;  // radius of stretrcher handler
+	constexpr double r = handler_conf::handler_radius;  // radius of stretrcher handler
 	switch (_current_handler)
 	{
 	case handler::top:
 		stretch(handler::top, sf::Vector2f(r, -std::min(h_val, -min_b) + r));
+		stretch(handler::right, sf::Vector2f(-std::max(-h_val, min_b) + r, r), eql_axis_mode);
 		break;
 	case handler::bottom:
 		stretch(handler::bottom, sf::Vector2f(r, -std::max(h_val, min_b) + r));
+		stretch(handler::right, sf::Vector2f(-std::max(h_val, min_b) + r, r), eql_axis_mode);
 		break;
 	case handler::right:
 		stretch(handler::right, sf::Vector2f(-std::max(w_val, min_b) + r, r));
+		stretch(handler::top, sf::Vector2f(r, -std::min(-w_val, -min_b) + r), eql_axis_mode);
 		break;
 	case handler::left:
 		stretch(handler::left, sf::Vector2f(-std::min(w_val, -min_b) + r, r));
+		stretch(handler::top, sf::Vector2f(r, -std::min(w_val, -min_b) + r), eql_axis_mode);
 		break;
 	case handler::top_left:
-		stretch(handler::top, sf::Vector2f(r, -std::min(h_val, -min_b) + r));
-		stretch(handler::left, sf::Vector2f(-std::min(w_val, -min_b) + r, r));
+		stretch(handler::top, sf::Vector2f(r, -std::min(h_val_xx, -min_b) + r));
+		stretch(handler::left, sf::Vector2f(-std::min(w_val_xx, -min_b) + r, r));
 		break;
 	case handler::top_right:
-		stretch(handler::top, sf::Vector2f(r, -std::min(h_val, -min_b) + r));
-		stretch(handler::right, sf::Vector2f(-std::max(w_val, min_b) + r, r));
+		stretch(handler::top, sf::Vector2f(r, -std::min(h_val_xx, -min_b) + r));
+		stretch(handler::right, sf::Vector2f(-std::max(w_val_xx, min_b) + r, r));
 		break;
 	case handler::bottom_right:
-		stretch(handler::bottom, sf::Vector2f(r, -std::max(h_val, min_b) + r));
-		stretch(handler::right, sf::Vector2f(-std::max(w_val, min_b) + r, r));
+		stretch(handler::bottom, sf::Vector2f(r, -std::max(h_val_xx, min_b) + r));
+		stretch(handler::right, sf::Vector2f(-std::max(w_val_xx, min_b) + r, r));
 		break;
 	case handler::bottom_left:
-		stretch(handler::bottom, sf::Vector2f(r, -std::max(h_val, min_b) + r));
-		stretch(handler::left, sf::Vector2f(-std::min(w_val, -min_b) + r, r));
+		stretch(handler::bottom, sf::Vector2f(r, -std::max(h_val_xx, min_b) + r));
+		stretch(handler::left, sf::Vector2f(-std::min(w_val_xx, -min_b) + r, r));
 		break;
 	}
 }
@@ -203,16 +214,16 @@ void body_handler::stretch_border(handler h)
 
 bool body_handler::borders_contains(const sf::Vector2f& v)
 {
-	vl::vec2d origin_offset = { 
+	vl::vec2d origin_offset = {
 		handler_conf::handler_radius,
-		handler_conf::handler_radius 
+		handler_conf::handler_radius
 	};
 	auto get_vec2d = [=](handler h) {
 		sf::Vector2f v = _stretchers[h].getGlobalBounds().getPosition();
 		return utils::sfml_to_vec2d(v);
 	};
-	vl::vec2d vs2d[4] = { 
-		get_vec2d(handler::top_left) + origin_offset, 
+	vl::vec2d vs2d[4] = {
+		get_vec2d(handler::top_left) + origin_offset,
 		get_vec2d(handler::top_right) + origin_offset,
 		get_vec2d(handler::bottom_right) + origin_offset,
 		get_vec2d(handler::bottom_left) + origin_offset

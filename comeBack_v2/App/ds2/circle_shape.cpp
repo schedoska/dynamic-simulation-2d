@@ -38,6 +38,13 @@ double ds2::circle_shape::second_moment_area() const
     return std::acos(-1) * std::pow(_radius, 4) / 2.0 + std::pow(d, 2) * area();
 }
 
+const ds2::rect ds2::circle_shape::box(const vl::vec2d& pos, const double& rot) const
+{
+    vl::vec2d cp = vl::rotate(_loc_pos, rot) + pos;
+    rect box = { cp - vl::vec2d(_radius, _radius) , 2.0 * _radius, 2.0 * _radius };
+    return box;
+}
+
 vl::vec2d ds2::circle_shape::centroid() const
 {
     return _loc_pos;

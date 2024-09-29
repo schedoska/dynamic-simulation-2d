@@ -41,7 +41,7 @@ void object_conf_ui::draw()
 	{
 		_target->set_mass(target_mass, adj_inertia);
 	}
-	ImGui::SameLine();
+	//ImGui::SameLine();
 	ImGui::Checkbox("Adjust inertia", &adj_inertia);
 
 	float target_inertia = _target->inertia();
@@ -54,14 +54,18 @@ void object_conf_ui::draw()
 	float target_x_pos = _target->pos()[0];
 	float target_y_pos = _target->pos()[1];
 	float target_rot = _target->rot();
-	ImGui::DragFloat("X", &target_x_pos, 1);
-	ImGui::DragFloat("Y", &target_y_pos, 1);
-	ImGui::DragFloat("Rotation", &target_rot, 0.05);
-	_target->pos() = vl::vec2d(target_x_pos, target_y_pos);
-	_target->rot() = target_rot;
-	// TODO: Fix issue with border moving using body handler because of funciton below.
-	_target_handler->set_border();
+
+	bool hupdt = false;	// handler border update flag
+	if (ImGui::DragFloat("X", &target_x_pos, 1)) hupdt = true;
+	if (ImGui::DragFloat("Y", &target_y_pos, 1)) hupdt = true;
+	if (ImGui::DragFloat("Rotation", &target_rot, 0.02)) hupdt = true;	
+	if (hupdt) {
+		_target->pos() = vl::vec2d(target_x_pos, target_y_pos);
+		_target->rot() = target_rot;
+		_target_handler->set_border();
+	}
 
 	ImGui::End();
 	_target->update_shape();
 }
+

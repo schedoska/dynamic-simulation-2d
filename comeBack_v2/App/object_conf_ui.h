@@ -4,6 +4,8 @@
 #include "imgui-SFML.h"
 #include "body_handler.h"
 
+#include <functional>
+
 class object_conf_ui
 {
 public:

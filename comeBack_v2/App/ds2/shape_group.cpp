@@ -81,8 +81,8 @@ const ds2::rect ds2::shape_group::box(const vl::vec2d& pos, const double& rot) c
     constexpr double dmax = std::numeric_limits<double>::max();
     rect box = { {dmax, dmax}, -dmax, -dmax };
 
-    for (const auto& i : _convexes)
-        box.expand(i.box(pos, rot));
+    for (const auto& i : _convexes) box.expand(i.box(pos, rot));
+    for (const auto& i : _circles) box.expand(i.box(pos, rot));
     return box;
 }
 

@@ -39,7 +39,12 @@ app::app(sf::RenderWindow* window)
 
 	bh.set_target(b);
 	oc_ui.set_target(&bh);
-	pt.start_shape(std::bind(&app::add_body, this, std::placeholders::_1));
+	//pt.start_shape(std::bind(&app::add_body, this, std::placeholders::_1));
+
+	mt_ui.set_create_convex_cbck(std::bind(
+		&app::add_convex_body, this, std::placeholders::_1));
+	mt_ui.set_create_circle_cbck(std::bind(
+		&app::add_circle_body, this, std::placeholders::_1, std::placeholders::_2));
 }
 
 app::~app()
@@ -72,27 +77,62 @@ void app::draw()
 	bh.draw(_window);
 	pt.draw(_window);
 	oc_ui.draw();
+	mt_ui.draw();
 
-	//ImGui::ShowDemoWindow();
+	ImGui::ShowDemoWindow();
 
 	ImGui::SFML::Render(*_window);
 }
 
-void app::add_body(const std::vector<vl::vec2d> &vertices)
+void app::add_convex_body(const std::vector<vl::vec2d>& vertices)
+{
+	ds2::convex_shape cs;
+	for (const vl::vec2d& v : vertices) {
+		cs.add(v);
+	}
+	body* b = new body("Object #" + std::to_string((int)_bodies.size() + 1));
+	b->shape().add(cs);
+	vl::vec2d ctr = b->shape().centroid();
+	b->shape().translate(ctr * -1.0);
+	b->pos() = ctr;
+	b->update_shape();
+	_bodies.push_back(b);
+	bh.set_target(b);
+}
+
+void app::add_circle_body(const vl::vec2d& pos, const double& radius)
+{
+	ds2::circle_shape cs;
+	cs.set_radius(radius);
+	body* b = new body("Object #" + std::to_string((int)_bodies.size() + 1));
+	b->shape().add(cs);
+
+	b->pos() = pos;
+	b->update_shape();
+	_bodies.push_back(b);
+	bh.set_target(b);
+}
+
+void app::add_concave_body(const std::vector<vl::vec2d> &vertices, bool delauney)
 {
 	ds2::concave_shape cs;
 	for (const vl::vec2d& v : vertices) {
 		cs.add(v);
 	}
-
 	body* b = new body("Object #" + std::to_string((int)_bodies.size() + 1));
-	b->shape() = cs.generate_shape_group(ds2::triangulation::delaunay);
+
+	if (delauney) {
+		b->shape() = cs.generate_shape_group(ds2::triangulation::delaunay);
+	}
+	else {
+		b->shape() = cs.generate_shape_group(ds2::triangulation::expanding);
+	}
 	vl::vec2d ctr = b->shape().centroid();
 	b->shape().translate(ctr * -1.0);
 	b->pos() = ctr;
-	b->rot() = 0.0;
 	b->update_shape();
 	_bodies.push_back(b);
+	bh.set_target(b);
 }
 
 body* app::body_at(const vl::vec2d& scene_pos)
