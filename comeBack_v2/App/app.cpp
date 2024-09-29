@@ -39,6 +39,7 @@ app::app(sf::RenderWindow* window)
 
 	bh.set_target(b);
 	oc_ui.set_target(&bh);
+	pt.start_shape(std::bind(&app::add_body, this, std::placeholders::_1));
 }
 
 app::~app()
@@ -62,19 +63,36 @@ void app::update(const sf::Time& dt)
 	}
 
 	bh.update(_window);
-
-	
+	pt.update(_window);
 }
 
 void app::draw()
 {
 	for (auto& b : _bodies) b->draw(*_window);
 	bh.draw(_window);
+	pt.draw(_window);
 	oc_ui.draw();
 
 	//ImGui::ShowDemoWindow();
 
 	ImGui::SFML::Render(*_window);
+}
+
+void app::add_body(const std::vector<vl::vec2d> &vertices)
+{
+	ds2::concave_shape cs;
+	for (const vl::vec2d& v : vertices) {
+		cs.add(v);
+	}
+
+	body* b = new body("Object #" + std::to_string((int)_bodies.size() + 1));
+	b->shape() = cs.generate_shape_group(ds2::triangulation::delaunay);
+	vl::vec2d ctr = b->shape().centroid();
+	b->shape().translate(ctr * -1.0);
+	b->pos() = ctr;
+	b->rot() = 0.0;
+	b->update_shape();
+	_bodies.push_back(b);
 }
 
 body* app::body_at(const vl::vec2d& scene_pos)
