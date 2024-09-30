@@ -4,7 +4,7 @@
 body::body(const std::string& name)
 	: _name(name)
 {
-	set_color(sf::Color(2, 205, 219));
+	set_color(sf::Color(209, 69, 69));
 }
 
 void body::draw(sf::RenderWindow& window)

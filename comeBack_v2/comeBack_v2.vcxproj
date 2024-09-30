@@ -54,6 +54,7 @@
     <ClInclude Include="App\object_conf_ui.h" />
     <ClInclude Include="App\polygon_tool.h" />
     <ClInclude Include="App\main_tools_ui.h" />
+    <ClInclude Include="App\simulation_ui.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App\app.cpp" />
@@ -85,6 +86,7 @@
     <ClCompile Include="App\object_conf_ui.cpp" />
     <ClCompile Include="App\polygon_tool.cpp" />
     <ClCompile Include="App\main_tools_ui.cpp" />
+    <ClCompile Include="App\simulation_ui.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

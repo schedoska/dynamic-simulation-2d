@@ -25,6 +25,7 @@ public:
 
 	void set_target(body* target);
 	body* target() const;
+	const bool is_active() const;
 
 	void set_border();	// adjust border to fit target	
 
@@ -53,10 +54,10 @@ namespace handler_conf
 	constexpr float handler_radius = 8;
 	constexpr float border_width = 4;
 
-	const sf::Color handler_color = sf::Color::Green;
-	const sf::Color handler_hover_color = sf::Color(2, 2, 2);
-	const sf::Color border_color = sf::Color::Red;
-	const sf::Color border_hover_color = sf::Color::Blue;
+	const sf::Color handler_color = sf::Color(235, 235, 235);
+	const sf::Color handler_hover_color = sf::Color(95, 161, 227);
+	const sf::Color border_color = sf::Color(66, 66, 66);
+	const sf::Color border_hover_color = sf::Color(91, 119, 245);
 
 	constexpr float min_border_size = 50;
 	constexpr float rotator_top_dist = 40;

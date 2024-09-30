@@ -14,7 +14,7 @@ void main_tools_ui::draw()
 
 	// Cincave tool invocation creation
 	ImGui::SeparatorText("Concave shape");
-	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.094, 0.216, 0.961, 1));
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.153, 0.306, 0.741, 1));
 	ImGui::Button("Add concave");
 	ImGui::PopStyleColor(1);
 	static bool delauney_tri = true;
@@ -23,10 +23,11 @@ void main_tools_ui::draw()
 
 	// Convex creation
 	ImGui::SeparatorText("Convex shape");
-	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.027, 0.741, 0.318, 1));
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.153, 0.306, 0.741, 1));
 	static int sides = 3;
 	if (ImGui::Button("Add convex") && _create_convex_cbck) {
-		_create_convex_cbck(create_convex({ 300,300 }, 100, sides));
+		_create_convex_cbck(create_convex(
+			main_tools_conf::new_shape_pos, main_tools_conf::new_shape_size, sides));
 	}
 	ImGui::PopStyleColor(1);
 
@@ -46,12 +47,30 @@ void main_tools_ui::draw()
 
 
 	// Circle creation
-	ImGui::SeparatorText("Convex shape");
-	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.961, 0.239, 0.298, 1));
+	ImGui::SeparatorText("Circle shape");
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.153, 0.306, 0.741, 1));
 	if (ImGui::Button("Add circle") && _create_circle_cbck) {
-		_create_circle_cbck({ 100,100 }, 50);
+		_create_circle_cbck(main_tools_conf::new_shape_pos, main_tools_conf::new_shape_size);
 	}
 	ImGui::PopStyleColor(1);
+
+
+	// Joints creation
+	ImGui::SeparatorText("Joints");
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.678, 0.678, 0.678, 1));
+	if (ImGui::Button("Add spring")) {
+		// something ...
+	}
+	ImGui::PopStyleColor(1);
+
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.722, 0.608, 0, 1));
+	if (ImGui::Button("Add hinge")) {
+		// something ...
+	}
+	ImGui::PopStyleColor(1);
+
+
+
 
 	ImGui::End();
 }

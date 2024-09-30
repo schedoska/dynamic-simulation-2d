@@ -24,3 +24,8 @@ private:
 	std::vector<vl::vec2d> create_convex(const vl::vec2d& pos, const double& size, const int sides);
 };
 
+namespace main_tools_conf
+{
+	const vl::vec2d new_shape_pos = { 400,400 };
+	constexpr float new_shape_size = 100;
+}

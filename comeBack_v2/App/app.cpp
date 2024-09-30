@@ -4,7 +4,7 @@
 #include "ds2/concave_shape.h"
 
 app::app(sf::RenderWindow* window)
-	:_window(window)
+	:_window(window), _mode(app_mode::edition)
 {
 	ImGui::SFML::Init(*_window);
 
@@ -36,6 +36,9 @@ app::app(sf::RenderWindow* window)
 
 	_bodies.push_back(b);
 	_bodies.push_back(b2);
+	_scene.add_object(b);
+	//_scene.add_object(b2);
+	b->vel() = { -10,0 };
 
 	bh.set_target(b);
 	oc_ui.set_target(&bh);
@@ -56,14 +59,27 @@ void app::update(const sf::Time& dt)
 {
 	ImGui::SFML::Update(*_window, dt);
 
+	if (_mode == app_mode::edition) {
+		edition_update(dt);
+	}
+	else {
+		simulation_update(dt);
+	}
+}
+
+void app::simulation_update(const sf::Time& dt)
+{
+	_scene.update(0.025, *_window);
+}
+
+void app::edition_update(const sf::Time& dt)
+{
 	sf::Vector2f mouse_pos = (sf::Vector2f)sf::Mouse::getPosition(*_window);
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && ImGui::GetIO().WantCaptureMouse == false) {
 		body* b = body_at(utils::sfml_to_vec2d(mouse_pos));
-		if (bh.target() == nullptr) {
+
+		if (!bh.is_active()) {
 			bh.set_target(b);
-		}
-		else if (b == nullptr){
-			bh.set_target(nullptr);
 		}
 	}
 
@@ -74,13 +90,17 @@ void app::update(const sf::Time& dt)
 void app::draw()
 {
 	for (auto& b : _bodies) b->draw(*_window);
-	bh.draw(_window);
-	pt.draw(_window);
-	oc_ui.draw();
-	mt_ui.draw();
+	if (_mode == app_mode::edition) {
+		bh.draw(_window);
+		pt.draw(_window);
+		oc_ui.draw();
+		mt_ui.draw();
+	}
+	else {
+		sim_ui.draw();
+	}
 
 	ImGui::ShowDemoWindow();
-
 	ImGui::SFML::Render(*_window);
 }
 
@@ -111,6 +131,10 @@ void app::add_circle_body(const vl::vec2d& pos, const double& radius)
 	b->update_shape();
 	_bodies.push_back(b);
 	bh.set_target(b);
+}
+
+void app::start_simulation()
+{
 }
 
 void app::add_concave_body(const std::vector<vl::vec2d> &vertices, bool delauney)

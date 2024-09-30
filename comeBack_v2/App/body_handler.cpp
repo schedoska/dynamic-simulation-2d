@@ -88,6 +88,11 @@ body* body_handler::target() const
 	return _target;
 }
 
+const bool body_handler::is_active() const
+{
+	return _active;
+}
+
 void body_handler::update_handlers_pos()
 {
 	double w2 = _border.getSize().x / 2.0;
