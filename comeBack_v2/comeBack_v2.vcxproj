@@ -30,6 +30,7 @@
     <ClInclude Include="App\ds2\delaunay.h" />
     <ClInclude Include="App\ds2\image.h" />
     <ClInclude Include="App\body.h" />
+    <ClInclude Include="App\drawable_joint.h" />
     <ClInclude Include="imgui\imconfig-SFML.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui-SFML.h" />
@@ -55,6 +56,8 @@
     <ClInclude Include="App\polygon_tool.h" />
     <ClInclude Include="App\main_tools_ui.h" />
     <ClInclude Include="App\simulation_ui.h" />
+    <ClInclude Include="App\joint_handler.h" />
+    <ClInclude Include="App\joint_conf_ui.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App\app.cpp" />
@@ -68,6 +71,7 @@
     <ClCompile Include="App\ds2\delaunay.cpp" />
     <ClCompile Include="App\ds2\image.cpp" />
     <ClCompile Include="App\body.cpp" />
+    <ClCompile Include="App\drawable_joint.cpp" />
     <ClCompile Include="imgui\imgui-SFML.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />
@@ -87,6 +91,8 @@
     <ClCompile Include="App\polygon_tool.cpp" />
     <ClCompile Include="App\main_tools_ui.cpp" />
     <ClCompile Include="App\simulation_ui.cpp" />
+    <ClCompile Include="App\joint_handler.cpp" />
+    <ClCompile Include="App\joint_conf_ui.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

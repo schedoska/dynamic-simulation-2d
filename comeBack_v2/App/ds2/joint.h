@@ -14,12 +14,18 @@ namespace ds2
 			vl::vec2d loc_b = vl::vec2d());
 
 		const vl::vec2d& loc_a() const;
-		vl::vec2d& loc_a();
+		void set_loc_a(const vl::vec2d& loc_a);
 		const vl::vec2d& loc_b() const;
-		vl::vec2d& loc_b();
+		void set_loc_b(const vl::vec2d& loc_b);
+
+		const vl::vec2d global_a() const;
+		const vl::vec2d global_b() const;
 
 		object* obj_a();
 		object* obj_b();
+		void set_obj_a(object* obj_a);
+		void set_obj_b(object* obj_b);
+
 
 		virtual void update(const double& dt);
 
@@ -28,8 +34,6 @@ namespace ds2
 		object* _obj_b;
 		vl::vec2d _loc_a;
 		vl::vec2d _loc_b;
-
-		inline double loc_distance() const;
 	};
 
 	class spring : public joint

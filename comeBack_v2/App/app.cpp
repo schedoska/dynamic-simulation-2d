@@ -33,6 +33,7 @@ app::app(sf::RenderWindow* window)
 	b->rot() = 0.3;
 
 	body* b2 = new body(*b);
+	b->pos() = { 450,200 };
 
 	_bodies.push_back(b);
 	_bodies.push_back(b2);
@@ -42,12 +43,16 @@ app::app(sf::RenderWindow* window)
 
 	bh.set_target(b);
 	oc_ui.set_target(&bh);
+	jc_ui.set_target(&jh);
 	//pt.start_shape(std::bind(&app::add_body, this, std::placeholders::_1));
 
 	mt_ui.set_create_convex_cbck(std::bind(
 		&app::add_convex_body, this, std::placeholders::_1));
 	mt_ui.set_create_circle_cbck(std::bind(
 		&app::add_circle_body, this, std::placeholders::_1, std::placeholders::_2));
+
+	drawable_spring* sd = new drawable_spring(b, nullptr, { 300,300 }, { 500,300 });
+	_joints.push_back(sd);
 }
 
 app::~app()
@@ -75,30 +80,57 @@ void app::simulation_update(const sf::Time& dt)
 void app::edition_update(const sf::Time& dt)
 {
 	sf::Vector2f mouse_pos = (sf::Vector2f)sf::Mouse::getPosition(*_window);
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && ImGui::GetIO().WantCaptureMouse == false) {
-		body* b = body_at(utils::sfml_to_vec2d(mouse_pos));
-
-		if (!bh.is_active()) {
-			bh.set_target(b);
-		}
-	}
+	bool left_mouse = sf::Mouse::isButtonPressed(sf::Mouse::Left);
+	bool left_ctrl = sf::Keyboard::isKeyPressed(sf::Keyboard::LControl);
 
 	bh.update(_window);
+	jh.update(_window);
 	pt.update(_window);
+
+	if (left_mouse && ImGui::GetIO().WantCaptureMouse == false) {
+		if (!jh.is_active() && !bh.is_active()) 
+		{
+			joint_at_data jad = joint_at(utils::sfml_to_vec2d(mouse_pos));
+			body* b = body_at(utils::sfml_to_vec2d(mouse_pos));
+
+			if (jh.target() && left_ctrl) {
+				jh.target_set_object(b);
+				return;
+			}
+
+			if (jad.joint) {
+				jh.set_target(jad.joint, jad.type);
+				bh.set_target(nullptr);
+			}
+			else if (b) {
+				bh.set_target(b);
+				jh.set_target(nullptr);
+			}
+			else {
+				bh.set_target(nullptr);
+				jh.set_target(nullptr);
+			}
+		}
+	}
 }
 
 void app::draw()
 {
-	for (auto& b : _bodies) b->draw(*_window);
+	for (auto& i : _bodies) i->draw(*_window);
+
 	if (_mode == app_mode::edition) {
 		bh.draw(_window);
+		jh.draw(_window);
 		pt.draw(_window);
 		oc_ui.draw();
 		mt_ui.draw();
+		jc_ui.draw();
 	}
 	else {
 		sim_ui.draw();
 	}
+
+	for (auto& i : _joints) i->draw(*_window);
 
 	ImGui::ShowDemoWindow();
 	ImGui::SFML::Render(*_window);
@@ -170,3 +202,16 @@ body* app::body_at(const vl::vec2d& scene_pos)
 	}
 	return nullptr;
 }
+
+const joint_at_data app::joint_at(const vl::vec2d& scene_pos) const
+{
+	for (drawable_spring* i : _joints) {
+		double dist_a = (scene_pos - i->global_a()).len();
+		double dist_b = (scene_pos - i->global_b()).len();
+		if (dist_a < 50) return joint_at_data{ i, joint_handler_mode::a };
+		if (dist_b < 50) return joint_at_data{ i, joint_handler_mode::b };
+	}
+	return joint_at_data{ nullptr, joint_handler_mode::a };
+}
+
+

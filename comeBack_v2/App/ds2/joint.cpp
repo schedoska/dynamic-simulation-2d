@@ -14,9 +14,9 @@ const vl::vec2d& ds2::joint::loc_a() const
 	return _loc_a;
 }
 
-vl::vec2d& ds2::joint::loc_a()
+void ds2::joint::set_loc_a(const vl::vec2d& loc_a)
 {
-	return _loc_a;
+	_loc_a = loc_a;
 }
 
 const vl::vec2d& ds2::joint::loc_b() const
@@ -24,9 +24,29 @@ const vl::vec2d& ds2::joint::loc_b() const
 	return _loc_b;
 }
 
-vl::vec2d& ds2::joint::loc_b()
+void ds2::joint::set_loc_b(const vl::vec2d& loc_b)
 {
-	return _loc_b;
+	_loc_b = loc_b;
+}
+
+const vl::vec2d ds2::joint::global_a() const
+{
+	if (!_obj_a) {
+		return _loc_a;
+	}
+	else {
+		return _obj_a->global(_loc_a);
+	} 
+}
+
+const vl::vec2d ds2::joint::global_b() const
+{
+	if (!_obj_b) {
+		return _loc_b;
+	}
+	else {
+		return _obj_b->global(_loc_b);
+	}
 }
 
 ds2::object* ds2::joint::obj_a()
@@ -39,14 +59,19 @@ ds2::object* ds2::joint::obj_b()
 	return _obj_b;
 }
 
+void ds2::joint::set_obj_a(object* obj_a)
+{
+	_obj_a = obj_a;
+}
+
+void ds2::joint::set_obj_b(object* obj_b)
+{
+	_obj_b = obj_b;
+}
+
 void ds2::joint::update(const double& dt)
 {
 	
-}
-
-inline double ds2::joint::loc_distance() const
-{
-	return (_obj_a->global(_loc_a) - _obj_b->global(_loc_b)).len();
 }
 
 /*
@@ -89,14 +114,14 @@ ds2::fixed_joint::fixed_joint(
 ds2::spring::spring(object* a, object* b, vl::vec2d loc_a, vl::vec2d loc_b)
 	: joint(a, b, loc_a, loc_b)
 {
-	_length = loc_distance();
+	//_length = loc_distance();
 	brace();
 }
 
 ds2::spring::spring(object* a, object* b, const double& strength, const double& damping, vl::vec2d loc_a, vl::vec2d loc_b)
 	: joint(a, b, loc_a, loc_b), _strength(strength), _damping(damping)
 {
-	_length = loc_distance();
+	//_length = loc_distance();
 }
 
 void ds2::spring::update(const double& dt)

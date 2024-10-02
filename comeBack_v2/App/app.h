@@ -9,10 +9,19 @@
 #include "polygon_tool.h"
 #include "main_tools_ui.h"
 #include "simulation_ui.h"
+#include "drawable_joint.h"
+#include "joint_handler.h"
+#include "joint_conf_ui.h"
 
 #include "ds2/scene.h"
 
 enum class app_mode {edition, simulation};
+
+struct joint_at_data
+{
+	drawable_spring* joint;
+	joint_handler_mode type;
+};
 
 class app
 {
@@ -35,16 +44,21 @@ public:
 private:
 	app_mode _mode;
 	sf::RenderWindow *_window;
+
 	std::vector<body*> _bodies;
+	std::vector<drawable_spring*> _joints;
 
 	ds2::scene _scene;
 
 	body_handler bh;
+	joint_handler jh;
+
 	polygon_tool pt;
 	object_conf_ui oc_ui;
 	main_tools_ui mt_ui;
 	simulation_ui sim_ui;
+	joint_conf_ui jc_ui;
 
 	body* body_at(const vl::vec2d& scene_pos);
+	const joint_at_data joint_at(const vl::vec2d& scene_pos) const;
 };
-
