@@ -2,35 +2,89 @@
 
 simulation_ui::simulation_ui()
 {
+	_scene = nullptr;
+	_step_time = 25;	// in ms
+	_nominal_fps = 40;
+}
+
+void simulation_ui::set_start_sim_cbck(std::function<void(void)> func)
+{
+	_start_sim_cbck = func;
+}
+
+void simulation_ui::set_stop_sim_cbck(std::function<void(void)> func)
+{
+	_stop_sim_cbck = func;
+}
+
+void simulation_ui::set_restart_sim_cbck(std::function<void(void)> func)
+{
+	_restart_sim_cbck = func;
+}
+
+const float simulation_ui::step_time() const
+{
+	return _step_time;
 }
 
 void simulation_ui::draw()
 {
 	ImGui::Begin("Simulation");
 
-	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.027, 0.741, 0.082, 1));
-	ImGui::Button("Start");
-	ImGui::PopStyleColor(1);
+	if (!_sim_on) {
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.027, 0.741, 0.082, 1));
+		if (ImGui::Button("Start")) {
+			if (_start_sim_cbck) _start_sim_cbck();
+		}
+		ImGui::PopStyleColor(1);
+	}
+	else {
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.878, 0.165, 0.247, 1));
+		if (ImGui::Button("Stop")) {
+			if (_stop_sim_cbck) _stop_sim_cbck();
+		}
+		ImGui::PopStyleColor(1);
+	}
+
 	ImGui::SameLine();
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.949, 0.188, 0.188, 1));
 	ImGui::Button("Restart");
 	ImGui::PopStyleColor(1);
 
+	ImGui::Text("FPS: %.2f", _fps);
+
 	ImGui::SeparatorText("Simulation speed");
-	float fps = 40.0;
-	static float step = (1.0 / fps) * 1000.0; // in ms not seconds!
-	ImGui::InputFloat("Time step", &step, 0.2f, 10.0f, "%.1f ms");
-	step = std::max(step, 0.f);
-	float norm_step = (1.0 / fps) * 1000.0;	// in ms
-	float speed_ratio = (step / norm_step) * 100.0; // relative to normal speed for selected fps 
+
+	if (ImGui::InputFloat("Time step", &_step_time, 0.2f, 10.0f, "%.1f ms")) {
+		_step_time = std::max(_step_time, 0.f);
+	}
+	float norm_step = (1.0 / _nominal_fps) * 1000.0;	// in ms
+	float speed_ratio = (_step_time / norm_step) * 100.0; // relative to normal speed for selected fps 
 	if (ImGui::DragFloat("asd", &speed_ratio, 0.2, 0, 10e10, "%.1f %%")) {
-		step = norm_step * speed_ratio / 100.0;
+		_step_time = norm_step * speed_ratio / 100.0;
 	}
 
 	ImGui::SeparatorText("Joints");
-	static int iterations = 10;
+	int iterations = _scene->joint_iterations();
 	ImGui::InputInt("Iterations", &iterations, 1, 10);
 	iterations = std::max(iterations, 0);
+	_scene->set_joint_iterations(iterations);
 
 	ImGui::End();
+}
+
+void simulation_ui::set_scene(ds2::scene* scene)
+{
+	_scene = scene;
+}
+
+void simulation_ui::set_fps(const float& fps, const float& nominal_fps)
+{
+	_fps = fps;
+	_nominal_fps = nominal_fps;
+}
+
+void simulation_ui::set_sim_on(const bool sim_on)
+{
+	_sim_on = sim_on;
 }

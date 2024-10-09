@@ -38,6 +38,7 @@ app::app(sf::RenderWindow* window)
 	_bodies.push_back(b);
 	_bodies.push_back(b2);
 	_scene.add_object(b);
+	_scene.add_object(b2);
 	//_scene.add_object(b2);
 	b->vel() = { -10,0 };
 
@@ -50,6 +51,10 @@ app::app(sf::RenderWindow* window)
 		&app::add_convex_body, this, std::placeholders::_1));
 	mt_ui.set_create_circle_cbck(std::bind(
 		&app::add_circle_body, this, std::placeholders::_1, std::placeholders::_2));
+
+	sim_ui.set_start_sim_cbck(std::bind(&app::start_simulation, this));
+	sim_ui.set_stop_sim_cbck(std::bind(&app::stop_simulation, this));
+	sim_ui.set_scene(&_scene);
 
 	drawable_spring* sd = new drawable_spring(b, nullptr, { 300,300 }, { 500,300 });
 	_joints.push_back(sd);
@@ -64,6 +69,9 @@ void app::update(const sf::Time& dt)
 {
 	ImGui::SFML::Update(*_window, dt);
 
+	sim_ui.set_sim_on(_mode == app_mode::simulation ? true : false);
+	sim_ui.set_fps(1.f / (float)dt.asSeconds(), 40);
+
 	if (_mode == app_mode::edition) {
 		edition_update(dt);
 	}
@@ -74,7 +82,7 @@ void app::update(const sf::Time& dt)
 
 void app::simulation_update(const sf::Time& dt)
 {
-	_scene.update(0.025, *_window);
+	_scene.update(sim_ui.step_time() / 1000.0, *_window);
 }
 
 void app::edition_update(const sf::Time& dt)
@@ -82,6 +90,7 @@ void app::edition_update(const sf::Time& dt)
 	sf::Vector2f mouse_pos = (sf::Vector2f)sf::Mouse::getPosition(*_window);
 	bool left_mouse = sf::Mouse::isButtonPressed(sf::Mouse::Left);
 	bool left_ctrl = sf::Keyboard::isKeyPressed(sf::Keyboard::LControl);
+	bool delet = sf::Keyboard::isKeyPressed(sf::Keyboard::Delete);
 
 	bh.update(_window);
 	jh.update(_window);
@@ -112,6 +121,10 @@ void app::edition_update(const sf::Time& dt)
 			}
 		}
 	}
+	if (delet) {
+		remove(bh.target());
+		bh.set_target(nullptr);
+	}
 }
 
 void app::draw()
@@ -126,9 +139,7 @@ void app::draw()
 		mt_ui.draw();
 		jc_ui.draw();
 	}
-	else {
-		sim_ui.draw();
-	}
+	sim_ui.draw();
 
 	for (auto& i : _joints) i->draw(*_window);
 
@@ -165,8 +176,29 @@ void app::add_circle_body(const vl::vec2d& pos, const double& radius)
 	bh.set_target(b);
 }
 
+void app::remove(const body* b)
+{
+	if (b == nullptr) return;
+	_bodies.erase(std::remove(_bodies.begin(), _bodies.end(), b));
+	_scene.remove(b);
+	delete b;
+}
+
 void app::start_simulation()
 {
+	_mode = app_mode::simulation;
+}
+
+void app::stop_simulation()
+{
+	_mode = app_mode::edition;
+	jh.set_target(nullptr);
+	bh.set_target(nullptr);
+}
+
+void app::set_step_time(const float& st)
+{
+	_step_time = st;
 }
 
 void app::add_concave_body(const std::vector<vl::vec2d> &vertices, bool delauney)

@@ -37,9 +37,14 @@ public:
 	void add_concave_body(const std::vector<vl::vec2d>& vertices, bool delauney = true);
 	void add_convex_body(const std::vector<vl::vec2d>& vertices);
 	void add_circle_body(const vl::vec2d& pos, const double& radius);
+
+	void remove(const body* b);
+	//void remove(const drawable_spring* ds);
 	
 	// simulation
 	void start_simulation();
+	void stop_simulation();
+	void set_step_time(const float& step_time);
 
 private:
 	app_mode _mode;
@@ -49,6 +54,7 @@ private:
 	std::vector<drawable_spring*> _joints;
 
 	ds2::scene _scene;
+	float _step_time;
 
 	body_handler bh;
 	joint_handler jh;

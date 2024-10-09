@@ -74,7 +74,10 @@ void body_handler::draw(sf::RenderWindow* window)
 void body_handler::set_target(body* target)
 {
 	_target = target;
-	if (_target == nullptr) return;
+	if (_target == nullptr) {
+		_active = false;
+		return;
+	}
 
 	// Decide wheter to use equal axis scling mode
 	eql_axis_mode = _target->shape().circles().size() > 0 ? true : false;
