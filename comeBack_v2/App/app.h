@@ -5,13 +5,14 @@
 
 #include "body.h"
 #include "body_handler.h"
-#include "object_conf_ui.h"
 #include "polygon_tool.h"
-#include "main_tools_ui.h"
-#include "simulation_ui.h"
 #include "drawable_joint.h"
 #include "joint_handler.h"
-#include "joint_conf_ui.h"
+
+#include "ui/object_conf_ui.h"
+#include "ui/main_tools_ui.h"
+#include "ui/simulation_ui.h"
+#include "ui/joint_conf_ui.h"
 
 #include "ds2/scene.h"
 
@@ -45,6 +46,9 @@ public:
 	void start_simulation();
 	void stop_simulation();
 	void set_step_time(const float& step_time);
+
+	void save_json(const std::string& path);
+	void load_json(const std::string& path);
 
 private:
 	app_mode _mode;

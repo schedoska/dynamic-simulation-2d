@@ -14,10 +14,15 @@ namespace ds2
 	{
 	public:
 		scene();
-		void add_object(object* object);
-		void add_joint(joint* joint);
+		void add(object* object);
+		void add(joint* joint);
 		void remove(const object* object);
 		void remove(const joint* joint);
+		// removes all objects and joints
+		void remove_all();
+
+		const std::vector<object*>& objects() const;
+		const std::vector<joint*>& joints() const;
 
 		void update(const double& dt, sf::RenderWindow& win);
 
@@ -29,7 +34,7 @@ namespace ds2
 	private:
 		std::list<object_collision_data> _collisions;
 		std::vector<object*> _objects;
-		std::list<joint*> _joints;
+		std::vector<joint*> _joints;
 
 		int _joint_iterations;
 

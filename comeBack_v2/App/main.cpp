@@ -17,9 +17,32 @@
 //#include <windows.h>
 
 #include "App.h"
+#include <nlohmann/json.hpp>
+#include <fstream>
 
 int main()
 {
+    /*
+    std::ifstream ifs("C:\\Users\\chedo\\OneDrive\\Pulpit\\test.json");
+    nlohmann::json jsonData = nlohmann::json::parse(ifs);
+    
+    nlohmann::json obj;
+    obj["id"] = "0001";
+    obj["color"] = "black";
+
+    jsonData["batters"]["apple"].push_back(obj);
+    jsonData["batters"]["apple"].push_back(obj);
+    jsonData["batters"]["apple"].push_back(obj);
+
+    nlohmann::json s = { {"assa", 33}, {"sd", 44}};
+    jsonData["sda"] = s;
+
+
+    std::cout << std::setw(4) << jsonData << std::endl;
+    //    return 1;
+    */
+
+
     sf::RenderWindow window;
     window.create(sf::VideoMode(1500, 1000), "Fdf", sf::Style::Default);
 

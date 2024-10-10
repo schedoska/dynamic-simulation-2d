@@ -2,6 +2,8 @@
 #include "ds2/collision_solver.h"
 #include "ds2/Utils.h"
 #include "ds2/concave_shape.h"
+#include <fstream>
+#include "json_utils.h"
 
 app::app(sf::RenderWindow* window)
 	:_window(window), _mode(app_mode::edition)
@@ -37,8 +39,8 @@ app::app(sf::RenderWindow* window)
 
 	_bodies.push_back(b);
 	_bodies.push_back(b2);
-	_scene.add_object(b);
-	_scene.add_object(b2);
+	_scene.add(b);
+	_scene.add(b2);
 	//_scene.add_object(b2);
 	b->vel() = { -10,0 };
 
@@ -58,6 +60,11 @@ app::app(sf::RenderWindow* window)
 
 	drawable_spring* sd = new drawable_spring(b, nullptr, { 300,300 }, { 500,300 });
 	_joints.push_back(sd);
+
+
+	
+
+	//json_utils::deserialize_body(j);
 }
 
 app::~app()
@@ -124,6 +131,12 @@ void app::edition_update(const sf::Time& dt)
 	if (delet) {
 		remove(bh.target());
 		bh.set_target(nullptr);
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
+		save_json("C:\\Users\\chedo\\OneDrive\\Pulpit\\test.json");
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::L)) {
+		load_json("C:\\Users\\chedo\\OneDrive\\Pulpit\\test.json");
 	}
 }
 
@@ -199,6 +212,44 @@ void app::stop_simulation()
 void app::set_step_time(const float& st)
 {
 	_step_time = st;
+}
+
+void app::save_json(const std::string& path)
+{
+	std::ofstream ofs(path);
+	nlohmann::json json_obj;
+
+	for (const body* it : _bodies) {
+		json_obj["bodies"].push_back(json_utils::serialize(*it));
+	}
+	ofs << std::setw(3) << json_obj;
+	ofs.close();
+}
+
+void app::load_json(const std::string& path)
+{
+	std::ifstream ifs(path);
+	nlohmann::json json_obj;
+	ifs >> json_obj;
+
+	_scene.remove_all();
+	for (auto* b : _bodies) {
+		delete b;
+	}
+	for (auto* j : _joints) {
+		delete j;
+	}
+	_bodies.clear();
+	_joints.clear();
+
+	for (const auto& i : json_obj["bodies"]) {
+		// iteracjo po kolejnych obiektach
+		body* b = new body(json_utils::deserialize_body(i));
+		b->update_shape();
+		_bodies.push_back(b);
+		_scene.add(b);
+	}
+	ifs.close();
 }
 
 void app::add_concave_body(const std::vector<vl::vec2d> &vertices, bool delauney)

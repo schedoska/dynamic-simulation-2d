@@ -2,7 +2,7 @@
 
 #include "imgui.h"
 #include "imgui-SFML.h"
-#include "ds2/shape_group.h"
+#include "../ds2/shape_group.h"
 
 #include <functional>
 

@@ -52,6 +52,7 @@ void simulation_ui::draw()
 	ImGui::PopStyleColor(1);
 
 	ImGui::Text("FPS: %.2f", _fps);
+	ImGui::Text("Object count: %d", _scene->objects().size());
 
 	ImGui::SeparatorText("Simulation speed");
 
