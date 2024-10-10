@@ -64,7 +64,7 @@ body json_utils::deserialize_body(const nlohmann::json& json_b)
 	b.inertia() = json_b["inertia"].get<double>();
 	b.rot() = json_b["rot"].get<double>();
 	b.rot_vel() = json_b["rot_vel"].get<double>();
-	b.set_mass(json_b["inertia"].get<double>());
+	b.set_mass(json_b["mass"].get<double>());
 	b.layer_min() = json_b["layer min"].get<double>();
 	b.layer_max() = json_b["layer max"].get<double>();
 	b.shape() = deserialize_shape_group(json_b["shape"]);

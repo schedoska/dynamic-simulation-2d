@@ -1,7 +1,7 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
-#include "body.h"
+#include "../body.h"
 
 enum handler {
 	top,

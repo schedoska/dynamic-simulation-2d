@@ -1,8 +1,8 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
-#include "ds2/joint.h"
-#include "body.h"
+#include "../ds2/joint.h"
+#include "../body.h"
 
 enum class joint_handler_mode { a, b, both };
 

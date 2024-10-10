@@ -55,16 +55,11 @@ app::app(sf::RenderWindow* window)
 		&app::add_circle_body, this, std::placeholders::_1, std::placeholders::_2));
 
 	sim_ui.set_start_sim_cbck(std::bind(&app::start_simulation, this));
-	sim_ui.set_stop_sim_cbck(std::bind(&app::stop_simulation, this));
+	sim_ui.set_restart_sim_cbck(std::bind(&app::restart_simulation, this));
 	sim_ui.set_scene(&_scene);
 
 	drawable_spring* sd = new drawable_spring(b, nullptr, { 300,300 }, { 500,300 });
 	_joints.push_back(sd);
-
-
-	
-
-	//json_utils::deserialize_body(j);
 }
 
 app::~app()
@@ -75,8 +70,6 @@ app::~app()
 void app::update(const sf::Time& dt)
 {
 	ImGui::SFML::Update(*_window, dt);
-
-	sim_ui.set_sim_on(_mode == app_mode::simulation ? true : false);
 	sim_ui.set_fps(1.f / (float)dt.asSeconds(), 40);
 
 	if (_mode == app_mode::edition) {
@@ -131,12 +124,6 @@ void app::edition_update(const sf::Time& dt)
 	if (delet) {
 		remove(bh.target());
 		bh.set_target(nullptr);
-	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
-		save_json("C:\\Users\\chedo\\OneDrive\\Pulpit\\test.json");
-	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::L)) {
-		load_json("C:\\Users\\chedo\\OneDrive\\Pulpit\\test.json");
 	}
 }
 
@@ -200,13 +187,13 @@ void app::remove(const body* b)
 void app::start_simulation()
 {
 	_mode = app_mode::simulation;
+	save_json("C:\\Users\\chedo\\OneDrive\\Pulpit\\test.json");
 }
 
-void app::stop_simulation()
+void app::restart_simulation()
 {
 	_mode = app_mode::edition;
-	jh.set_target(nullptr);
-	bh.set_target(nullptr);
+	load_json("C:\\Users\\chedo\\OneDrive\\Pulpit\\test.json");
 }
 
 void app::set_step_time(const float& st)
@@ -232,6 +219,8 @@ void app::load_json(const std::string& path)
 	nlohmann::json json_obj;
 	ifs >> json_obj;
 
+	jh.set_target(nullptr);
+	bh.set_target(nullptr);
 	_scene.remove_all();
 	for (auto* b : _bodies) {
 		delete b;

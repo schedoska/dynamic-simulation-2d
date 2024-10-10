@@ -123,13 +123,13 @@
     <ClInclude Include="App\body.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
-    <ClInclude Include="App\body_handler.h">
+    <ClInclude Include="App\tools\body_handler.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
     <ClInclude Include="App\ui\object_conf_ui.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
-    <ClInclude Include="App\polygon_tool.h">
+    <ClInclude Include="App\tools\polygon_tool.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
     <ClInclude Include="App\ui\main_tools_ui.h">
@@ -141,7 +141,7 @@
     <ClInclude Include="App\drawable_joint.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
-    <ClInclude Include="App\joint_handler.h">
+    <ClInclude Include="App\tools\joint_handler.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
     <ClInclude Include="App\ui\joint_conf_ui.h">
@@ -362,13 +362,13 @@
     <ClCompile Include="App\body.cpp">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
-    <ClCompile Include="App\body_handler.cpp">
+    <ClCompile Include="App\tools\body_handler.cpp">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
     <ClCompile Include="App\ui\object_conf_ui.cpp">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
-    <ClCompile Include="App\polygon_tool.cpp">
+    <ClCompile Include="App\tools\polygon_tool.cpp">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
     <ClCompile Include="App\ui\main_tools_ui.cpp">
@@ -380,7 +380,7 @@
     <ClCompile Include="App\drawable_joint.cpp">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
-    <ClCompile Include="App\joint_handler.cpp">
+    <ClCompile Include="App\tools\joint_handler.cpp">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
     <ClCompile Include="App\ui\joint_conf_ui.cpp">

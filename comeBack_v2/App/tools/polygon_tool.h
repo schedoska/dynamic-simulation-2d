@@ -1,7 +1,7 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
-#include "ds2/vec.h"
+#include "../ds2/vec.h"
 #include <functional>
 
 class polygon_tool

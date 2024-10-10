@@ -44,6 +44,7 @@ const std::vector<ds2::joint*>& ds2::scene::joints() const
 
 
 void ds2::scene::update(const double& dt, sf::RenderWindow& win){
+    if (dt == 0.0) return;
     for (auto& i : _objects)
         i->update(dt);
 

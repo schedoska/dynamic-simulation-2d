@@ -1,6 +1,5 @@
 #include "body_handler.h"
-#include "body_handler.h"
-#include "ds2/Utils.h"
+#include "../ds2/Utils.h"
 
 body_handler::body_handler()
 {

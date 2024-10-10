@@ -52,12 +52,12 @@
     <ClInclude Include="App\ds2\Utils.h" />
     <ClInclude Include="App\ds2\vec.h" />
     <ClInclude Include="App\ds2\vec2.h" />
-    <ClInclude Include="App\body_handler.h" />
+    <ClInclude Include="App\tools\body_handler.h" />
     <ClInclude Include="App\ui\object_conf_ui.h" />
-    <ClInclude Include="App\polygon_tool.h" />
+    <ClInclude Include="App\tools\polygon_tool.h" />
     <ClInclude Include="App\ui\main_tools_ui.h" />
     <ClInclude Include="App\ui\simulation_ui.h" />
-    <ClInclude Include="App\joint_handler.h" />
+    <ClInclude Include="App\tools\joint_handler.h" />
     <ClInclude Include="App\ui\joint_conf_ui.h" />
     <ClInclude Include="nlohmann\adl_serializer.hpp" />
     <ClInclude Include="nlohmann\byte_container_with_subtype.hpp" />
@@ -133,12 +133,12 @@
     <ClCompile Include="App\ds2\shape.cpp" />
     <ClCompile Include="App\ds2\shape_group.cpp" />
     <ClCompile Include="App\ds2\Utils.cpp" />
-    <ClCompile Include="App\body_handler.cpp" />
+    <ClCompile Include="App\tools\body_handler.cpp" />
     <ClCompile Include="App\ui\object_conf_ui.cpp" />
-    <ClCompile Include="App\polygon_tool.cpp" />
+    <ClCompile Include="App\tools\polygon_tool.cpp" />
     <ClCompile Include="App\ui\main_tools_ui.cpp" />
     <ClCompile Include="App\ui\simulation_ui.cpp" />
-    <ClCompile Include="App\joint_handler.cpp" />
+    <ClCompile Include="App\tools\joint_handler.cpp" />
     <ClCompile Include="App\ui\joint_conf_ui.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

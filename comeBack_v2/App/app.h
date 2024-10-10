@@ -4,10 +4,11 @@
 #include <SFML/Graphics.hpp>
 
 #include "body.h"
-#include "body_handler.h"
-#include "polygon_tool.h"
 #include "drawable_joint.h"
-#include "joint_handler.h"
+
+#include "tools/body_handler.h"
+#include "tools/polygon_tool.h"
+#include "tools/joint_handler.h"
 
 #include "ui/object_conf_ui.h"
 #include "ui/main_tools_ui.h"
@@ -44,7 +45,7 @@ public:
 	
 	// simulation
 	void start_simulation();
-	void stop_simulation();
+	void restart_simulation();
 	void set_step_time(const float& step_time);
 
 	void save_json(const std::string& path);
@@ -60,10 +61,12 @@ private:
 	ds2::scene _scene;
 	float _step_time;
 
+	// Tools
 	body_handler bh;
 	joint_handler jh;
-
 	polygon_tool pt;
+
+	// UI elements 
 	object_conf_ui oc_ui;
 	main_tools_ui mt_ui;
 	simulation_ui sim_ui;

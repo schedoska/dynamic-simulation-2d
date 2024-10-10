@@ -5,16 +5,12 @@ simulation_ui::simulation_ui()
 	_scene = nullptr;
 	_step_time = 25;	// in ms
 	_nominal_fps = 40;
+	_sim_state = simulation_ui_state::edition;
 }
 
 void simulation_ui::set_start_sim_cbck(std::function<void(void)> func)
 {
 	_start_sim_cbck = func;
-}
-
-void simulation_ui::set_stop_sim_cbck(std::function<void(void)> func)
-{
-	_stop_sim_cbck = func;
 }
 
 void simulation_ui::set_restart_sim_cbck(std::function<void(void)> func)
@@ -24,32 +20,50 @@ void simulation_ui::set_restart_sim_cbck(std::function<void(void)> func)
 
 const float simulation_ui::step_time() const
 {
-	return _step_time;
+	return _sim_state == simulation_ui_state::paused ? 0 : _step_time;
 }
 
 void simulation_ui::draw()
 {
 	ImGui::Begin("Simulation");
 
-	if (!_sim_on) {
+	if (_sim_state == simulation_ui_state::edition) {
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.027, 0.741, 0.082, 1));
 		if (ImGui::Button("Start")) {
-			if (_start_sim_cbck) _start_sim_cbck();
+			if (_start_sim_cbck) {
+				_start_sim_cbck();
+				_sim_state = simulation_ui_state::simulation;
+			}
+		}
+		ImGui::PopStyleColor(1);
+	}
+	else if (_sim_state == simulation_ui_state::paused) {
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.027, 0.741, 0.082, 1));
+		if (ImGui::Button("Start")) {
+			_sim_state = simulation_ui_state::simulation;
 		}
 		ImGui::PopStyleColor(1);
 	}
 	else {
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.878, 0.165, 0.247, 1));
 		if (ImGui::Button("Stop")) {
-			if (_stop_sim_cbck) _stop_sim_cbck();
+			_sim_state = simulation_ui_state::paused;
 		}
 		ImGui::PopStyleColor(1);
 	}
-
-	ImGui::SameLine();
-	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.949, 0.188, 0.188, 1));
-	ImGui::Button("Restart");
-	ImGui::PopStyleColor(1);
+	
+	if (_sim_state == simulation_ui_state::paused ||
+		_sim_state == simulation_ui_state::simulation) {
+		ImGui::SameLine();
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.949, 0.188, 0.188, 1));
+		if (ImGui::Button("Restart")) {
+			if (_restart_sim_cbck) {
+				_restart_sim_cbck();
+				_sim_state = simulation_ui_state::edition;
+			}
+		}
+		ImGui::PopStyleColor(1);
+	}
 
 	ImGui::Text("FPS: %.2f", _fps);
 	ImGui::Text("Object count: %d", _scene->objects().size());
@@ -83,9 +97,4 @@ void simulation_ui::set_fps(const float& fps, const float& nominal_fps)
 {
 	_fps = fps;
 	_nominal_fps = nominal_fps;
-}
-
-void simulation_ui::set_sim_on(const bool sim_on)
-{
-	_sim_on = sim_on;
 }
