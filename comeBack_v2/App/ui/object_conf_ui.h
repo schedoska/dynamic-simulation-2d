@@ -15,5 +15,10 @@ public:
 
 private:
 	body_handler* _target_handler;
+
+	void draw_color_selector();
+	void draw_physical_properties();
+	void draw_position_and_rotation();
+	void draw_velocity();
 };
 

@@ -39,6 +39,8 @@ private:
 	std::array<sf::CircleShape, 8> _stretchers;
 	sf::CircleShape _rotator;
 	sf::RectangleShape _border;
+	sf::RectangleShape _velocity_line;
+	sf::CircleShape _velocity_com;
 
 	void update_handlers_pos();
 	void update_active(const sf::Vector2f& mouse_pos);
@@ -47,6 +49,9 @@ private:
 	double snap_angle(const double& rad, const int n);
 
 	void set_target();	// adjust target to fit the border
+
+	/* Draws line visualizating direction and lenght of velocity vector */
+	void draw_velocity(sf::RenderWindow* window);
 };
 
 namespace handler_conf 
@@ -62,5 +67,9 @@ namespace handler_conf
 	constexpr float min_border_size = 50;
 	constexpr float rotator_top_dist = 40;
 	constexpr float border_margin = 20;
+
+	constexpr float velocity_com_radius = 8;
+	constexpr float velocity_line_width = 4;
+	const sf::Color velocity_line_color = sf::Color(89, 40, 250);
 }
 

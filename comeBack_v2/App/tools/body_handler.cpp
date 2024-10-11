@@ -18,6 +18,11 @@ body_handler::body_handler()
 	_rotator.setFillColor(handler_conf::handler_color);
 	_rotator.setRadius(handler_conf::handler_radius);
 	_rotator.setOrigin(handler_conf::handler_radius, handler_conf::handler_radius);
+
+	_velocity_line.setFillColor(handler_conf::velocity_line_color);
+	_velocity_com.setRadius(handler_conf::velocity_com_radius);
+	_velocity_com.setOrigin(handler_conf::velocity_com_radius, handler_conf::velocity_com_radius);
+	_velocity_com.setFillColor(handler_conf::velocity_line_color);
 }
 
 void body_handler::update(const sf::Window* window)
@@ -65,6 +70,7 @@ void body_handler::update(const sf::Window* window)
 void body_handler::draw(sf::RenderWindow* window)
 {
 	if (_target == nullptr) return;
+	draw_velocity(window);
 	window->draw(_border);
 	window->draw(_rotator);
 	for (const auto& i : _stretchers) window->draw(i);
@@ -77,7 +83,6 @@ void body_handler::set_target(body* target)
 		_active = false;
 		return;
 	}
-
 	// Decide wheter to use equal axis scling mode
 	eql_axis_mode = _target->shape().circles().size() > 0 ? true : false;
 	set_border();
@@ -269,6 +274,25 @@ void body_handler::set_target()
 	_target->pos() = utils::sfml_to_vec2d(_border.getPosition()) - gcmc;
 	_target->update_shape();
 	_target->adjust_inertia();
+}
+
+void body_handler::draw_velocity(sf::RenderWindow* window)
+{
+	sf::Vector2f beg = utils::vec2_to_sfml(_target->pos());
+	sf::Vector2f end = beg + utils::vec2_to_sfml(_target->vel());
+	_velocity_com.setPosition(beg);
+
+	_velocity_line.setPosition(beg);
+	sf::Vector2f delta = beg - end;
+	double len = utils::sfml_to_vec2d(delta).len();
+
+	_velocity_line.setSize(sf::Vector2f(len, handler_conf::velocity_line_width));
+	float angle = utils::RadToDegrees(atan(delta.y / delta.x));
+	if (end.x <= beg.x) angle -= 180;
+	_velocity_line.setRotation(angle);
+
+	window->draw(_velocity_com);
+	window->draw(_velocity_line);
 }
 
 void body_handler::set_border()

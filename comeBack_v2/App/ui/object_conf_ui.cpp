@@ -17,10 +17,6 @@ void object_conf_ui::draw()
 	body* _target = _target_handler->target();
 	if (_target == nullptr) return;
 
-	sf::Color col = _target->color();
-	float g[4] = { col.r / 255.f, col.g / 255.f, col.b / 255.f, col.a / 255.f };
-
-
 	ImGui::Begin("Object configuration");
 
 	static char target_name[128];
@@ -28,20 +24,38 @@ void object_conf_ui::draw()
 	if (ImGui::InputText("Name", target_name, IM_ARRAYSIZE(target_name))) {
 		_target->set_name(target_name);
 	}
-	
+
+	draw_color_selector();
+	draw_physical_properties();
+	draw_position_and_rotation();
+	draw_velocity();
+
+	ImGui::End();
+	_target->update_shape();
+}
+
+void object_conf_ui::draw_color_selector()
+{
+	body* _target = _target_handler->target();
+
+	sf::Color col = _target->color();
+	float g[4] = { col.r / 255.f, col.g / 255.f, col.b / 255.f, col.a / 255.f };
 	ImGui::ColorPicker4("MyColor##4", (float*)g, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_DisplayRGB);
 	col.r = g[0] * 255.f;
 	col.g = g[1] * 255.f;
 	col.b = g[2] * 255.f;
 	col.a = g[3] * 255.f;
 	_target->set_color(col);
+}
 
+void object_conf_ui::draw_physical_properties()
+{
+	body* _target = _target_handler->target();
+	bool is_static = _target->mass() == ds2::inf_mass ? true : false;
 
 	ImGui::SeparatorText("Physical properties");
-
 	ImGui::LabelText("Area", (std::to_string(_target->shape().area()) + " m^2").c_str());
 
-	bool is_static = _target->mass() == ds2::inf_mass ? true : false;
 	if (ImGui::Checkbox("Static", &is_static)) {
 		if (is_static) {
 			_target->set_mass(ds2::inf_mass, false);
@@ -53,7 +67,7 @@ void object_conf_ui::draw()
 			_target->set_mass(1, true);
 		}
 	}
-	
+
 	if (is_static) ImGui::BeginDisabled();
 	static bool adj_inertia = false;
 	float target_mass = _target->mass();
@@ -61,7 +75,7 @@ void object_conf_ui::draw()
 	{
 		_target->set_mass(target_mass, adj_inertia);
 	}
-	//ImGui::SameLine();
+
 	ImGui::Checkbox("Adjust inertia", &adj_inertia);
 
 	float target_inertia = _target->inertia();
@@ -70,6 +84,11 @@ void object_conf_ui::draw()
 		_target->inertia() = target_inertia;
 	}
 	if (is_static) ImGui::EndDisabled();
+}
+
+void object_conf_ui::draw_position_and_rotation()
+{
+	body* _target = _target_handler->target();
 
 	ImGui::SeparatorText("Position and rotation");
 	float target_x_pos = _target->pos()[0];
@@ -79,12 +98,18 @@ void object_conf_ui::draw()
 	bool hupdt = false;	// handler border update flag
 	if (ImGui::DragFloat("X", &target_x_pos, 1)) hupdt = true;
 	if (ImGui::DragFloat("Y", &target_y_pos, 1)) hupdt = true;
-	if (ImGui::DragFloat("Rotation", &target_rot, 0.02)) hupdt = true;	
+	if (ImGui::DragFloat("Rotation", &target_rot, 0.02)) hupdt = true;
 	if (hupdt) {
 		_target->pos() = vl::vec2d(target_x_pos, target_y_pos);
 		_target->rot() = target_rot;
 		_target_handler->set_border();
 	}
+}
+
+void object_conf_ui::draw_velocity()
+{
+	body* _target = _target_handler->target();
+	bool is_static = _target->mass() == ds2::inf_mass ? true : false;
 
 	if (is_static) ImGui::BeginDisabled();
 
@@ -99,8 +124,5 @@ void object_conf_ui::draw()
 	_target->rot_vel() = target_rot_vel;
 
 	if (is_static) ImGui::EndDisabled();
-
-	ImGui::End();
-	_target->update_shape();
 }
 
