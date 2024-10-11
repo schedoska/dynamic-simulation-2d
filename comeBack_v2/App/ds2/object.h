@@ -61,5 +61,8 @@ namespace ds2
 		int _layer_min;
 		int _layer_max;
 	};
+
+	constexpr double inf_mass = 10.0e+100;
+	constexpr double inf_inertia = 10.0e+100;
 }
 

@@ -19,9 +19,15 @@ void object_conf_ui::draw()
 
 	sf::Color col = _target->color();
 	float g[4] = { col.r / 255.f, col.g / 255.f, col.b / 255.f, col.a / 255.f };
-	//static float g[4];
 
-	ImGui::Begin(_target->name().c_str());
+
+	ImGui::Begin("Object configuration");
+
+	static char target_name[128];
+	strcpy_s(target_name, _target->name().c_str());
+	if (ImGui::InputText("Name", target_name, IM_ARRAYSIZE(target_name))) {
+		_target->set_name(target_name);
+	}
 	
 	ImGui::ColorPicker4("MyColor##4", (float*)g, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_DisplayRGB);
 	col.r = g[0] * 255.f;
@@ -34,7 +40,21 @@ void object_conf_ui::draw()
 	ImGui::SeparatorText("Physical properties");
 
 	ImGui::LabelText("Area", (std::to_string(_target->shape().area()) + " m^2").c_str());
+
+	bool is_static = _target->mass() == ds2::inf_mass ? true : false;
+	if (ImGui::Checkbox("Static", &is_static)) {
+		if (is_static) {
+			_target->set_mass(ds2::inf_mass, false);
+			_target->inertia() = ds2::inf_inertia;
+			_target->vel() = vl::vec2d(0, 0);
+			_target->rot_vel() = 0;
+		}
+		else {
+			_target->set_mass(1, true);
+		}
+	}
 	
+	if (is_static) ImGui::BeginDisabled();
 	static bool adj_inertia = false;
 	float target_mass = _target->mass();
 	if (ImGui::DragFloat("Mass", &target_mass, 1.0, 0.0, 10e10, "%.2f kg", ImGuiSliderFlags_AlwaysClamp))
@@ -49,6 +69,7 @@ void object_conf_ui::draw()
 	{
 		_target->inertia() = target_inertia;
 	}
+	if (is_static) ImGui::EndDisabled();
 
 	ImGui::SeparatorText("Position and rotation");
 	float target_x_pos = _target->pos()[0];
@@ -64,6 +85,20 @@ void object_conf_ui::draw()
 		_target->rot() = target_rot;
 		_target_handler->set_border();
 	}
+
+	if (is_static) ImGui::BeginDisabled();
+
+	ImGui::SeparatorText("Velocity");
+	float target_x_vel = _target->vel()[0];
+	float target_y_vel = _target->vel()[1];
+	float target_rot_vel = _target->rot_vel();
+	ImGui::DragFloat("X vel", &target_x_vel, 1);
+	ImGui::DragFloat("Y vel", &target_y_vel, 1);
+	ImGui::DragFloat("Rotation vel", &target_rot_vel, 0.02);
+	_target->vel() = vl::vec2d(target_x_vel, target_y_vel);
+	_target->rot_vel() = target_rot_vel;
+
+	if (is_static) ImGui::EndDisabled();
 
 	ImGui::End();
 	_target->update_shape();
