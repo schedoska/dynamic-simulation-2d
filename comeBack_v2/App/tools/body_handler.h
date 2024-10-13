@@ -64,12 +64,12 @@ namespace handler_conf
 	const sf::Color border_color = sf::Color(66, 66, 66);
 	const sf::Color border_hover_color = sf::Color(91, 119, 245);
 
-	constexpr float min_border_size = 50;
+	constexpr float min_border_size = 20;
 	constexpr float rotator_top_dist = 40;
 	constexpr float border_margin = 20;
 
 	constexpr float velocity_com_radius = 8;
 	constexpr float velocity_line_width = 4;
-	const sf::Color velocity_line_color = sf::Color(89, 40, 250);
+	const sf::Color velocity_line_color = sf::Color(89, 40, 250, 100);
 }
 

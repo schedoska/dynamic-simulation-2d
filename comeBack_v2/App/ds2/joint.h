@@ -4,6 +4,10 @@
 
 namespace ds2
 {
+	enum class joint_type {
+		joint, spring, hinge, motor
+	};
+
 	class joint
 	{
 	public:
@@ -26,8 +30,8 @@ namespace ds2
 		void set_obj_a(object* obj_a);
 		void set_obj_b(object* obj_b);
 
-
 		virtual void update(const double& dt);
+		virtual joint_type type() const;
 
 	protected:
 		object* _obj_a;
@@ -36,16 +40,16 @@ namespace ds2
 		vl::vec2d _loc_b;
 	};
 
-	class spring : public joint
+	class spring_joint : public joint
 	{
 	public: 
-		spring(
+		spring_joint(
 			object* a,
 			object* b,
 			vl::vec2d loc_a = vl::vec2d(),
 			vl::vec2d loc_b = vl::vec2d());
 
-		spring(
+		spring_joint(
 			object* a,
 			object* b,
 			const double& strength, 
@@ -54,6 +58,7 @@ namespace ds2
 			vl::vec2d loc_b = vl::vec2d());
 
 		void update(const double& dt) override;
+		joint_type type() const override;
 		void brace();
 
 		const double& length() const;
@@ -80,6 +85,7 @@ namespace ds2
 			const double& beta = 0.1);
 
 		void update(const double& dt) override;
+		joint_type type() const override;
 		const double& beta() const;
 		double& beta();
 

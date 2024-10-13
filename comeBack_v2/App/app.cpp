@@ -10,6 +10,21 @@ app::app(sf::RenderWindow* window)
 {
 	ImGui::SFML::Init(*_window);
 
+	bh.set_target(nullptr);
+	oc_ui.set_target(&bh);
+	//pt.start_shape(std::bind(&app::add_body, this, std::placeholders::_1));
+
+	mt_ui.set_create_convex_cbck(std::bind(
+		&app::add_convex_body, this, std::placeholders::_1));
+	mt_ui.set_create_circle_cbck(std::bind(
+		&app::add_circle_body, this, std::placeholders::_1, std::placeholders::_2));
+
+	sim_ui.set_start_sim_cbck(std::bind(&app::start_simulation, this));
+	sim_ui.set_restart_sim_cbck(std::bind(&app::restart_simulation, this));
+	sim_ui.set_scene(&_scene);
+
+	//return;
+
 	ds2::convex_shape block;
 	block.add(vl::vec2d(0, 0));
 	block.add(vl::vec2d(50, 0));
@@ -44,22 +59,11 @@ app::app(sf::RenderWindow* window)
 	//_scene.add_object(b2);
 	b->vel() = { -10,0 };
 
-	bh.set_target(b);
-	oc_ui.set_target(&bh);
-	jc_ui.set_target(&jh);
-	//pt.start_shape(std::bind(&app::add_body, this, std::placeholders::_1));
-
-	mt_ui.set_create_convex_cbck(std::bind(
-		&app::add_convex_body, this, std::placeholders::_1));
-	mt_ui.set_create_circle_cbck(std::bind(
-		&app::add_circle_body, this, std::placeholders::_1, std::placeholders::_2));
-
-	sim_ui.set_start_sim_cbck(std::bind(&app::start_simulation, this));
-	sim_ui.set_restart_sim_cbck(std::bind(&app::restart_simulation, this));
-	sim_ui.set_scene(&_scene);
-
-	drawable_spring* sd = new drawable_spring(b, nullptr, { 300,300 }, { 500,300 });
+	
+	dble_spring* sd = new dble_spring(nullptr, nullptr, { 300,300 }, { 500,300 });
 	_joints.push_back(sd);
+	_dwbl_joints.push_back(sd);
+	_scene.add(sd);
 }
 
 app::~app()
@@ -82,49 +86,85 @@ void app::update(const sf::Time& dt)
 
 void app::simulation_update(const sf::Time& dt)
 {
+	sf::Vector2i mouse_pos = sf::Mouse::getPosition(*_window);
+	bool left_mouse_btn = sf::Mouse::isButtonPressed(sf::Mouse::Left);
+
+	ft.update(_window, dt);
+
+	if (left_mouse_btn && ImGui::GetIO().WantCaptureMouse == false) {
+		if (!ft.target()) {
+			body* b = body_at(utils::sfml_to_vec2d(mouse_pos));
+			ft.set_target(b, mouse_pos);
+		}
+	}
+	for (auto& i : _bodies) {
+		if (i->mass() != ds2::inf_mass)
+		i->vel() += vl::vec2d(0, 100 * dt.asSeconds());
+	}
 	_scene.update(sim_ui.step_time() / 1000.0, *_window);
 }
 
 void app::edition_update(const sf::Time& dt)
 {
 	sf::Vector2f mouse_pos = (sf::Vector2f)sf::Mouse::getPosition(*_window);
-	bool left_mouse = sf::Mouse::isButtonPressed(sf::Mouse::Left);
-	bool left_ctrl = sf::Keyboard::isKeyPressed(sf::Keyboard::LControl);
-	bool delet = sf::Keyboard::isKeyPressed(sf::Keyboard::Delete);
+	bool left_mouse_btn = sf::Mouse::isButtonPressed(sf::Mouse::Left);
+	bool left_ctrl_btn = sf::Keyboard::isKeyPressed(sf::Keyboard::LControl);
+	bool delete_btn = sf::Keyboard::isKeyPressed(sf::Keyboard::Delete);
+	bool c_btn = sf::Keyboard::isKeyPressed(sf::Keyboard::C);
+	bool v_btn = sf::Keyboard::isKeyPressed(sf::Keyboard::V);
 
 	bh.update(_window);
 	jh.update(_window);
 	pt.update(_window);
 
-	if (left_mouse && ImGui::GetIO().WantCaptureMouse == false) {
+	if (left_mouse_btn && ImGui::GetIO().WantCaptureMouse == false) {
 		if (!jh.is_active() && !bh.is_active()) 
 		{
 			joint_at_data jad = joint_at(utils::sfml_to_vec2d(mouse_pos));
 			body* b = body_at(utils::sfml_to_vec2d(mouse_pos));
 
-			if (jh.target() && left_ctrl) {
+			if (jh.target() && left_ctrl_btn) {
 				jh.target_set_object(b);
 				return;
 			}
 
 			if (jad.joint) {
 				jh.set_target(jad.joint, jad.type);
+				jc_ui.set_target(jad.joint);
 				bh.set_target(nullptr);
 			}
 			else if (b) {
 				bh.set_target(b);
 				jh.set_target(nullptr);
+				jc_ui.set_target(nullptr);
 			}
 			else {
 				bh.set_target(nullptr);
 				jh.set_target(nullptr);
+				jc_ui.set_target(nullptr);
 			}
 		}
 	}
-	if (delet) {
+	if (delete_btn) {
 		remove(bh.target());
 		bh.set_target(nullptr);
 	}
+	if (left_ctrl_btn && c_btn) {
+		buffor_body = bh.target();
+	}
+	static bool block = false;
+	if (left_ctrl_btn && v_btn && !block) {
+		if (buffor_body) {
+			body* b = new body(*buffor_body);
+			b->pos() = utils::sfml_to_vec2d(mouse_pos);
+			b->update_shape();
+			_bodies.push_back(b);
+			_scene.add(b);
+			bh.set_target(b);
+		}
+		block = true;
+	}
+	if (!(left_ctrl_btn && v_btn)) block = false;
 }
 
 void app::draw()
@@ -139,9 +179,12 @@ void app::draw()
 		mt_ui.draw();
 		jc_ui.draw();
 	}
+	else {
+		ft.draw(_window);
+	}
 	sim_ui.draw();
 
-	for (auto& i : _joints) i->draw(*_window);
+	for (auto& i : _dwbl_joints) i->draw(*_window);
 
 	ImGui::ShowDemoWindow();
 	ImGui::SFML::Render(*_window);
@@ -232,7 +275,7 @@ void app::load_json(const std::string& path)
 	_joints.clear();
 
 	for (const auto& i : json_obj["bodies"]) {
-		// iteracjo po kolejnych obiektach
+		// iteracja po kolejnych obiektach
 		body* b = new body(json_utils::deserialize_body(i));
 		b->update_shape();
 		_bodies.push_back(b);
@@ -263,7 +306,7 @@ void app::add_concave_body(const std::vector<vl::vec2d> &vertices, bool delauney
 	bh.set_target(b);
 }
 
-body* app::body_at(const vl::vec2d& scene_pos)
+body* app::body_at(const vl::vec2d& scene_pos) const
 {
 	ds2::object pos_obj(scene_pos);
 	pos_obj.shape().add(ds2::circle_shape());
@@ -275,13 +318,20 @@ body* app::body_at(const vl::vec2d& scene_pos)
 	return nullptr;
 }
 
-const joint_at_data app::joint_at(const vl::vec2d& scene_pos) const
+joint_at_data app::joint_at(const vl::vec2d& scene_pos) const
 {
-	for (drawable_spring* i : _joints) {
+	for (ds2::joint* i : _joints) {
+		ds2::joint_type jt = i->type();
 		double dist_a = (scene_pos - i->global_a()).len();
 		double dist_b = (scene_pos - i->global_b()).len();
-		if (dist_a < 50) return joint_at_data{ i, joint_handler_mode::a };
-		if (dist_b < 50) return joint_at_data{ i, joint_handler_mode::b };
+
+		if (jt == ds2::joint_type::hinge || jt == ds2::joint_type::motor) {
+			if (dist_a < 50) return joint_at_data{ i, joint_handler_mode::both };
+		}
+		else {
+			if (dist_a < 50) return joint_at_data{ i, joint_handler_mode::a };
+			if (dist_b < 50) return joint_at_data{ i, joint_handler_mode::b };
+		}
 	}
 	return joint_at_data{ nullptr, joint_handler_mode::a };
 }

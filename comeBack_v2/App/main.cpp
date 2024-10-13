@@ -22,41 +22,28 @@
 
 int main()
 {
-    /*
-    std::ifstream ifs("C:\\Users\\chedo\\OneDrive\\Pulpit\\test.json");
-    nlohmann::json jsonData = nlohmann::json::parse(ifs);
-    
-    nlohmann::json obj;
-    obj["id"] = "0001";
-    obj["color"] = "black";
-
-    jsonData["batters"]["apple"].push_back(obj);
-    jsonData["batters"]["apple"].push_back(obj);
-    jsonData["batters"]["apple"].push_back(obj);
-
-    nlohmann::json s = { {"assa", 33}, {"sd", 44}};
-    jsonData["sda"] = s;
-
-
-    std::cout << std::setw(4) << jsonData << std::endl;
-    //    return 1;
-    */
-
-
     sf::RenderWindow window;
-    window.create(sf::VideoMode(1500, 1000), "Fdf", sf::Style::Default);
+    window.create(sf::VideoMode(1600, 900), "Dynamic symulation 2d", sf::Style::Default);
 
     window.setFramerateLimit(40);
     sf::Clock deltaClock;
 
     app a(&window);
 
-    while (window.isOpen()) {
+    while (window.isOpen()) 
+    {
         sf::Event event;
-        while (window.pollEvent(event)) {
+        while (window.pollEvent(event)) 
+        {
             ImGui::SFML::ProcessEvent(window, event);
-            if (event.type == sf::Event::Closed) {
+            if (event.type == sf::Event::Closed) 
+            {
                 window.close();
+            }
+            if (event.type == sf::Event::Resized) 
+            {
+                sf::FloatRect visibleArea(0, 0, event.size.width, event.size.height);
+                window.setView(sf::View(visibleArea));
             }
         }
 
@@ -67,6 +54,7 @@ int main()
         a.draw();
         window.display();
     }
+    return 0;
 }
 
 /*int main() {

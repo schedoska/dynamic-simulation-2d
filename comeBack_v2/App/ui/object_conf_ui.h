@@ -20,5 +20,6 @@ private:
 	void draw_physical_properties();
 	void draw_position_and_rotation();
 	void draw_velocity();
+	void draw_layers();
 };
 

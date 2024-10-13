@@ -70,7 +70,7 @@ void joint_handler::set_target(ds2::joint* target, joint_handler_mode mode)
 void joint_handler::set_border()
 {
 	sf::Vector2f pos;
-	if (_mode == joint_handler_mode::a) {
+	if (_mode == joint_handler_mode::a || _mode == joint_handler_mode::both) {
 		_border.setPosition(utils::vec2_to_sfml(_target->global_a()));
 	}
 	else {
@@ -96,14 +96,36 @@ void joint_handler::target_set_object(ds2::object* obj)
 	vl::vec2d pos_a = _target->global_a();
 	vl::vec2d pos_b = _target->global_b();
 
-	if (_mode == joint_handler_mode::a || _mode == joint_handler_mode::both) {
+	if (_mode == joint_handler_mode::a) {
 		_target->set_obj_a(obj);
 		obj ? _target->set_loc_a(obj->local(pos_a)) : _target->set_loc_a(pos_a);
 	}
-	if (_mode == joint_handler_mode::b || _mode == joint_handler_mode::both) {
+	if (_mode == joint_handler_mode::b) {
 		_target->set_obj_b(obj);
 		obj ? _target->set_loc_b(obj->local(pos_b)) : _target->set_loc_b(pos_b);
 	}
+
+	if (_mode == joint_handler_mode::both) {
+		if (obj == nullptr) {
+			_target->set_obj_a(obj);
+			_target->set_obj_b(obj);
+			_target->set_loc_a(pos_a);
+			_target->set_loc_b(pos_b);
+		}
+		else {
+			if (_turn) {
+				_target->set_obj_a(obj);
+				_target->set_loc_a(obj->local(pos_a));
+			}
+			else {
+				_target->set_obj_b(obj);
+				_target->set_loc_b(obj->local(pos_b));
+			}
+		}
+	}
+
+
+	_turn = !_turn;
 }
 
 void joint_handler::set_target()

@@ -29,6 +29,7 @@ private:
 	
 	ds2::joint* _target;
 	joint_handler_mode _mode;
+	bool _turn;		// true = a assignment turn, false = b
 
 	void set_target();
 	void draw_line(

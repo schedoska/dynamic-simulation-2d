@@ -32,6 +32,7 @@
     <ClInclude Include="App\body.h" />
     <ClInclude Include="App\drawable_joint.h" />
     <ClInclude Include="App\json_utils.h" />
+    <ClInclude Include="App\tools\force_tool.h" />
     <ClInclude Include="imgui\imconfig-SFML.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui-SFML.h" />
@@ -119,6 +120,7 @@
     <ClCompile Include="App\body.cpp" />
     <ClCompile Include="App\drawable_joint.cpp" />
     <ClCompile Include="App\json_utils.cpp" />
+    <ClCompile Include="App\tools\force_tool.cpp" />
     <ClCompile Include="imgui\imgui-SFML.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />

@@ -29,6 +29,7 @@ void object_conf_ui::draw()
 	draw_physical_properties();
 	draw_position_and_rotation();
 	draw_velocity();
+	draw_layers();
 
 	ImGui::End();
 	_target->update_shape();
@@ -124,5 +125,22 @@ void object_conf_ui::draw_velocity()
 	_target->rot_vel() = target_rot_vel;
 
 	if (is_static) ImGui::EndDisabled();
+}
+
+void object_conf_ui::draw_layers()
+{
+	ImGui::SeparatorText("Layers");
+	body* _target = _target_handler->target();
+
+	static bool one_layer = true;
+	ImGui::Checkbox("One layer", &one_layer);
+	if (one_layer) {
+		ImGui::InputInt("Layer", &_target->layer_max());
+		_target->layer_min() = _target->layer_max();
+	}
+	else {
+		ImGui::InputInt("Layer min", &_target->layer_min());
+		ImGui::InputInt("Layer max", &_target->layer_max());
+	}
 }
 

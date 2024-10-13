@@ -74,6 +74,11 @@ void ds2::joint::update(const double& dt)
 	
 }
 
+ds2::joint_type ds2::joint::type() const
+{
+	return joint_type::joint;
+}
+
 /*
 void ds2::spring_joint::update(const double& dt)
 {
@@ -111,20 +116,20 @@ ds2::fixed_joint::fixed_joint(
 }
 */
 
-ds2::spring::spring(object* a, object* b, vl::vec2d loc_a, vl::vec2d loc_b)
+ds2::spring_joint::spring_joint(object* a, object* b, vl::vec2d loc_a, vl::vec2d loc_b)
 	: joint(a, b, loc_a, loc_b)
 {
 	//_length = loc_distance();
 	brace();
 }
 
-ds2::spring::spring(object* a, object* b, const double& strength, const double& damping, vl::vec2d loc_a, vl::vec2d loc_b)
+ds2::spring_joint::spring_joint(object* a, object* b, const double& strength, const double& damping, vl::vec2d loc_a, vl::vec2d loc_b)
 	: joint(a, b, loc_a, loc_b), _strength(strength), _damping(damping)
 {
 	//_length = loc_distance();
 }
 
-void ds2::spring::update(const double& dt)
+void ds2::spring_joint::update(const double& dt)
 {
 	vl::vec2d dv = _obj_a->global(_loc_a) - _obj_b->global(_loc_b);
 	double dist = dv.len();
@@ -135,7 +140,12 @@ void ds2::spring::update(const double& dt)
 	_obj_b->apply_force(dv, _loc_b, dt);
 }
 
-void ds2::spring::brace()
+ds2::joint_type ds2::spring_joint::type() const
+{
+	return joint_type::spring;
+}
+
+void ds2::spring_joint::brace()
 {
 	//_strength = 27000;
 	//_damping = 220;
@@ -143,32 +153,32 @@ void ds2::spring::brace()
 	_damping = 200;
 }
 
-const double& ds2::spring::length() const
+const double& ds2::spring_joint::length() const
 {
 	return _length;
 }
 
-double& ds2::spring::length()
+double& ds2::spring_joint::length()
 {
 	return _length;
 }
 
-const double& ds2::spring::strength() const
+const double& ds2::spring_joint::strength() const
 {
 	return _strength;
 }
 
-double& ds2::spring::strength()
+double& ds2::spring_joint::strength()
 {
 	return _strength;
 }
 
-const double& ds2::spring::damping() const
+const double& ds2::spring_joint::damping() const
 {
 	return _damping;
 }
 
-double& ds2::spring::damping()
+double& ds2::spring_joint::damping()
 {
 	return _damping;
 }
@@ -241,6 +251,11 @@ void ds2::hinge_joint::update(const double& dt)
 	vl::vec2d b_dpos = (cpos - _obj_b->global(_loc_b)) * _beta;
 	_obj_b->pos() += b_dpos;
 	_obj_b->vel() += (b_dpos / dt) * 1;
+}
+
+ds2::joint_type ds2::hinge_joint::type() const
+{
+	return joint_type::hinge;
 }
 
 const double& ds2::hinge_joint::beta() const
