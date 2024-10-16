@@ -23,7 +23,14 @@ void polygon_tool::update(const sf::Window* window)
 	if (!_active) return;
 
 	static bool prev_clkd = false;
-	bool clkd = sf::Mouse::isButtonPressed(sf::Mouse::Left);
+	bool left_button = sf::Mouse::isButtonPressed(sf::Mouse::Left);
+	bool right_button = sf::Mouse::isButtonPressed(sf::Mouse::Right);
+	bool esc_button = sf::Keyboard::isKeyPressed(sf::Keyboard::Escape);
+
+	if (right_button || esc_button) {
+		_active = false;
+	}
+
 	bool snapped_start = false;
 	_snap_pos = static_cast<sf::Vector2f>(sf::Mouse::getPosition(*window));
 
@@ -39,13 +46,13 @@ void polygon_tool::update(const sf::Window* window)
 			snapped_start = true;
 		}
 	}
-	if (clkd && !prev_clkd) {
+	if (left_button && !prev_clkd) {
 		if (snapped_start)
 			create_shape();
 		else
 			_vertices.push_back(_snap_pos);
 	}
-	prev_clkd = clkd;
+	prev_clkd = left_button;
 }
 
 void polygon_tool::draw(sf::RenderWindow* window)
@@ -77,22 +84,43 @@ void polygon_tool::draw(sf::RenderWindow* window)
 	}
 }
 
-void polygon_tool::start_shape(std::function<void(std::vector<vl::vec2d>)> created_callback)
+void polygon_tool::start_shape()
 {
 	_active = true;
 	_vertices.clear();
-	_created_callback = created_callback;
+}
+
+void polygon_tool::set_create_body_cbck(std::function<void(const ds2::shape_group& shape, const vl::vec2d& pos)> func)
+{
+	_create_body_cbck = func;
+}
+
+void polygon_tool::set_triangulation_mode(bool delauney)
+{
+	_triangulation_mode = delauney ? ds2::triangulation::delaunay : ds2::triangulation::expanding;
+}
+
+const bool polygon_tool::active() const
+{
+	return _active;
 }
 
 void polygon_tool::create_shape()
 {
 	if (_vertices.size() < 3) return;
 	_active = false;
+	if (!_create_body_cbck) return;
 
-	std::vector<vl::vec2d> vl_vertices;
-	for (const sf::Vector2f& i : _vertices) 
-		vl_vertices.push_back({ i.x, i.y });
-	_created_callback(vl_vertices);
+	ds2::concave_shape cs;
+	for (const sf::Vector2f& i : _vertices) {
+		cs.add({ i.x, i.y });
+	}
+	cs.normalize_vertices();
+	ds2::shape_group sg = cs.generate_shape_group(_triangulation_mode);
+	vl::vec2d centorid_pos = sg.centroid();
+	sg.translate_to_centroid();
+
+	_create_body_cbck(sg, centorid_pos);
 }
 
 void polygon_tool::draw_line(

@@ -15,6 +15,7 @@ app::app(sf::RenderWindow* window)
 	oc_ui.set_target(&bh);
 	//pt.start_shape(std::bind(&app::add_body, this, std::placeholders::_1));
 
+	mt_ui.set_polygon_tool(&pt);
 	mt_ui.set_create_body_cbck(std::bind(
 		&app::create_body, this, std::placeholders::_1, std::placeholders::_2));
 	mt_ui.set_create_joint_cbck(std::bind(
@@ -23,6 +24,9 @@ app::app(sf::RenderWindow* window)
 	sim_ui.set_start_sim_cbck(std::bind(&app::start_simulation, this));
 	sim_ui.set_restart_sim_cbck(std::bind(&app::restart_simulation, this));
 	sim_ui.set_scene(&_scene);
+
+	pt.set_create_body_cbck(std::bind(
+		&app::create_body, this, std::placeholders::_1, std::placeholders::_2));
 
 	load_json("C:\\Users\\chedo\\OneDrive\\Pulpit\\test.json");
 	return;
@@ -109,9 +113,11 @@ void app::edition_update(const sf::Time& dt)
 	bool c_btn = sf::Keyboard::isKeyPressed(sf::Keyboard::C);
 	bool v_btn = sf::Keyboard::isKeyPressed(sf::Keyboard::V);
 
+	pt.update(_window);
+	if (pt.active()) return;
+
 	bh.update(_window);
 	jh.update(_window);
-	pt.update(_window);
 
 	if (left_mouse_btn && ImGui::GetIO().WantCaptureMouse == false) {
 		if (!jh.is_active() && !bh.is_active()) 
@@ -141,12 +147,16 @@ void app::edition_update(const sf::Time& dt)
 			}
 		}
 	}
+
+	/* Deleting of selected joints and bodies */
 	if (delete_btn) {
 		remove(bh.target());
 		remove(jh.target());
 		bh.set_target(nullptr);
 		jh.set_target(nullptr);
 	}
+
+	/* Copy paste mechnism */
 	if (left_ctrl_btn && c_btn) {
 		buffor_body = bh.target();
 	}

@@ -19,7 +19,6 @@ ds2::shape_group ds2::concave_shape::generate_shape_group(triangulation mode)
 {
 	const std::vector<vl::vec2d>& vl = _vertices;
 	std::vector<triangle> tr_l = triangulate();
-
 	if (mode == triangulation::delaunay) {
 		delaunay del(vl);
 		del.edge_flip(tr_l);
@@ -27,7 +26,6 @@ ds2::shape_group ds2::concave_shape::generate_shape_group(triangulation mode)
 	}
 
 	shape_group sg;
-
 	for (const auto& i : tr_l){
 		convex_shape tr;
 		tr.add(vl[i[0]]);
@@ -35,7 +33,6 @@ ds2::shape_group ds2::concave_shape::generate_shape_group(triangulation mode)
 		tr.add(vl[i[2]]);
 		sg.add(tr);
 	}
-
 	return sg;
 }
 
@@ -44,9 +41,26 @@ const std::vector<vl::vec2d>& ds2::concave_shape::vertices() const
 	return _vertices;
 }
 
+void ds2::concave_shape::normalize_vertices()
+{
+	if (!is_clockwise()) std::reverse(_vertices.begin(), _vertices.end());
+}
+
+const bool ds2::concave_shape::is_clockwise() const
+{
+	const std::vector<vl::vec2d>& vl = _vertices;
+	size_t size = vl.size();
+
+	auto loop = [](int a, int n) { return ((a % n) + n) % n; };
+	double s = 0;
+	for (size_t i = 0; i < size; ++i) {
+		s += (vl[loop(i + 1, size)][0] - vl[i][0]) * (vl[loop(i + 1, size)][1] + vl[i][1]);
+	}
+	return s > 0 ? false : true;
+}
+
 std::vector<ds2::concave_shape::triangle> ds2::concave_shape::triangulate()
 {
-	//shape_group sg;
 	std::vector<triangle> tr_l;
 	const std::vector<vl::vec2d>& vl = _vertices;
 	size_t size = vl.size();

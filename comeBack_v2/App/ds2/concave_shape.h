@@ -18,6 +18,8 @@ namespace ds2
 		void clear();
 		shape_group generate_shape_group(triangulation mode);
 		const std::vector<vl::vec2d>& vertices() const;
+		void normalize_vertices();	// Procedure if vertices happen not to be clockwise
+		const bool is_clockwise() const;
 
 	private:
 		std::vector<triangle> triangulate();

@@ -5,24 +5,25 @@
 
 #include "../ds2/regular_shape.h"
 
-main_tools_ui::main_tools_ui()
-{
-}
-
 void main_tools_ui::draw()
 {
 	ImGui::Begin("Tools");
 
-
 	// Cincave tool invocation creation
 	ImGui::SeparatorText("Concave shape");
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.153, 0.306, 0.741, 1));
-	ImGui::Button("Add concave");
+	if (ImGui::Button("Add concave")) {
+		_pt->start_shape();
+	}
 	ImGui::PopStyleColor(1);
-	static bool delauney_tri = true;
-	ImGui::Checkbox("Delauney triangulation", &delauney_tri);
 
-
+	static int traingulation_mode = 1;
+	bool b_del = ImGui::RadioButton("Delauney", &(traingulation_mode), 1);
+	bool b_exp = ImGui::RadioButton("Expanding", &(traingulation_mode), 0);
+	if (b_del || b_exp)	{
+		_pt->set_triangulation_mode(traingulation_mode);
+	}
+	
 	// Convex creation
 	ImGui::SeparatorText("Convex shape");
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.153, 0.306, 0.741, 1));
@@ -81,15 +82,16 @@ void main_tools_ui::draw()
 	}
 	ImGui::PopStyleColor(1);
 
-
-
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.424, 0.6, 0.949, 1));
+	if (ImGui::Button("Add motor") && _create_joint_cbck) {
+		_create_joint_cbck(
+			ds2::joint_type::motor,
+			main_tools_conf::new_joint_pos_a,
+			main_tools_conf::new_joint_pos_b);
+	}
+	ImGui::PopStyleColor(1);
 
 	ImGui::End();
-}
-
-void main_tools_ui::set_start_polygon_tool_cbck(std::function<void(void)> func)
-{
-	_start_polygon_tool_cbck = func;
 }
 
 void main_tools_ui::set_create_body_cbck(std::function<void(const ds2::shape_group& shape, const vl::vec2d& pos)> func)
@@ -100,6 +102,11 @@ void main_tools_ui::set_create_body_cbck(std::function<void(const ds2::shape_gro
 void main_tools_ui::set_create_joint_cbck(std::function<void(ds2::joint_type type, const vl::vec2d& pos_a, const vl::vec2d& pos_b)> func)
 {
 	_create_joint_cbck = func;
+}
+
+void main_tools_ui::set_polygon_tool(polygon_tool* pt)
+{
+	_pt = pt;
 }
 
 std::vector<vl::vec2d> main_tools_ui::create_convex(const vl::vec2d& pos, const double& size, const int sides)

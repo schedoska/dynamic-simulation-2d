@@ -1,7 +1,8 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
-#include "../ds2/vec.h"
+#include "../ds2/shape_group.h"
+#include "../ds2/concave_shape.h"
 #include <functional>
 
 class polygon_tool
@@ -10,7 +11,12 @@ public:
 	polygon_tool();
 	void update(const sf::Window* window);
 	void draw(sf::RenderWindow* window);
-	void start_shape(std::function<void(std::vector<vl::vec2d>)> created_callback);
+
+	void start_shape();
+	void set_create_body_cbck(
+		std::function<void(const ds2::shape_group& shape, const vl::vec2d& pos)> func);
+	void set_triangulation_mode(bool delauney);
+	const bool active() const;
 
 private:
 	// is currently drawing
@@ -20,6 +26,8 @@ private:
 
 	sf::RectangleShape _start_vx_shape;
 	sf::CircleShape _vx_shape;
+
+	ds2::triangulation _triangulation_mode;
 
 	void create_shape();
 	void draw_line(
@@ -31,7 +39,7 @@ private:
 		const sf::Vector2f& beg, 
 		const sf::Vector2f& end);
 
-	std::function<void (std::vector<vl::vec2d>)> _created_callback;
+	std::function<void(const ds2::shape_group& shape, const vl::vec2d& pos)> _create_body_cbck;
 };
 
 namespace polygon_tool_conf
