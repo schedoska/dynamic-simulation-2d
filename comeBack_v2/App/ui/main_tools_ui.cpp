@@ -64,14 +64,20 @@ void main_tools_ui::draw()
 	// Joints creation
 	ImGui::SeparatorText("Joints");
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.678, 0.678, 0.678, 1));
-	if (ImGui::Button("Add spring")) {
-		// something ...
+	if (ImGui::Button("Add spring") && _create_joint_cbck) {
+		_create_joint_cbck(
+			ds2::joint_type::spring, 
+			main_tools_conf::new_joint_pos_a, 
+			main_tools_conf::new_joint_pos_b);
 	}
 	ImGui::PopStyleColor(1);
 
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.722, 0.608, 0, 1));
-	if (ImGui::Button("Add hinge")) {
-		// something ...
+	if (ImGui::Button("Add hinge") && _create_joint_cbck) {
+		_create_joint_cbck(
+			ds2::joint_type::hinge,
+			main_tools_conf::new_joint_pos_a,
+			main_tools_conf::new_joint_pos_b);
 	}
 	ImGui::PopStyleColor(1);
 
@@ -89,6 +95,11 @@ void main_tools_ui::set_start_polygon_tool_cbck(std::function<void(void)> func)
 void main_tools_ui::set_create_body_cbck(std::function<void(const ds2::shape_group& shape, const vl::vec2d& pos)> func)
 {
 	_create_body_cbck = func;
+}
+
+void main_tools_ui::set_create_joint_cbck(std::function<void(ds2::joint_type type, const vl::vec2d& pos_a, const vl::vec2d& pos_b)> func)
+{
+	_create_joint_cbck = func;
 }
 
 std::vector<vl::vec2d> main_tools_ui::create_convex(const vl::vec2d& pos, const double& size, const int sides)

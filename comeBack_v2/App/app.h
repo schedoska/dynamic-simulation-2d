@@ -38,9 +38,10 @@ public:
 	void draw();
 
 	void create_body(const ds2::shape_group& shape, const vl::vec2d& pos);
+	void create_joint(ds2::joint_type type, const vl::vec2d& pos_a, const vl::vec2d& pos_b);
 
 	void remove(const body* b);
-	//void remove(const drawable_spring* ds);
+	void remove(const dble_joint* j);
 	
 	// simulation
 	void start_simulation();
@@ -55,7 +56,7 @@ private:
 	sf::RenderWindow *_window;
 
 	std::vector<body*> _bodies;
-	std::vector<dble_joint*> _dwbl_joints;
+	std::vector<dble_joint*> _dble_joints;
 
 	ds2::scene _scene;
 	float _step_time;

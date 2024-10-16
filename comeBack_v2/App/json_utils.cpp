@@ -51,13 +51,82 @@ nlohmann::json json_utils::serialize(const sf::Color& c)
 	return nlohmann::json{ {"r", c.r}, {"g", c.g}, {"b", c.b}, {"a", c.a} };
 }
 
-nlohmann::json json_utils::serialize(const dble_hinge& h)
+nlohmann::json json_utils::serialize(dble_joint* h)
 {
-	nlohmann::json json_obj; 
-	json_obj["loc_a"] = serialize(h.hinge_joint()->loc_a());
-	json_obj["loc_b"] = serialize(h.hinge_joint()->loc_b());
-	
-	return nlohmann::json();
+	nlohmann::json json_joint;
+	ds2::joint *j = h->joint();
+
+	json_joint["loc_a"] = serialize(j->loc_a());
+	json_joint["loc_b"] = serialize(j->loc_b());
+
+	json_joint["body_a"] = h->body_a() ? h->body_a()->id() : -1;
+	json_joint["body_b"] = h->body_b() ? h->body_b()->id() : -1;
+
+	switch (h->joint()->type())
+	{
+	case ds2::joint_type::spring:
+		serialize(json_joint, dynamic_cast<dble_spring*>(h));
+		break;
+	case ds2::joint_type::hinge:
+		serialize(json_joint, dynamic_cast<dble_hinge*>(h));
+		break;
+	case ds2::joint_type::motor:
+		serialize(json_joint, dynamic_cast<dble_motor*>(h));
+		break;
+	default:
+		return json_joint;
+	};
+	return json_joint;
+}
+
+void json_utils::serialize(nlohmann::json& j, dble_hinge* h)
+{
+	j["type"] = ds2::joint_type::hinge;
+}
+
+void json_utils::serialize(nlohmann::json& j, dble_spring* h)
+{
+	j["type"] = ds2::joint_type::spring;
+}
+
+void json_utils::serialize(nlohmann::json& j, dble_motor* h)
+{
+	j["type"] = ds2::joint_type::motor;
+}
+
+dble_joint* json_utils::deserialize_joint(const nlohmann::json& json_j, std::vector<body*>& bodies)
+{
+	switch (json_j["type"].get<ds2::joint_type>()) {
+	case ds2::joint_type::spring:
+		return deserialize_spring(json_j, bodies);
+	case ds2::joint_type::hinge:
+		return deserialize_hinge(json_j, bodies);
+	case ds2::joint_type::motor:
+		return deserialize_motor(json_j, bodies);
+	}
+}
+
+dble_hinge* json_utils::deserialize_hinge(const nlohmann::json& json_j, std::vector<body*>& bodies)
+{
+	vl::vec2d loc_a = deserialize_vec2d(json_j["loc_a"]);
+	vl::vec2d loc_b = deserialize_vec2d(json_j["loc_b"]);
+	int id_a = json_j["body_a"].get<int>();
+	int id_b = json_j["body_b"].get<int>();
+	body* a = id_a == -1 ? nullptr : body_of_id(id_a, bodies);
+	body* b = id_b == -1 ? nullptr : body_of_id(id_b, bodies);
+
+	dble_hinge* hinge = new dble_hinge(a, b, loc_a, loc_b);
+	return hinge;
+}
+
+dble_spring* json_utils::deserialize_spring(const nlohmann::json& json_j, std::vector<body*>& bodies)
+{
+	return nullptr;
+}
+
+dble_motor* json_utils::deserialize_motor(const nlohmann::json& json_j, std::vector<body*>& bodies)
+{
+	return nullptr;
 }
 
 vl::vec2d json_utils::deserialize_vec2d(const nlohmann::json& json_v)
@@ -114,4 +183,11 @@ sf::Color json_utils::deserialize_color(const nlohmann::json& json_c)
 		json_c["g"].get<sf::Uint8>(),
 		json_c["b"].get<sf::Uint8>(),
 		json_c["a"].get<sf::Uint8>());
+}
+
+body* json_utils::body_of_id(const unsigned int& id, std::vector<body*>& bodies)
+{
+	for (body* body_it : bodies) {
+		if (body_it->id() == id) return body_it;
+	}
 }

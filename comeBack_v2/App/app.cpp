@@ -17,17 +17,14 @@ app::app(sf::RenderWindow* window)
 
 	mt_ui.set_create_body_cbck(std::bind(
 		&app::create_body, this, std::placeholders::_1, std::placeholders::_2));
+	mt_ui.set_create_joint_cbck(std::bind(
+		&app::create_joint, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 
 	sim_ui.set_start_sim_cbck(std::bind(&app::start_simulation, this));
 	sim_ui.set_restart_sim_cbck(std::bind(&app::restart_simulation, this));
 	sim_ui.set_scene(&_scene);
 
 	load_json("C:\\Users\\chedo\\OneDrive\\Pulpit\\test.json");
-
-	dble_hinge* sd = new dble_hinge(nullptr, nullptr, { 300,300 }, { 500,300 });
-	//_joints.push_back(sd);
-	_dwbl_joints.push_back(sd);
-	_scene.add(sd->joint());
 	return;
 
 	ds2::convex_shape block;
@@ -146,7 +143,9 @@ void app::edition_update(const sf::Time& dt)
 	}
 	if (delete_btn) {
 		remove(bh.target());
+		remove(jh.target());
 		bh.set_target(nullptr);
+		jh.set_target(nullptr);
 	}
 	if (left_ctrl_btn && c_btn) {
 		buffor_body = bh.target();
@@ -158,7 +157,6 @@ void app::edition_update(const sf::Time& dt)
 			b->pos() = utils::sfml_to_vec2d(mouse_pos);
 			b->update_shape();
 			_bodies.push_back(b);
-			_scene.add(b);
 			bh.set_target(b);
 		}
 		block = true;
@@ -183,7 +181,7 @@ void app::draw()
 	}
 	sim_ui.draw();
 
-	for (auto& i : _dwbl_joints) i->draw(*_window);
+	for (auto& i : _dble_joints) i->draw(*_window);
 
 	ImGui::ShowDemoWindow();
 	ImGui::SFML::Render(*_window);
@@ -194,22 +192,55 @@ void app::create_body(const ds2::shape_group& shape, const vl::vec2d& pos)
 	std::string name = "Object #" + std::to_string((int)_bodies.size() + 1);
 	body* b = new body(++_current_id, name, shape, pos);
 	_bodies.push_back(b);
-	_scene.add(b);
 	bh.set_target(b);
+}
+
+void app::create_joint(ds2::joint_type type, const vl::vec2d& pos_a, const vl::vec2d& pos_b)
+{
+	dble_joint* j;
+
+	switch (type) {
+	case ds2::joint_type::spring:
+		j = new dble_spring(nullptr, nullptr, pos_a, pos_b);
+		break;
+	case ds2::joint_type::hinge:
+		j = new dble_hinge(nullptr, nullptr, pos_a, pos_b);
+		break;
+	case ds2::joint_type::motor:
+		j = new dble_motor(nullptr, nullptr, pos_a, pos_b);
+		break;
+	}
+	_dble_joints.push_back(j);
 }
 
 void app::remove(const body* b)
 {
 	if (b == nullptr) return;
 	_bodies.erase(std::remove(_bodies.begin(), _bodies.end(), b));
-	_scene.remove(b);
 	delete b;
+}
+
+void app::remove(const dble_joint* j)
+{
+	if (j == nullptr) return;
+	_dble_joints.erase(std::remove(_dble_joints.begin(), _dble_joints.end(), j));
+	delete j;
 }
 
 void app::start_simulation()
 {
 	_mode = app_mode::simulation;
 	save_json("C:\\Users\\chedo\\OneDrive\\Pulpit\\test.json");
+
+	/* Load all application elements into tho the scene object */
+	_scene.remove_all();
+	for (body* b : _bodies) {
+		_scene.add(b);
+	}
+	for (dble_joint* j : _dble_joints) {
+		if (j->body_a() && j->body_b())
+		_scene.add(j->joint());
+	}
 }
 
 void app::restart_simulation()
@@ -228,8 +259,11 @@ void app::save_json(const std::string& path)
 	std::ofstream ofs(path);
 	nlohmann::json json_obj;
 
-	for (const body* it : _bodies) {
-		json_obj["bodies"].push_back(json_utils::serialize(*it));
+	for (const body* body_it : _bodies) {
+		json_obj["bodies"].push_back(json_utils::serialize(*body_it));
+	}
+	for (dble_joint* joint_it : _dble_joints) {
+		json_obj["joints"].push_back(json_utils::serialize(joint_it));
 	}
 	ofs << std::setw(3) << json_obj;
 	ofs.close();
@@ -247,19 +281,23 @@ void app::load_json(const std::string& path)
 	for (auto* b : _bodies) {
 		delete b;
 	}
-	for (auto* j : _dwbl_joints) {
+	for (auto* j : _dble_joints) {
 		delete j;
 	}
 	_bodies.clear();
-	_dwbl_joints.clear();
+	_dble_joints.clear();
 
 	for (const auto& i : json_obj["bodies"]) {
 		// iteracja po kolejnych obiektach
 		body* b = new body(json_utils::deserialize_body(i));
 		b->update_shape();
 		_bodies.push_back(b);
-		_scene.add(b);
 		_current_id = std::max(_current_id, b->id());
+	}
+	for (const auto& i : json_obj["joints"]) {
+		// iteracja po kolejnych przegubach
+		dble_joint* j = json_utils::deserialize_joint(i, _bodies);
+		_dble_joints.push_back(j);
 	}
 	ifs.close();
 }
@@ -278,7 +316,7 @@ body* app::body_at(const vl::vec2d& scene_pos) const
 
 joint_at_data app::joint_at(const vl::vec2d& scene_pos) const
 {
-	for (dble_joint* dj : _dwbl_joints) {
+	for (dble_joint* dj : _dble_joints) {
 		ds2::joint* i = dj->joint();
 		ds2::joint_type jt = i->type();
 		double dist_a = (scene_pos - i->global_a()).len();
