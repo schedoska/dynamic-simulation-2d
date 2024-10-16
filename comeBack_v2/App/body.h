@@ -20,6 +20,7 @@ public:
 	void set_name(const std::string& name);
 	const std::string& name() const;
 	const unsigned int& id() const;
+	void set_id(const unsigned int& id);
 
 private:
 	sf::Color _color;

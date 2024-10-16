@@ -232,25 +232,27 @@ void ds2::hinge_joint::update(const double& dt)
 		_obj_b->global(_loc_b) * _obj_b->mass();
 	cpos /= tm;
 
+	const double energy_loss = 0.4;
+
 	vl::vec2d a1 = _obj_a->global(_loc_a) - _obj_a->pos();
 	vl::vec2d a2 = cpos - _obj_a->pos();
 	double a_dang = utils::angle2(a1, a2) * _beta;
 	_obj_a->rot() += a_dang;
-	_obj_a->rot_vel() += (a_dang / dt) * 1;
+	_obj_a->rot_vel() += (a_dang / dt) * energy_loss;
 
 	vl::vec2d b1 = _obj_b->global(_loc_b) - _obj_b->pos();
 	vl::vec2d b2 = cpos - _obj_b->pos();
 	double b_dang = utils::angle2(b1, b2) * _beta;
 	_obj_b->rot() += b_dang;
-	_obj_b->rot_vel() += (b_dang / dt) * 1;
+	_obj_b->rot_vel() += (b_dang / dt) * energy_loss;
 
 	vl::vec2d a_dpos = (cpos - _obj_a->global(_loc_a)) * _beta;
 	_obj_a->pos() += a_dpos;
-	_obj_a->vel() += (a_dpos / dt) * 1;
+	_obj_a->vel() += (a_dpos / dt) * energy_loss;
 
 	vl::vec2d b_dpos = (cpos - _obj_b->global(_loc_b)) * _beta;
 	_obj_b->pos() += b_dpos;
-	_obj_b->vel() += (b_dpos / dt) * 1;
+	_obj_b->vel() += (b_dpos / dt) * energy_loss;
 }
 
 ds2::joint_type ds2::hinge_joint::type() const
@@ -280,6 +282,11 @@ ds2::motor_joint::motor_joint(
 	_torque = 300;
 }
 
+ds2::joint_type ds2::motor_joint::type() const
+{
+	return joint_type::motor;
+}
+
 void ds2::motor_joint::update(const double& dt)
 {
 	hinge_joint::update(dt);
@@ -288,7 +295,8 @@ void ds2::motor_joint::update(const double& dt)
 	d.normalize();
 	vl::vec2d perp = { -d[1], d[0] };
 
-	if (std::abs(perp.dot(_obj_b->vel())) < _speed)
+	std::cout << perp.dot(_obj_b->vel()) << "\n";
+	if (perp.dot(_obj_b->vel()) < _speed)
 	{
 		_obj_b->apply_force_local({ 0, _torque }, _loc_b + vl::vec2d(100, 0), dt);
 		_obj_b->apply_force_local({ 0, -_torque }, _loc_b - vl::vec2d(100, 0), dt);

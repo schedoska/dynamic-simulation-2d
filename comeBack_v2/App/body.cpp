@@ -57,6 +57,11 @@ const unsigned int& body::id() const
 	return _id;
 }
 
+void body::set_id(const unsigned int& id)
+{
+	_id = id;
+}
+
 void body::update_shape()
 {
 	_circle_gr.clear();

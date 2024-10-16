@@ -12,7 +12,7 @@ void force_tool::update(const sf::Window* window, const sf::Time& dt)
 	_glob_end_pos = utils::sfml_to_vec2d(sf::Mouse::getPosition(*window));
 
 	vl::vec2d force_v = _glob_end_pos - _target->global(_loc_grab_pos);
-	_target->apply_force(force_v, _loc_grab_pos, dt.asSeconds());
+	_target->apply_force(force_v * 10, _loc_grab_pos, dt.asSeconds());
 }
 
 void force_tool::draw(sf::RenderWindow* window)

@@ -13,7 +13,6 @@ app::app(sf::RenderWindow* window)
 	_current_id = 0;
 	bh.set_target(nullptr);
 	oc_ui.set_target(&bh);
-	//pt.start_shape(std::bind(&app::add_body, this, std::placeholders::_1));
 
 	mt_ui.set_polygon_tool(&pt);
 	mt_ui.set_create_body_cbck(std::bind(
@@ -29,41 +28,6 @@ app::app(sf::RenderWindow* window)
 		&app::create_body, this, std::placeholders::_1, std::placeholders::_2));
 
 	load_json("C:\\Users\\chedo\\OneDrive\\Pulpit\\test.json");
-	return;
-
-	ds2::convex_shape block;
-	block.add(vl::vec2d(0, 0));
-	block.add(vl::vec2d(50, 0));
-	block.add(vl::vec2d(50, 50));
-	block.add(vl::vec2d(0, 50));
-
-	ds2::concave_shape s;
-	s.add(vl::vec2d(-30, -100));
-	s.add(vl::vec2d(30, -100));
-	s.add(vl::vec2d(30, -30));
-	s.add(vl::vec2d(90, -30));
-	s.add(vl::vec2d(90, -100));
-	s.add(vl::vec2d(120, -100));
-	s.add(vl::vec2d(120, 100));
-	s.add(vl::vec2d(-0, 100));
-	s.add(vl::vec2d(-120, -130));
-
-	body *b = new body(1);
-	//b->shape().add(block);
-	b->shape() = s.generate_shape_group(ds2::triangulation::delaunay);
-	b->update_shape();
-	b->pos() = { 250,200 };
-	b->rot() = 0.3;
-
-	body* b2 = new body(*b);
-	b->pos() = { 450,200 };
-
-	_bodies.push_back(b);
-	_bodies.push_back(b2);
-	_scene.add(b);
-	_scene.add(b2);
-	//_scene.add_object(b2);
-	b->vel() = { -10,0 };
 }
 
 app::~app()
@@ -163,11 +127,7 @@ void app::edition_update(const sf::Time& dt)
 	static bool block = false;
 	if (left_ctrl_btn && v_btn && !block) {
 		if (buffor_body) {
-			body* b = new body(*buffor_body);
-			b->pos() = utils::sfml_to_vec2d(mouse_pos);
-			b->update_shape();
-			_bodies.push_back(b);
-			bh.set_target(b);
+			create_body_copy(*buffor_body, utils::sfml_to_vec2d(mouse_pos));
 		}
 		block = true;
 	}
@@ -201,6 +161,16 @@ void app::create_body(const ds2::shape_group& shape, const vl::vec2d& pos)
 {
 	std::string name = "Object #" + std::to_string((int)_bodies.size() + 1);
 	body* b = new body(++_current_id, name, shape, pos);
+	_bodies.push_back(b);
+	bh.set_target(b);
+}
+
+void app::create_body_copy(const body& original, const vl::vec2d& pos)
+{
+	std::string name = "Object #" + std::to_string((int)_bodies.size() + 1);
+	body* b = new body(original);
+	b->set_id(++_current_id);
+	b->pos() = pos;
 	_bodies.push_back(b);
 	bh.set_target(b);
 }

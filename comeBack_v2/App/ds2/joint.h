@@ -104,6 +104,7 @@ namespace ds2
 			vl::vec2d loc_b = vl::vec2d(),
 			const double& beta = 0.1);
 
+		joint_type type() const override;
 		void update(const double& dt) override;
 		
 		double _speed;

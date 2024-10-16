@@ -86,4 +86,14 @@ motor_joint_conf::motor_joint_conf(ds2::motor_joint* target)
 void motor_joint_conf::draw()
 {
 	ImGui::SeparatorText("Motor joint");
+
+	float speed = _target->_speed;
+	ImGui::DragFloat("speed", &speed);
+	_target->_speed = speed;
+
+	float tor = _target->_torque;
+	ImGui::DragFloat("torque", &tor);
+	_target->_torque = tor;
+
+
 }

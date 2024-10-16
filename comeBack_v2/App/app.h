@@ -38,6 +38,7 @@ public:
 	void draw();
 
 	void create_body(const ds2::shape_group& shape, const vl::vec2d& pos);
+	void create_body_copy(const body& original, const vl::vec2d& pos);
 	void create_joint(ds2::joint_type type, const vl::vec2d& pos_a, const vl::vec2d& pos_b);
 
 	void remove(const body* b);
