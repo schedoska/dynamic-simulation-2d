@@ -10,20 +10,25 @@ app::app(sf::RenderWindow* window)
 {
 	ImGui::SFML::Init(*_window);
 
+	_current_id = 0;
 	bh.set_target(nullptr);
 	oc_ui.set_target(&bh);
 	//pt.start_shape(std::bind(&app::add_body, this, std::placeholders::_1));
 
-	mt_ui.set_create_convex_cbck(std::bind(
-		&app::add_convex_body, this, std::placeholders::_1));
-	mt_ui.set_create_circle_cbck(std::bind(
-		&app::add_circle_body, this, std::placeholders::_1, std::placeholders::_2));
+	mt_ui.set_create_body_cbck(std::bind(
+		&app::create_body, this, std::placeholders::_1, std::placeholders::_2));
 
 	sim_ui.set_start_sim_cbck(std::bind(&app::start_simulation, this));
 	sim_ui.set_restart_sim_cbck(std::bind(&app::restart_simulation, this));
 	sim_ui.set_scene(&_scene);
 
-	//return;
+	load_json("C:\\Users\\chedo\\OneDrive\\Pulpit\\test.json");
+
+	dble_hinge* sd = new dble_hinge(nullptr, nullptr, { 300,300 }, { 500,300 });
+	//_joints.push_back(sd);
+	_dwbl_joints.push_back(sd);
+	_scene.add(sd->joint());
+	return;
 
 	ds2::convex_shape block;
 	block.add(vl::vec2d(0, 0));
@@ -42,7 +47,7 @@ app::app(sf::RenderWindow* window)
 	s.add(vl::vec2d(-0, 100));
 	s.add(vl::vec2d(-120, -130));
 
-	body *b = new body("Blok 1");
+	body *b = new body(1);
 	//b->shape().add(block);
 	b->shape() = s.generate_shape_group(ds2::triangulation::delaunay);
 	b->update_shape();
@@ -58,12 +63,6 @@ app::app(sf::RenderWindow* window)
 	_scene.add(b2);
 	//_scene.add_object(b2);
 	b->vel() = { -10,0 };
-
-	
-	dble_spring* sd = new dble_spring(nullptr, nullptr, { 300,300 }, { 500,300 });
-	_joints.push_back(sd);
-	_dwbl_joints.push_back(sd);
-	_scene.add(sd);
 }
 
 app::~app()
@@ -128,9 +127,9 @@ void app::edition_update(const sf::Time& dt)
 				return;
 			}
 
-			if (jad.joint) {
-				jh.set_target(jad.joint, jad.type);
-				jc_ui.set_target(jad.joint);
+			if (jad.dble_joint) {
+				jh.set_target(jad.dble_joint, jad.type);
+				jc_ui.set_target(jad.dble_joint);
 				bh.set_target(nullptr);
 			}
 			else if (b) {
@@ -190,32 +189,12 @@ void app::draw()
 	ImGui::SFML::Render(*_window);
 }
 
-void app::add_convex_body(const std::vector<vl::vec2d>& vertices)
+void app::create_body(const ds2::shape_group& shape, const vl::vec2d& pos)
 {
-	ds2::convex_shape cs;
-	for (const vl::vec2d& v : vertices) {
-		cs.add(v);
-	}
-	body* b = new body("Object #" + std::to_string((int)_bodies.size() + 1));
-	b->shape().add(cs);
-	vl::vec2d ctr = b->shape().centroid();
-	b->shape().translate(ctr * -1.0);
-	b->pos() = ctr;
-	b->update_shape();
+	std::string name = "Object #" + std::to_string((int)_bodies.size() + 1);
+	body* b = new body(++_current_id, name, shape, pos);
 	_bodies.push_back(b);
-	bh.set_target(b);
-}
-
-void app::add_circle_body(const vl::vec2d& pos, const double& radius)
-{
-	ds2::circle_shape cs;
-	cs.set_radius(radius);
-	body* b = new body("Object #" + std::to_string((int)_bodies.size() + 1));
-	b->shape().add(cs);
-
-	b->pos() = pos;
-	b->update_shape();
-	_bodies.push_back(b);
+	_scene.add(b);
 	bh.set_target(b);
 }
 
@@ -268,11 +247,11 @@ void app::load_json(const std::string& path)
 	for (auto* b : _bodies) {
 		delete b;
 	}
-	for (auto* j : _joints) {
+	for (auto* j : _dwbl_joints) {
 		delete j;
 	}
 	_bodies.clear();
-	_joints.clear();
+	_dwbl_joints.clear();
 
 	for (const auto& i : json_obj["bodies"]) {
 		// iteracja po kolejnych obiektach
@@ -280,30 +259,9 @@ void app::load_json(const std::string& path)
 		b->update_shape();
 		_bodies.push_back(b);
 		_scene.add(b);
+		_current_id = std::max(_current_id, b->id());
 	}
 	ifs.close();
-}
-
-void app::add_concave_body(const std::vector<vl::vec2d> &vertices, bool delauney)
-{
-	ds2::concave_shape cs;
-	for (const vl::vec2d& v : vertices) {
-		cs.add(v);
-	}
-	body* b = new body("Object #" + std::to_string((int)_bodies.size() + 1));
-
-	if (delauney) {
-		b->shape() = cs.generate_shape_group(ds2::triangulation::delaunay);
-	}
-	else {
-		b->shape() = cs.generate_shape_group(ds2::triangulation::expanding);
-	}
-	vl::vec2d ctr = b->shape().centroid();
-	b->shape().translate(ctr * -1.0);
-	b->pos() = ctr;
-	b->update_shape();
-	_bodies.push_back(b);
-	bh.set_target(b);
 }
 
 body* app::body_at(const vl::vec2d& scene_pos) const
@@ -320,17 +278,18 @@ body* app::body_at(const vl::vec2d& scene_pos) const
 
 joint_at_data app::joint_at(const vl::vec2d& scene_pos) const
 {
-	for (ds2::joint* i : _joints) {
+	for (dble_joint* dj : _dwbl_joints) {
+		ds2::joint* i = dj->joint();
 		ds2::joint_type jt = i->type();
 		double dist_a = (scene_pos - i->global_a()).len();
 		double dist_b = (scene_pos - i->global_b()).len();
 
 		if (jt == ds2::joint_type::hinge || jt == ds2::joint_type::motor) {
-			if (dist_a < 50) return joint_at_data{ i, joint_handler_mode::both };
+			if (dist_a < 50) return joint_at_data{ dj, joint_handler_mode::both };
 		}
 		else {
-			if (dist_a < 50) return joint_at_data{ i, joint_handler_mode::a };
-			if (dist_b < 50) return joint_at_data{ i, joint_handler_mode::b };
+			if (dist_a < 50) return joint_at_data{ dj, joint_handler_mode::a };
+			if (dist_b < 50) return joint_at_data{ dj, joint_handler_mode::b };
 		}
 	}
 	return joint_at_data{ nullptr, joint_handler_mode::a };

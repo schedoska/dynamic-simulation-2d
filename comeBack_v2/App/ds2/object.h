@@ -47,7 +47,7 @@ namespace ds2
 		void set_mass(const double& mass, bool adjust_inertia = true);
 		void set_density(const double& den, bool adjust_inertia = true);
 
-	private:
+	protected:
 		inline void init();
 
 		vl::vec2d _pos;

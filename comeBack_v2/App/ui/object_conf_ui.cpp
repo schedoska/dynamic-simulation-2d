@@ -24,6 +24,7 @@ void object_conf_ui::draw()
 	if (ImGui::InputText("Name", target_name, IM_ARRAYSIZE(target_name))) {
 		_target->set_name(target_name);
 	}
+	ImGui::Text("Object ID: %d", _target->id());
 
 	draw_color_selector();
 	draw_physical_properties();

@@ -44,22 +44,22 @@ void joint_handler::draw(sf::RenderWindow* window)
 	if (_target == nullptr) return;
 
 	sf::Color lc = sf::Color(0, 0, 0, 60);
-	if (_target->obj_a()) {
-		vl::vec2d ap = _target->obj_a()->pos();
-		draw_line(_target->global_a(), ap, lc, window);
+	if (_target->body_a()) {
+		vl::vec2d ap = _target->body_a()->pos();
+		draw_line(_target->joint()->global_a(), ap, lc, window);
 		_connected_obj_shape.setPosition(utils::vec2_to_sfml(ap));
 		window->draw(_connected_obj_shape);
 	}
-	if (_target->obj_b()) {
-		vl::vec2d bp = _target->obj_b()->pos();
-		draw_line(_target->global_b(), bp, lc, window);
+	if (_target->body_b()) {
+		vl::vec2d bp = _target->body_b()->pos();
+		draw_line(_target->joint()->global_b(), bp, lc, window);
 		_connected_obj_shape.setPosition(utils::vec2_to_sfml(bp));
 		window->draw(_connected_obj_shape);
 	}
 	window->draw(_border);
 }
 
-void joint_handler::set_target(ds2::joint* target, joint_handler_mode mode)
+void joint_handler::set_target(dble_joint* target, joint_handler_mode mode)
 {
 	_target = target;
 	if (_target == nullptr) return;
@@ -71,14 +71,14 @@ void joint_handler::set_border()
 {
 	sf::Vector2f pos;
 	if (_mode == joint_handler_mode::a || _mode == joint_handler_mode::both) {
-		_border.setPosition(utils::vec2_to_sfml(_target->global_a()));
+		_border.setPosition(utils::vec2_to_sfml(_target->joint()->global_a()));
 	}
 	else {
-		_border.setPosition(utils::vec2_to_sfml(_target->global_b()));
+		_border.setPosition(utils::vec2_to_sfml(_target->joint()->global_b()));
 	}
 }
 
-ds2::joint* joint_handler::target() const
+dble_joint* joint_handler::target() const
 {
 	return _target;
 }
@@ -88,57 +88,55 @@ const bool joint_handler::is_active() const
 	return _active;
 }
 
-void joint_handler::target_set_object(ds2::object* obj)
+void joint_handler::target_set_object(body* obj)
 {
 	if (_target == nullptr) return;
-	if ((obj == _target->obj_a() || obj == _target->obj_b()) && obj) return;
+	if ((obj == _target->body_a() || obj == _target->body_b()) && obj) return;
 
-	vl::vec2d pos_a = _target->global_a();
-	vl::vec2d pos_b = _target->global_b();
+	vl::vec2d pos_a = _target->joint()->global_a();
+	vl::vec2d pos_b = _target->joint()->global_b();
 
 	if (_mode == joint_handler_mode::a) {
-		_target->set_obj_a(obj);
-		obj ? _target->set_loc_a(obj->local(pos_a)) : _target->set_loc_a(pos_a);
+		_target->set_body_a(obj);
+		obj ? _target->joint()->set_loc_a(obj->local(pos_a)) : _target->joint()->set_loc_a(pos_a);
 	}
 	if (_mode == joint_handler_mode::b) {
-		_target->set_obj_b(obj);
-		obj ? _target->set_loc_b(obj->local(pos_b)) : _target->set_loc_b(pos_b);
+		_target->set_body_b(obj);
+		obj ? _target->joint()->set_loc_b(obj->local(pos_b)) : _target->joint()->set_loc_b(pos_b);
 	}
 
 	if (_mode == joint_handler_mode::both) {
 		if (obj == nullptr) {
-			_target->set_obj_a(obj);
-			_target->set_obj_b(obj);
-			_target->set_loc_a(pos_a);
-			_target->set_loc_b(pos_b);
+			_target->set_body_a(obj);
+			_target->set_body_b(obj);
+			_target->joint()->set_loc_a(pos_a);
+			_target->joint()->set_loc_b(pos_b);
 		}
 		else {
 			if (_turn) {
-				_target->set_obj_a(obj);
-				_target->set_loc_a(obj->local(pos_a));
+				_target->set_body_a(obj);
+				_target->joint()->set_loc_a(obj->local(pos_a));
 			}
 			else {
-				_target->set_obj_b(obj);
-				_target->set_loc_b(obj->local(pos_b));
+				_target->set_body_b(obj);
+				_target->joint()->set_loc_b(obj->local(pos_b));
 			}
 		}
 	}
-
-
 	_turn = !_turn;
 }
 
 void joint_handler::set_target()
 {
 	vl::vec2d new_pos = utils::sfml_to_vec2d(_border.getPosition());
-	vl::vec2d loc_a = _target->obj_a() ? _target->obj_a()->local(new_pos) : new_pos;
-	vl::vec2d loc_b = _target->obj_b() ? _target->obj_b()->local(new_pos) : new_pos;
+	vl::vec2d loc_a = _target->body_a() ? _target->body_a()->local(new_pos) : new_pos;
+	vl::vec2d loc_b = _target->body_b() ? _target->body_b()->local(new_pos) : new_pos;
 
 	if (_mode == joint_handler_mode::a || _mode == joint_handler_mode::both) {
-		_target->set_loc_a(loc_a);
+		_target->joint()->set_loc_a(loc_a);
 	}
 	if (_mode == joint_handler_mode::b || _mode == joint_handler_mode::both) {
-		_target->set_loc_b(loc_b);
+		_target->joint()->set_loc_b(loc_b);
 	}
 }
 

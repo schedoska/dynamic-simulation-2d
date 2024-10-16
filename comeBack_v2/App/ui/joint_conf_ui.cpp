@@ -4,22 +4,22 @@ joint_conf_ui::joint_conf_ui()
 {
 }
 
-void joint_conf_ui::set_target(ds2::joint* target)
+void joint_conf_ui::set_target(dble_joint* target)
 {
 	_target = target;
 	if (!target) return;
 	
 	if (_jc) delete _jc;
 
-	switch (target->type()) {
+	switch (target->joint()->type()) {
 	case ds2::joint_type::spring:
-		_jc = new spring_joint_conf(dynamic_cast<ds2::spring_joint*>(target));
+		_jc = new spring_joint_conf(dynamic_cast<ds2::spring_joint*>(target->joint()));
 		break;
 	case ds2::joint_type::hinge:
-		_jc = new hinge_joint_conf(dynamic_cast<ds2::hinge_joint*>(target));
+		_jc = new hinge_joint_conf(dynamic_cast<ds2::hinge_joint*>(target->joint()));
 		break;
 	case ds2::joint_type::motor:
-		_jc = new motor_joint_conf(dynamic_cast<ds2::motor_joint*>(target));
+		_jc = new motor_joint_conf(dynamic_cast<ds2::motor_joint*>(target->joint()));
 		break;
 	}
 }
@@ -30,13 +30,13 @@ void joint_conf_ui::draw()
 
 	ImGui::Begin("Joint");
 
-	auto obj_status = [](bool active, const char* txt)
+	auto obj_status = [](body* b, const char* txt)
 	{
 		ImGui::Text(txt);
 		ImGui::SameLine();
-		if (active) {
+		if (b) {
 			ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 255, 0, 255));
-			ImGui::Text("SET");
+			ImGui::Text("SET - %s", b->name());
 		}
 		else {
 			ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 0, 0, 255));
@@ -45,10 +45,10 @@ void joint_conf_ui::draw()
 		ImGui::PopStyleColor(1);
 	};
 
-	obj_status(_target->obj_a(), "Object A:");
-	obj_status(_target->obj_b(), "Object B:");
+	obj_status(_target->body_a(), "Object A:");
+	obj_status(_target->body_b(), "Object B:");
 
-	if (!_target->obj_a() || !_target->obj_b()) {
+	if (!_target->body_a() || !_target->body_b()) {
 		ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 0, 0, 255));
 		ImGui::Text("Joint not connected!");
 		ImGui::PopStyleColor(1);

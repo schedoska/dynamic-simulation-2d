@@ -138,7 +138,7 @@
     <ClInclude Include="App\ui\simulation_ui.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
-    <ClInclude Include="App\drawable_joint.h">
+    <ClInclude Include="App\dble_joint.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
     <ClInclude Include="App\tools\joint_handler.h">
@@ -288,6 +288,9 @@
     <ClInclude Include="App\tools\force_tool.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
+    <ClInclude Include="App\ds2\regular_shape.h">
+      <Filter>Pliki nagłówkowe</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App\ds2\object.cpp">
@@ -380,7 +383,7 @@
     <ClCompile Include="App\ui\simulation_ui.cpp">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
-    <ClCompile Include="App\drawable_joint.cpp">
+    <ClCompile Include="App\dble_joint.cpp">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
     <ClCompile Include="App\tools\joint_handler.cpp">
@@ -393,6 +396,9 @@
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
     <ClCompile Include="App\tools\force_tool.cpp">
+      <Filter>Pliki źródłowe</Filter>
+    </ClCompile>
+    <ClCompile Include="App\ds2\regular_shape.cpp">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
   </ItemGroup>

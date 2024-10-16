@@ -1,10 +1,21 @@
 #include "Body.h"
 #include "ds2/Utils.h"
 
-body::body(const std::string& name)
-	: _name(name)
+body::body(const unsigned int& id)
 {
-	set_color(sf::Color(209, 69, 69));
+	_id = id;
+	_name = ""; 
+	set_color(sf::Color(rand() % 255, rand() % 255, rand() % 255));
+}
+
+body::body(const unsigned int& id, const std::string& name, ds2::shape_group shape, const vl::vec2d& pos)
+{
+	_id = id;
+	_name = name;
+	set_color(sf::Color(rand() % 255, rand() % 255, rand() % 255));
+	_shape = shape;
+	_pos = pos;
+	update_shape();
 }
 
 void body::draw(sf::RenderWindow& window)
@@ -39,6 +50,11 @@ void body::set_name(const std::string& name)
 const std::string& body::name() const
 {
 	return _name;
+}
+
+const unsigned int& body::id() const
+{
+	return _id;
 }
 
 void body::update_shape()

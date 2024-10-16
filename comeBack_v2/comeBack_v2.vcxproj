@@ -30,7 +30,7 @@
     <ClInclude Include="App\ds2\delaunay.h" />
     <ClInclude Include="App\ds2\image.h" />
     <ClInclude Include="App\body.h" />
-    <ClInclude Include="App\drawable_joint.h" />
+    <ClInclude Include="App\dble_joint.h" />
     <ClInclude Include="App\json_utils.h" />
     <ClInclude Include="App\tools\force_tool.h" />
     <ClInclude Include="imgui\imconfig-SFML.h" />
@@ -105,6 +105,7 @@
     <ClInclude Include="nlohmann\ordered_map.hpp" />
     <ClInclude Include="nlohmann\thirdparty\hedley\hedley.hpp" />
     <ClInclude Include="nlohmann\thirdparty\hedley\hedley_undef.hpp" />
+    <ClInclude Include="App\ds2\regular_shape.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App\app.cpp" />
@@ -118,7 +119,7 @@
     <ClCompile Include="App\ds2\delaunay.cpp" />
     <ClCompile Include="App\ds2\image.cpp" />
     <ClCompile Include="App\body.cpp" />
-    <ClCompile Include="App\drawable_joint.cpp" />
+    <ClCompile Include="App\dble_joint.cpp" />
     <ClCompile Include="App\json_utils.cpp" />
     <ClCompile Include="App\tools\force_tool.cpp" />
     <ClCompile Include="imgui\imgui-SFML.cpp" />
@@ -142,6 +143,7 @@
     <ClCompile Include="App\ui\simulation_ui.cpp" />
     <ClCompile Include="App\tools\joint_handler.cpp" />
     <ClCompile Include="App\ui\joint_conf_ui.cpp" />
+    <ClCompile Include="App\ds2\regular_shape.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

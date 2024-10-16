@@ -16,11 +16,11 @@ class joint_conf_ui
 {
 public:
 	joint_conf_ui();
-	void set_target(ds2::joint* target);
+	void set_target(dble_joint* target);
 	void draw();
 
 private:
-	ds2::joint* _target;
+	dble_joint* _target;
 	joint_conf* _jc;
 };
 

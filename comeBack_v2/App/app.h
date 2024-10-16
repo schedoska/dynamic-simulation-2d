@@ -4,7 +4,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "body.h"
-#include "drawable_joint.h"
+#include "dble_joint.h"
 
 #include "tools/body_handler.h"
 #include "tools/polygon_tool.h"
@@ -22,7 +22,7 @@ enum class app_mode {edition, simulation};
 
 struct joint_at_data
 {
-	ds2::joint* joint;
+	dble_joint* dble_joint;
 	joint_handler_mode type;
 };
 
@@ -37,9 +37,7 @@ public:
 	void edition_update(const sf::Time& dt);
 	void draw();
 
-	void add_concave_body(const std::vector<vl::vec2d>& vertices, bool delauney = true);
-	void add_convex_body(const std::vector<vl::vec2d>& vertices);
-	void add_circle_body(const vl::vec2d& pos, const double& radius);
+	void create_body(const ds2::shape_group& shape, const vl::vec2d& pos);
 
 	void remove(const body* b);
 	//void remove(const drawable_spring* ds);
@@ -57,12 +55,12 @@ private:
 	sf::RenderWindow *_window;
 
 	std::vector<body*> _bodies;
-	std::vector<ds2::joint*> _joints;
-	std::vector<drawable_joint*> _dwbl_joints;
+	std::vector<dble_joint*> _dwbl_joints;
 
 	ds2::scene _scene;
 	float _step_time;
 	body* buffor_body;
+	unsigned int _current_id;
 
 	// Tools
 	body_handler bh;
