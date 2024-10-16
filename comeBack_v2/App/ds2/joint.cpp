@@ -291,18 +291,24 @@ void ds2::motor_joint::update(const double& dt)
 {
 	hinge_joint::update(dt);
 
-	vl::vec2d d = _obj_b->pos() - _obj_b->global(_loc_b);
-	d.normalize();
-	vl::vec2d perp = { -d[1], d[0] };
+	vl::vec2d b_loc_v = _obj_b->pos() - _obj_b->global(_loc_b);
+	double r_b = b_loc_v.len();
+	b_loc_v.normalize();
+	vl::vec2d b_loc_v_perp = { -b_loc_v[1], b_loc_v[0] };
+	double b_lin_vel = b_loc_v_perp.dot(_obj_b->vel());
+	double b_ang_vel = b_lin_vel / r_b;
 
-	std::cout << perp.dot(_obj_b->vel()) << "\n";
-	if (perp.dot(_obj_b->vel()) < _speed)
-	{
-		_obj_b->apply_force_local({ 0, _torque }, _loc_b + vl::vec2d(100, 0), dt);
-		_obj_b->apply_force_local({ 0, -_torque }, _loc_b - vl::vec2d(100, 0), dt);
-	}
-	else {
-		_obj_b->apply_force_local({ 0, -_torque }, _loc_b + vl::vec2d(100, 0), dt);
-		_obj_b->apply_force_local({ 0, _torque }, _loc_b - vl::vec2d(100, 0), dt);
-	}
+	vl::vec2d a_loc_v = _obj_a->pos() - _obj_a->global(_loc_a);
+	double r_a = a_loc_v.len();
+	a_loc_v.normalize();
+	vl::vec2d a_loc_v_perp = { -a_loc_v[1], a_loc_v[0] };
+	double a_lin_vel = a_loc_v_perp.dot(_obj_a->vel());
+	double a_ang_vel = a_lin_vel / r_a;
+
+	double rel_ang_vel = a_ang_vel - b_ang_vel;
+	double force = _torque * (rel_ang_vel - _speed);
+	_obj_b->apply_force_local({ 0, force }, _loc_b + vl::vec2d(100, 0), dt);
+	_obj_b->apply_force_local({ 0, -force }, _loc_b - vl::vec2d(100, 0), dt);
+	_obj_a->apply_force_local({ 0, -force }, _loc_b + vl::vec2d(100, 0), dt);
+	_obj_a->apply_force_local({ 0, force }, _loc_b - vl::vec2d(100, 0), dt);
 }

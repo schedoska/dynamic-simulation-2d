@@ -52,6 +52,8 @@ public:
 	void save_json(const std::string& path);
 	void load_json(const std::string& path);
 
+	void set_bodies_display_mode(body::display_mode inside, body::display_mode outline);
+
 private:
 	app_mode _mode;
 	sf::RenderWindow *_window;

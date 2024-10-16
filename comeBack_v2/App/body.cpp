@@ -5,14 +5,14 @@ body::body(const unsigned int& id)
 {
 	_id = id;
 	_name = ""; 
-	set_color(sf::Color(rand() % 255, rand() % 255, rand() % 255));
+	set_fill_color(sf::Color(rand() % 255, rand() % 255, rand() % 255));
 }
 
 body::body(const unsigned int& id, const std::string& name, ds2::shape_group shape, const vl::vec2d& pos)
 {
 	_id = id;
 	_name = name;
-	set_color(sf::Color(rand() % 255, rand() % 255, rand() % 255));
+	set_fill_color(sf::Color(rand() % 255, rand() % 255, rand() % 255));
 	_shape = shape;
 	_pos = pos;
 	update_shape();
@@ -32,14 +32,14 @@ void body::draw(sf::RenderWindow& window)
 	}
 }
 
-void body::set_color(const sf::Color& color)
+void body::set_fill_color(const sf::Color& fill_color)
 {
-	_color = color;
+	_fill_color = fill_color;
 }
 
-const sf::Color& body::color() const
+const sf::Color& body::fill_color() const
 {
-	return _color;
+	return _fill_color;
 }
 
 void body::set_name(const std::string& name)
@@ -62,6 +62,40 @@ void body::set_id(const unsigned int& id)
 	_id = id;
 }
 
+void body::set_body_display_mode(display_mode mode)
+{
+	sf::Color c;
+	switch (mode) {
+	case display_mode::object_color:
+		c = _fill_color;			break;
+	case display_mode::off:
+		c = sf::Color::Transparent; break;
+	case display_mode::white:
+		c = sf::Color::White;		break;
+	}
+	for (auto& i : _convex_gr) i.setFillColor(c);
+	for (auto& i : _circle_gr) i.setFillColor(c);
+}
+
+void body::set_edges_display_mode(display_mode mode)
+{
+	sf::Color c;
+	switch (mode) {
+	case display_mode::object_color:
+		c = _fill_color;			break;
+	case display_mode::off:
+		c = sf::Color::Transparent; break;
+	case display_mode::white:
+		c = sf::Color::White;		break;
+	}
+	for (auto& i : _convex_gr) {
+		i.setOutlineColor(c);
+	}
+	for (auto& i : _circle_gr) {
+		i.setOutlineColor(c);
+	}
+}
+
 void body::update_shape()
 {
 	_circle_gr.clear();
@@ -70,7 +104,8 @@ void body::update_shape()
 	for (const auto& i : shape().convexes()) {
 		const std::vector<vl::vec2d>& vert = i.vertices();
 		sf::ConvexShape cs;
-		cs.setFillColor(_color);
+		cs.setFillColor(_fill_color);
+		cs.setOutlineThickness(_outline_thicness);
 		cs.setPointCount(vert.size());
 		for (int i = 0; i < vert.size(); i++) {
 			cs.setPoint(i, utils::vec2_to_sfml(vert[i]));
@@ -79,7 +114,8 @@ void body::update_shape()
 	}
 	for (const auto& i : shape().circles()) {
 		sf::CircleShape cs;
-		cs.setFillColor(_color);
+		cs.setFillColor(_fill_color);
+		cs.setOutlineThickness(_outline_thicness);
 		cs.setRadius(i.radius());
 		vl::vec2d offset = i.loc_pos() * -1.f + vl::vec2d(i.radius(), i.radius());
 		cs.setOrigin(utils::vec2_to_sfml(offset));

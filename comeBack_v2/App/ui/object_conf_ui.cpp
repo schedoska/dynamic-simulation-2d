@@ -40,14 +40,14 @@ void object_conf_ui::draw_color_selector()
 {
 	body* _target = _target_handler->target();
 
-	sf::Color col = _target->color();
+	sf::Color col = _target->fill_color();
 	float g[4] = { col.r / 255.f, col.g / 255.f, col.b / 255.f, col.a / 255.f };
 	ImGui::ColorPicker4("MyColor##4", (float*)g, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_DisplayRGB);
 	col.r = g[0] * 255.f;
 	col.g = g[1] * 255.f;
 	col.b = g[2] * 255.f;
 	col.a = g[3] * 255.f;
-	_target->set_color(col);
+	_target->set_fill_color(col);
 }
 
 void object_conf_ui::draw_physical_properties()

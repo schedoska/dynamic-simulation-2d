@@ -16,7 +16,7 @@ nlohmann::json json_utils::serialize(const body& b)
 	json_obj["shape"] = serialize(b.shape());
 
 	json_obj["name"] = b.name();
-	json_obj["color"] = serialize(b.color());
+	json_obj["color"] = serialize(b.fill_color());
 
 	return json_obj;
 }
@@ -160,7 +160,7 @@ body json_utils::deserialize_body(const nlohmann::json& json_b)
 	b.layer_min() = json_b["layer min"].get<int>();
 	b.layer_max() = json_b["layer max"].get<int>();
 	b.shape() = deserialize_shape_group(json_b["shape"]);
-	b.set_color(deserialize_color(json_b["color"]));
+	b.set_fill_color(deserialize_color(json_b["color"]));
 
 	return b;
 }

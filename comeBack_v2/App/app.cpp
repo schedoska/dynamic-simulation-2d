@@ -221,6 +221,8 @@ void app::start_simulation()
 		if (j->body_a() && j->body_b())
 		_scene.add(j->joint());
 	}
+
+	//set_bodies_display_mode(body::display_mode::off, body::display_mode::object_color);
 }
 
 void app::restart_simulation()
@@ -280,6 +282,14 @@ void app::load_json(const std::string& path)
 		_dble_joints.push_back(j);
 	}
 	ifs.close();
+}
+
+void app::set_bodies_display_mode(body::display_mode inside, body::display_mode outline)
+{
+	for (auto& b : _bodies) {
+		b->set_body_display_mode(inside);
+		b->set_edges_display_mode(outline);
+	}
 }
 
 body* app::body_at(const vl::vec2d& scene_pos) const
