@@ -82,18 +82,25 @@ nlohmann::json json_utils::serialize(dble_joint* h)
 void json_utils::serialize(nlohmann::json& j, dble_hinge* h)
 {
 	j["type"] = ds2::joint_type::hinge;
+	j["stiffness"] = h->hinge_joint()->stiffness();
+	j["friction"] = h->hinge_joint()->friction();
 }
 
 void json_utils::serialize(nlohmann::json& j, dble_spring* h)
 {
 	j["type"] = ds2::joint_type::spring;
+	j["length"] = h->spring_joint()->length();
+	j["strength"] = h->spring_joint()->strength();
+	j["damping"] = h->spring_joint()->damping();
 }
 
 void json_utils::serialize(nlohmann::json& j, dble_motor* h)
 {
 	j["type"] = ds2::joint_type::motor;
-	j["speed"] = h->motor_joint()->_speed;
-	j["torque"] = h->motor_joint()->_torque;
+	j["ang_vel"] = h->motor_joint()->ang_vel();
+	j["torque"] = h->motor_joint()->torque();
+	j["stiffness"] = h->motor_joint()->stiffness();
+	j["friction"] = h->motor_joint()->friction();
 }
 
 dble_joint* json_utils::deserialize_joint(const nlohmann::json& json_j, std::vector<body*>& bodies)
@@ -118,12 +125,25 @@ dble_hinge* json_utils::deserialize_hinge(const nlohmann::json& json_j, std::vec
 	body* b = id_b == -1 ? nullptr : body_of_id(id_b, bodies);
 
 	dble_hinge* hinge = new dble_hinge(a, b, loc_a, loc_b);
+	hinge->hinge_joint()->set_stiffness(json_j["stiffness"].get<double>());
+	hinge->hinge_joint()->set_friction(json_j["friction"].get<double>());
 	return hinge;
 }
 
 dble_spring* json_utils::deserialize_spring(const nlohmann::json& json_j, std::vector<body*>& bodies)
 {
-	return nullptr;
+	vl::vec2d loc_a = deserialize_vec2d(json_j["loc_a"]);
+	vl::vec2d loc_b = deserialize_vec2d(json_j["loc_b"]);
+	int id_a = json_j["body_a"].get<int>();
+	int id_b = json_j["body_b"].get<int>();
+	body* a = id_a == -1 ? nullptr : body_of_id(id_a, bodies);
+	body* b = id_b == -1 ? nullptr : body_of_id(id_b, bodies);
+
+	dble_spring* spring = new dble_spring(a, b, loc_a, loc_b);
+	spring->spring_joint()->set_length(json_j["length"].get<double>());
+	spring->spring_joint()->set_damping(json_j["damping"].get<double>());
+	spring->spring_joint()->set_strength(json_j["strength"].get<double>());
+	return spring;
 }
 
 dble_motor* json_utils::deserialize_motor(const nlohmann::json& json_j, std::vector<body*>& bodies)
@@ -136,8 +156,10 @@ dble_motor* json_utils::deserialize_motor(const nlohmann::json& json_j, std::vec
 	body* b = id_b == -1 ? nullptr : body_of_id(id_b, bodies);
 
 	dble_motor* motor = new dble_motor(a, b, loc_a, loc_b);
-	motor->motor_joint()->_speed = json_j["speed"].get<double>();
-	motor->motor_joint()->_torque = json_j["torque"].get<double>();
+	motor->motor_joint()->set_ang_vel(json_j["ang_vel"].get<double>());
+	motor->motor_joint()->set_torque(json_j["torque"].get<double>());
+	motor->motor_joint()->set_stiffness(json_j["stiffness"].get<double>());
+	motor->motor_joint()->set_friction(json_j["friction"].get<double>());
 	return motor;
 }
 

@@ -66,6 +66,18 @@ spring_joint_conf::spring_joint_conf(ds2::spring_joint* target)
 void spring_joint_conf::draw()
 {
 	ImGui::SeparatorText("Spring joint");
+
+	float strength = _target->strength();
+	ImGui::DragFloat("strength", &strength);
+	_target->set_strength(strength);
+
+	float damping = _target->damping();
+	ImGui::DragFloat("damping", &damping);
+	_target->set_damping(damping);
+
+	float length = _target->length();
+	ImGui::DragFloat("length", &length);
+	_target->set_length(length);
 }
 
 hinge_joint_conf::hinge_joint_conf(ds2::hinge_joint* target)
@@ -76,6 +88,14 @@ hinge_joint_conf::hinge_joint_conf(ds2::hinge_joint* target)
 void hinge_joint_conf::draw()
 {
 	ImGui::SeparatorText("Hinge joint");
+
+	float stiffness = _target->stiffness();
+	ImGui::DragFloat("stiffness", &stiffness);
+	_target->set_stiffness(stiffness);
+
+	float firction = _target->friction();
+	ImGui::DragFloat("friction", &firction);
+	_target->set_friction(firction);
 }
 
 motor_joint_conf::motor_joint_conf(ds2::motor_joint* target)
@@ -87,13 +107,19 @@ void motor_joint_conf::draw()
 {
 	ImGui::SeparatorText("Motor joint");
 
-	float speed = _target->_speed;
-	ImGui::DragFloat("speed", &speed);
-	_target->_speed = speed;
+	float ang_vel = _target->ang_vel();
+	ImGui::DragFloat("target angular vel", &ang_vel);
+	_target->set_ang_vel(ang_vel);
 
-	float tor = _target->_torque;
-	ImGui::DragFloat("torque", &tor);
-	_target->_torque = tor;
+	float torque = _target->torque();
+	ImGui::DragFloat("torque", &torque);
+	_target->set_torque(torque);
 
+	float stiffness = _target->stiffness();
+	ImGui::DragFloat("stiffness", &stiffness);
+	_target->set_stiffness(stiffness);
 
+	float firction = _target->friction();
+	ImGui::DragFloat("friction", &firction);
+	_target->set_friction(firction);
 }

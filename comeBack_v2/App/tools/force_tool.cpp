@@ -9,6 +9,11 @@ force_tool::force_tool()
 void force_tool::update(const sf::Window* window, const sf::Time& dt)
 {
 	if (_target == nullptr) return;
+	if (!sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+		_target = nullptr;
+		return;
+	}
+
 	_glob_end_pos = utils::sfml_to_vec2d(sf::Mouse::getPosition(*window));
 
 	vl::vec2d force_v = _glob_end_pos - _target->global(_loc_grab_pos);

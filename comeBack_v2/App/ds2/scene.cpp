@@ -13,7 +13,7 @@ void ds2::scene::add(object* object)
 
 void ds2::scene::add(joint* j)
 {
-    _joints.push_back(j);
+    j->iterative() ? _iterative_joints.push_back(j) : _joints.push_back(j);
 }
 
 void ds2::scene::remove(const object* object)
@@ -30,6 +30,7 @@ void ds2::scene::remove_all()
 {
     _objects.clear();
     _joints.clear();
+    _iterative_joints.clear();
 }
 
 const std::vector<ds2::object*>& ds2::scene::objects() const
@@ -42,15 +43,22 @@ const std::vector<ds2::joint*>& ds2::scene::joints() const
     return _joints;
 }
 
+const std::vector<ds2::joint*>& ds2::scene::iterative_joints() const
+{
+    return _iterative_joints;
+}
 
 void ds2::scene::update(const double& dt, sf::RenderWindow& win){
     if (dt == 0.0) return;
     for (auto& i : _objects)
         i->update(dt);
 
+    for (auto i : _joints) {
+        i->update(dt);
+    }
     for (int j = 0; j < _joint_iterations; ++j) {
-        for (auto i : _joints) {
-            i->update(dt);
+        for (auto i : _iterative_joints) {
+            i->update(dt, _joint_iterations);
         }
     }
 

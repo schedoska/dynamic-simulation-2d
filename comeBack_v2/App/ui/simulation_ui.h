@@ -23,6 +23,7 @@ public:
 	void set_restart_sim_cbck(std::function<void(void)> func);
 
 	const float step_time() const;	// in ms
+	const int ips() const;
 
 private:
 	ds2::scene* _scene;
@@ -32,7 +33,10 @@ private:
 
 	float _fps;
 	float _nominal_fps;
-	float _step_time;	// in ms
+	float _target_step_time;	// in ms
+	float _real_step_time;	// in ms
+	
+	int _ips;	// iterations per step
 	simulation_ui_state _sim_state;
 };
 

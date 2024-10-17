@@ -30,8 +30,10 @@ namespace ds2
 		void set_obj_a(object* obj_a);
 		void set_obj_b(object* obj_b);
 
-		virtual void update(const double& dt);
+		/* dt - delta time, n - amount of iterations per step */
+		virtual void update(const double& dt, const unsigned& n = 1);
 		virtual joint_type type() const;
+		virtual bool iterative() const = 0;
 
 	protected:
 		object* _obj_a;
@@ -57,16 +59,16 @@ namespace ds2
 			vl::vec2d loc_a = vl::vec2d(),
 			vl::vec2d loc_b = vl::vec2d());
 
-		void update(const double& dt) override;
+		void update(const double& dt, const unsigned& n = 1) override;
 		joint_type type() const override;
-		void brace();
+		bool iterative() const override;
 
 		const double& length() const;
-		double& length();
+		void set_length(const double& length);
 		const double& strength() const;
-		double& strength();
+		void set_strength(const double& strength);
 		const double& damping() const;
-		double& damping();
+		void set_damping(const double& damping);
 
 	protected:
 		double _length;
@@ -82,15 +84,20 @@ namespace ds2
 			object* b,
 			vl::vec2d loc_a = vl::vec2d(),
 			vl::vec2d loc_b = vl::vec2d(),
-			const double& beta = 0.1);
+			const double& stiffness = 0.1);
 
-		void update(const double& dt) override;
+		void update(const double& dt, const unsigned& n = 1) override;
 		joint_type type() const override;
-		const double& beta() const;
-		double& beta();
+		bool iterative() const override;
 
+		const double& stiffness() const;
+		void set_stiffness(const double& stiffness);
+		const double& friction() const;
+		void set_friction(const double& friction);
+			
 	private:
-		double _beta;
+		double _stiffness;
+		double _friction;
 	};
 
 	class motor_joint : public hinge_joint
@@ -99,15 +106,22 @@ namespace ds2
 		motor_joint(
 			object* a,
 			object* b,
-			const double& speed,
 			vl::vec2d loc_a = vl::vec2d(),
 			vl::vec2d loc_b = vl::vec2d(),
 			const double& beta = 0.1);
 
 		joint_type type() const override;
-		void update(const double& dt) override;
+		void update(const double& dt, const unsigned& n = 1) override;
+		bool iterative() const override;
+
+		void set_ang_vel(const double& ang_vel);
+		const double& ang_vel() const;
+		void set_torque(const double& torque);
+		const double& torque() const;
 		
-		double _speed;
+	private:
+		double _ang_vel;
 		double _torque;
 	};
 }
+

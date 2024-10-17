@@ -33,7 +33,7 @@ void dble_spring::draw(sf::RenderWindow& window)
 {
 	vl::vec2d a_pos = _spring_joint->global_a();
 	vl::vec2d b_pos = _spring_joint->global_b();
-	utils::drawLine(a_pos, b_pos, window, sf::Color::Magenta);
+	utils::drawLine(a_pos, b_pos, window, sf::Color::Black);
 	
 	_a_shape.setPosition(utils::vec2_to_sfml(a_pos));
 	_b_shape.setPosition(utils::vec2_to_sfml(b_pos));
@@ -115,7 +115,7 @@ dble_motor::dble_motor(
 	_shape.setRadius(10);
 	_shape.setOrigin(10, 10);
 
-	_motor_joint = new ds2::motor_joint(a, b, 1, pos_a, pos_b);
+	_motor_joint = new ds2::motor_joint(a, b, pos_a, pos_b);
 }
 
 dble_motor::~dble_motor()

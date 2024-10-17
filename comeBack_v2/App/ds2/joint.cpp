@@ -69,7 +69,7 @@ void ds2::joint::set_obj_b(object* obj_b)
 	_obj_b = obj_b;
 }
 
-void ds2::joint::update(const double& dt)
+void ds2::joint::update(const double& dt, const unsigned& n)
 {
 	
 }
@@ -79,65 +79,29 @@ ds2::joint_type ds2::joint::type() const
 	return joint_type::joint;
 }
 
-/*
-void ds2::spring_joint::update(const double& dt)
-{
-	std::shared_ptr<object> a = obj_a().lock();
-	std::shared_ptr<object> b = obj_b().lock();
-
-	vl::vec2d dv = a->global(_loc_a) - b->global(_loc_b);
-	double str = _len - dv.len();
-	dv.normalize();
-
-	if (_fixed_a) {
-		double angle_diff = _rot_a - a->rot();
-		a->rot_vel() += (angle_diff * 75000000 - a->rot_vel() * 3000000) / a->inertia() * dt;
-	}
-	if (_fixed_b) {
-		double angle_diff = _rot_b - b->rot();
-		b->rot_vel() += (angle_diff * 75000000 - b->rot_vel() * 3000000) / a->inertia() * dt;
-	}
-
-	vl::vec2d delta_vel = dv * (a->vel() - b->vel()).dot(dv);
-	a->apply_force(dv * str * _stiff - delta_vel * _damp, _loc_a, dt);
-	b->apply_force(dv * -str * _stiff + delta_vel * _damp, _loc_b, dt);
-}
-
-ds2::fixed_joint::fixed_joint(
-	const std::shared_ptr<object>& a, 
-	const std::shared_ptr<object>& b, 
-	vl::vec2d loc_a, 
-	vl::vec2d loc_b)
-	: spring_joint(a, b, loc_a, loc_b)
-{
-	_damp = 1000;
-	_stiff = 20000;
-	_len = 0.0;
-}
-*/
-
 ds2::spring_joint::spring_joint(object* a, object* b, vl::vec2d loc_a, vl::vec2d loc_b)
 	: joint(a, b, loc_a, loc_b)
 {
-	//_length = loc_distance();
-	brace();
+	_length = 200;
+	_strength = 30;
+	_damping = 20;
 }
 
 ds2::spring_joint::spring_joint(object* a, object* b, const double& strength, const double& damping, vl::vec2d loc_a, vl::vec2d loc_b)
 	: joint(a, b, loc_a, loc_b), _strength(strength), _damping(damping)
 {
-	//_length = loc_distance();
 }
 
-void ds2::spring_joint::update(const double& dt)
+void ds2::spring_joint::update(const double& dt, const unsigned& n)
 {
 	vl::vec2d dv = _obj_a->global(_loc_a) - _obj_b->global(_loc_b);
 	double dist = dv.len();
 	dv.normalize();
-	dv *= _strength * (dist - _length) + _damping * (_obj_a->vel() - _obj_b->vel()).dot(dv);
+	double rel_vel = (_obj_a->vel() - _obj_b->vel()).dot(dv);
+	vl::vec2d f = dv * (_strength * (dist - _length) + _damping * rel_vel);
 
-	_obj_a->apply_force(dv * -1.0, _loc_a, dt);
-	_obj_b->apply_force(dv, _loc_b, dt);
+	_obj_a->apply_force(f * -1.0, _loc_a, dt);
+	_obj_b->apply_force(f, _loc_b, dt);
 }
 
 ds2::joint_type ds2::spring_joint::type() const
@@ -145,12 +109,9 @@ ds2::joint_type ds2::spring_joint::type() const
 	return joint_type::spring;
 }
 
-void ds2::spring_joint::brace()
+bool ds2::spring_joint::iterative() const
 {
-	//_strength = 27000;
-	//_damping = 220;
-	_strength = 7700;
-	_damping = 200;
+	return false;
 }
 
 const double& ds2::spring_joint::length() const
@@ -158,9 +119,9 @@ const double& ds2::spring_joint::length() const
 	return _length;
 }
 
-double& ds2::spring_joint::length()
+void ds2::spring_joint::set_length(const double& length)
 {
-	return _length;
+	_length = length;
 }
 
 const double& ds2::spring_joint::strength() const
@@ -168,9 +129,9 @@ const double& ds2::spring_joint::strength() const
 	return _strength;
 }
 
-double& ds2::spring_joint::strength()
+void ds2::spring_joint::set_strength(const double& strength)
 {
-	return _strength;
+	_strength = strength;
 }
 
 const double& ds2::spring_joint::damping() const
@@ -178,9 +139,9 @@ const double& ds2::spring_joint::damping() const
 	return _damping;
 }
 
-double& ds2::spring_joint::damping()
+void ds2::spring_joint::set_damping(const double& damping)
 {
-	return _damping;
+	_damping = damping;
 }
 
 ds2::hinge_joint::hinge_joint(
@@ -188,13 +149,13 @@ ds2::hinge_joint::hinge_joint(
 	object* b, 
 	vl::vec2d loc_a, 
 	vl::vec2d loc_b,
-	const double& beta)
-	: joint(a, b, loc_a, loc_b), _beta(beta)
+	const double& stiffness)
+	: joint(a, b, loc_a, loc_b), _stiffness(stiffness)
 {
+	_friction = 0.8;
 }
 
-/*
-void ds2::hinge_joint::update(const double& dt)
+void ds2::hinge_joint::update(const double& dt, const unsigned& n)
 {
 	double tm = _obj_a->mass() + _obj_b->mass();
 	vl::vec2d cpos =
@@ -204,55 +165,23 @@ void ds2::hinge_joint::update(const double& dt)
 
 	vl::vec2d a1 = _obj_a->global(_loc_a) - _obj_a->pos();
 	vl::vec2d a2 = cpos - _obj_a->pos();
-	double a_dang = utils::angle2(a1, a2) * _beta;
+	double a_dang = utils::angle2(a1, a2) * _stiffness;
 	_obj_a->rot() += a_dang;
-	_obj_a->rot_vel() += (a_dang / dt) * 1;
+	_obj_a->rot_vel() += (a_dang / dt) * _friction;
 
 	vl::vec2d b1 = _obj_b->global(_loc_b) - _obj_b->pos();
 	vl::vec2d b2 = cpos - _obj_b->pos();
-	double b_dang = utils::angle2(b1, b2) * _beta;
+	double b_dang = utils::angle2(b1, b2) * _stiffness;
 	_obj_b->rot() += b_dang;
-	_obj_b->rot_vel() += (b_dang / dt) * 1;
+	_obj_b->rot_vel() += (b_dang / dt) * _friction;
 
-	vl::vec2d a_dpos = (cpos - _obj_a->global(_loc_a)) * _beta;
+	vl::vec2d a_dpos = (cpos - _obj_a->global(_loc_a)) * _stiffness;
 	_obj_a->pos() += a_dpos;
-	_obj_a->vel() += (a_dpos / dt) * 1;
+	_obj_a->vel() += (a_dpos / dt) * _friction;
 
-	vl::vec2d b_dpos = (cpos - _obj_b->global(_loc_b)) * _beta;
+	vl::vec2d b_dpos = (cpos - _obj_b->global(_loc_b)) * _stiffness;
 	_obj_b->pos() += b_dpos;
-	_obj_b->vel() += (b_dpos / dt) * 1;
-}
-*/
-
-void ds2::hinge_joint::update(const double& dt)
-{
-	double tm = _obj_a->mass() + _obj_b->mass();
-	vl::vec2d cpos =
-		_obj_a->global(_loc_a) * _obj_a->mass() +
-		_obj_b->global(_loc_b) * _obj_b->mass();
-	cpos /= tm;
-
-	const double energy_loss = 0.4;
-
-	vl::vec2d a1 = _obj_a->global(_loc_a) - _obj_a->pos();
-	vl::vec2d a2 = cpos - _obj_a->pos();
-	double a_dang = utils::angle2(a1, a2) * _beta;
-	_obj_a->rot() += a_dang;
-	_obj_a->rot_vel() += (a_dang / dt) * energy_loss;
-
-	vl::vec2d b1 = _obj_b->global(_loc_b) - _obj_b->pos();
-	vl::vec2d b2 = cpos - _obj_b->pos();
-	double b_dang = utils::angle2(b1, b2) * _beta;
-	_obj_b->rot() += b_dang;
-	_obj_b->rot_vel() += (b_dang / dt) * energy_loss;
-
-	vl::vec2d a_dpos = (cpos - _obj_a->global(_loc_a)) * _beta;
-	_obj_a->pos() += a_dpos;
-	_obj_a->vel() += (a_dpos / dt) * energy_loss;
-
-	vl::vec2d b_dpos = (cpos - _obj_b->global(_loc_b)) * _beta;
-	_obj_b->pos() += b_dpos;
-	_obj_b->vel() += (b_dpos / dt) * energy_loss;
+	_obj_b->vel() += (b_dpos / dt) * _friction;
 }
 
 ds2::joint_type ds2::hinge_joint::type() const
@@ -260,26 +189,41 @@ ds2::joint_type ds2::hinge_joint::type() const
 	return joint_type::hinge;
 }
 
-const double& ds2::hinge_joint::beta() const
+bool ds2::hinge_joint::iterative() const
 {
-	return _beta;
+	return true;
 }
 
-double& ds2::hinge_joint::beta()
+const double& ds2::hinge_joint::stiffness() const
 {
-	return _beta;
+	return _stiffness;
+}
+
+void ds2::hinge_joint::set_stiffness(const double& stiffness)
+{
+	_stiffness = stiffness;
+}
+
+const double& ds2::hinge_joint::friction() const
+{
+	return _friction;
+}
+
+void ds2::hinge_joint::set_friction(const double& friction)
+{
+	_friction = friction;
 }
 
 ds2::motor_joint::motor_joint(
 	object* a,
 	object* b,
-	const double& speed,
 	vl::vec2d loc_a,
 	vl::vec2d loc_b,
 	const double& beta)
-	: hinge_joint(a, b, loc_a, loc_b, beta), _speed(speed)
+	: hinge_joint(a, b, loc_a, loc_b, beta)
 {
-	_torque = 300;
+	_torque = 0;
+	_ang_vel = 0;
 }
 
 ds2::joint_type ds2::motor_joint::type() const
@@ -287,7 +231,7 @@ ds2::joint_type ds2::motor_joint::type() const
 	return joint_type::motor;
 }
 
-void ds2::motor_joint::update(const double& dt)
+void ds2::motor_joint::update(const double& dt, const unsigned& n)
 {
 	hinge_joint::update(dt);
 
@@ -306,9 +250,36 @@ void ds2::motor_joint::update(const double& dt)
 	double a_ang_vel = a_lin_vel / r_a;
 
 	double rel_ang_vel = a_ang_vel - b_ang_vel;
-	double force = _torque * (rel_ang_vel - _speed);
+	double force = _torque * (rel_ang_vel - _ang_vel);
+	force /= static_cast<double>(n);
+
 	_obj_b->apply_force_local({ 0, force }, _loc_b + vl::vec2d(100, 0), dt);
 	_obj_b->apply_force_local({ 0, -force }, _loc_b - vl::vec2d(100, 0), dt);
-	_obj_a->apply_force_local({ 0, -force }, _loc_b + vl::vec2d(100, 0), dt);
-	_obj_a->apply_force_local({ 0, force }, _loc_b - vl::vec2d(100, 0), dt);
+	_obj_a->apply_force_local({ 0, -force }, _loc_a + vl::vec2d(100, 0), dt);
+	_obj_a->apply_force_local({ 0, force }, _loc_a - vl::vec2d(100, 0), dt);
+}
+
+bool ds2::motor_joint::iterative() const
+{
+	return true;
+}
+
+void ds2::motor_joint::set_ang_vel(const double& ang_vel)
+{
+	_ang_vel = ang_vel;
+}
+
+const double& ds2::motor_joint::ang_vel() const
+{
+	return _ang_vel;
+}
+
+void ds2::motor_joint::set_torque(const double& torque)
+{
+	_torque = torque;
+}
+
+const double& ds2::motor_joint::torque() const
+{
+	return _torque;
 }

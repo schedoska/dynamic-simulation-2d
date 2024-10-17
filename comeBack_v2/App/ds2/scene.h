@@ -23,6 +23,7 @@ namespace ds2
 
 		const std::vector<object*>& objects() const;
 		const std::vector<joint*>& joints() const;
+		const std::vector<joint*>& iterative_joints() const;
 
 		void update(const double& dt, sf::RenderWindow& win);
 
@@ -35,6 +36,7 @@ namespace ds2
 		std::list<object_collision_data> _collisions;
 		std::vector<object*> _objects;
 		std::vector<joint*> _joints;
+		std::vector<joint*> _iterative_joints;
 
 		int _joint_iterations;
 

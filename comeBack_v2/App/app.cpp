@@ -56,16 +56,19 @@ void app::simulation_update(const sf::Time& dt)
 	ft.update(_window, dt);
 
 	if (left_mouse_btn && ImGui::GetIO().WantCaptureMouse == false) {
-		if (!ft.target()) {
-			body* b = body_at(utils::sfml_to_vec2d(mouse_pos));
-			ft.set_target(b, mouse_pos);
-		}
+		body* b = body_at(utils::sfml_to_vec2d(mouse_pos));
+		ft.set_target(b, mouse_pos);
 	}
 	for (auto& i : _bodies) {
 		if (i->mass() != ds2::inf_mass)
 		i->vel() += vl::vec2d(0, 100 * dt.asSeconds());
 	}
-	_scene.update(sim_ui.step_time() / 1000.0, *_window);
+
+	int ips = sim_ui.ips();
+	double st = sim_ui.step_time() / 1000.0; // in seconds
+	for (int i = 0; i < ips; ++i) {
+		_scene.update(st, *_window);
+	}
 }
 
 void app::edition_update(const sf::Time& dt)
@@ -218,8 +221,9 @@ void app::start_simulation()
 		_scene.add(b);
 	}
 	for (dble_joint* j : _dble_joints) {
-		if (j->body_a() && j->body_b())
-		_scene.add(j->joint());
+		if (j->body_a() && j->body_b()) {
+			_scene.add(j->joint());
+		}
 	}
 
 	//set_bodies_display_mode(body::display_mode::off, body::display_mode::object_color);
