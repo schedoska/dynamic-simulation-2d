@@ -19,7 +19,8 @@ app::app(sf::RenderWindow* window)
 		&app::create_body, this, std::placeholders::_1, std::placeholders::_2));
 	mt_ui.set_create_joint_cbck(std::bind(
 		&app::create_joint, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
-
+	mt_ui.set_remove_all_cbck(std::bind(&app::remove_all, this));
+		
 	sim_ui.set_start_sim_cbck(std::bind(&app::start_simulation, this));
 	sim_ui.set_restart_sim_cbck(std::bind(&app::restart_simulation, this));
 	sim_ui.set_scene(&_scene);
@@ -59,9 +60,13 @@ void app::simulation_update(const sf::Time& dt)
 		body* b = body_at(utils::sfml_to_vec2d(mouse_pos));
 		ft.set_target(b, mouse_pos);
 	}
+
+	_scene.set_gravity_v(sim_ui.gravity_v());
+
+	// DRAG FRICTION
 	for (auto& i : _bodies) {
-		if (i->mass() != ds2::inf_mass)
-		i->vel() += vl::vec2d(0, 100 * dt.asSeconds());
+		if (i->mass() != ds2::inf_mass) {}
+			//i->vel() -= i->vel() * 0.1;
 	}
 
 	int ips = sim_ui.ips();
@@ -121,6 +126,7 @@ void app::edition_update(const sf::Time& dt)
 		remove(jh.target());
 		bh.set_target(nullptr);
 		jh.set_target(nullptr);
+		jc_ui.set_target(nullptr);
 	}
 
 	/* Copy paste mechnism */
@@ -208,6 +214,14 @@ void app::remove(const dble_joint* j)
 	if (j == nullptr) return;
 	_dble_joints.erase(std::remove(_dble_joints.begin(), _dble_joints.end(), j));
 	delete j;
+}
+
+void app::remove_all()
+{
+	std::vector<body*> _bodies_cpy(_bodies);
+	std::vector<dble_joint*> _dble_joints_cpy(_dble_joints);
+	for (auto& i : _bodies_cpy) remove(i);
+	for (auto& i : _dble_joints_cpy) remove(i);
 }
 
 void app::start_simulation()

@@ -7,6 +7,7 @@
 #include <vector>
 #include <list>
 #include <SFML/Graphics.hpp>
+#include <functional>
 
 namespace ds2 
 {
@@ -29,8 +30,12 @@ namespace ds2
 
 		void set_joint_iterations(const int& joint_iterations);
 		const int joint_iterations() const;
+		void set_gravity_v(const vl::vec2d& gravity_vec);
+		const vl::vec2d& gravity_v() const;
 
 		const std::list<object_collision_data>& collisions() const;
+
+		void apply_to_objects(std::function<void(object*)> func);
 
 	private:
 		std::list<object_collision_data> _collisions;
@@ -43,6 +48,8 @@ namespace ds2
 		inline bool overlaping_layers(
 			const object* a,
 			const object* b);
+
+		vl::vec2d _gravity_v;
 	};
 }
 

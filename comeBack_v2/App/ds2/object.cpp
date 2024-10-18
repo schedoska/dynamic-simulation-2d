@@ -71,6 +71,16 @@ const ds2::shape_group& ds2::object::shape() const
     return _shape;
 }
 
+double& ds2::object::drag_coeff()
+{
+    return _drag_coeff;
+}
+
+const double& ds2::object::drag_coeff() const
+{
+    return _drag_coeff;
+}
+
 int& ds2::object::layer_min()
 {
     return _layer_min;
@@ -101,6 +111,9 @@ void ds2::object::update(const double& dt)
 {
     _pos += _vel * dt;
     _rot += _rot_vel * dt;
+
+    _vel -= _vel * _drag_coeff;
+    _rot_vel -= _rot_vel * _drag_coeff;
 }
 
 vl::vec2d ds2::object::global(const vl::vec2d& local) const
@@ -150,6 +163,11 @@ void ds2::object::set_density(const double& den, bool _adjust_inertia)
     if (_adjust_inertia) adjust_inertia();
 }
 
+const bool ds2::object::is_static() const
+{
+    return _mass == inf_mass ? true : false;
+}
+
 inline void ds2::object::init()
 {
     _pos = vl::vec2d();
@@ -157,4 +175,5 @@ inline void ds2::object::init()
     _inertia = 1;
     _layer_min = std::numeric_limits<int>::min();
     _layer_max = std::numeric_limits<int>::max();
+    _drag_coeff = 0;
 }

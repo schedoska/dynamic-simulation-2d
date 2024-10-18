@@ -31,6 +31,7 @@ void object_conf_ui::draw()
 	draw_position_and_rotation();
 	draw_velocity();
 	draw_layers();
+	draw_other();
 
 	ImGui::End();
 	_target->update_shape();
@@ -143,5 +144,16 @@ void object_conf_ui::draw_layers()
 		ImGui::InputInt("Layer min", &_target->layer_min());
 		ImGui::InputInt("Layer max", &_target->layer_max());
 	}
+}
+
+void object_conf_ui::draw_other()
+{
+	body* _target = _target_handler->target();
+
+	ImGui::SeparatorText("Other");
+
+	float drag_coeff = _target->drag_coeff();
+	ImGui::SliderFloat("Drag coeff", &drag_coeff, 0, 1);
+	_target->drag_coeff() = drag_coeff;
 }
 

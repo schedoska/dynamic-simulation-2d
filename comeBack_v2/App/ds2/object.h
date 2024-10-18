@@ -8,6 +8,7 @@ namespace ds2
 	public:
 		object();
 		object(const vl::vec2d& pos);
+		virtual ~object() {};
 
 		vl::vec2d& pos();
 		const vl::vec2d& pos() const;
@@ -22,6 +23,8 @@ namespace ds2
 		const double& inertia() const;
 		shape_group& shape();
 		const shape_group& shape() const;
+		double& drag_coeff();
+		const double& drag_coeff() const;
 
 		int& layer_min();
 		const int& layer_min() const;
@@ -47,6 +50,8 @@ namespace ds2
 		void set_mass(const double& mass, bool adjust_inertia = true);
 		void set_density(const double& den, bool adjust_inertia = true);
 
+		const bool is_static() const;
+
 	protected:
 		inline void init();
 
@@ -60,6 +65,9 @@ namespace ds2
 
 		int _layer_min;
 		int _layer_max;
+
+		/* Friction between object and background */
+		double _drag_coeff;
 	};
 
 	constexpr double inf_mass = 10.0e+100;

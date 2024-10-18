@@ -9,10 +9,17 @@ void main_tools_ui::draw()
 {
 	ImGui::Begin("Tools");
 
+	ImGui::SeparatorText("Scene");
+	if (ImGui::Button("Clear all", ImVec2(ImGui::GetWindowSize().x * 0.9f, 0.0f))
+		&& _remove_all_cbck) 
+	{
+		_remove_all_cbck();
+	}
+
 	// Cincave tool invocation creation
 	ImGui::SeparatorText("Concave shape");
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.153, 0.306, 0.741, 1));
-	if (ImGui::Button("Add concave")) {
+	if (ImGui::Button("Add concave", ImVec2(ImGui::GetWindowSize().x * 0.9f, 0.0f))) {
 		_pt->start_shape();
 	}
 	ImGui::PopStyleColor(1);
@@ -28,7 +35,9 @@ void main_tools_ui::draw()
 	ImGui::SeparatorText("Convex shape");
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.153, 0.306, 0.741, 1));
 	static int sides = 3;
-	if (ImGui::Button("Add convex") && _create_body_cbck) {
+	if (ImGui::Button("Add convex", ImVec2(ImGui::GetWindowSize().x * 0.9f, 0.0f))
+		&& _create_body_cbck) 
+	{
 		_create_body_cbck(
 			generate_regular_shape(sides, main_tools_conf::new_shape_size), 
 			main_tools_conf::new_shape_pos);
@@ -54,7 +63,7 @@ void main_tools_ui::draw()
 	ImGui::SeparatorText("Circle shape");
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.153, 0.306, 0.741, 1));
 
-	if (ImGui::Button("Add circle") && _create_body_cbck) {
+	if (ImGui::Button("Add circle", ImVec2(ImGui::GetWindowSize().x * 0.9f, 0.0f)) && _create_body_cbck) {
 		_create_body_cbck(
 			generate_circle_shape({ 0,0 }, main_tools_conf::new_shape_size),
 			main_tools_conf::new_shape_pos);
@@ -65,7 +74,7 @@ void main_tools_ui::draw()
 	// Joints creation
 	ImGui::SeparatorText("Joints");
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.678, 0.678, 0.678, 1));
-	if (ImGui::Button("Add spring") && _create_joint_cbck) {
+	if (ImGui::Button("Add spring", ImVec2(ImGui::GetWindowSize().x * 0.9f, 0.0f)) && _create_joint_cbck) {
 		_create_joint_cbck(
 			ds2::joint_type::spring, 
 			main_tools_conf::new_joint_pos_a, 
@@ -74,7 +83,7 @@ void main_tools_ui::draw()
 	ImGui::PopStyleColor(1);
 
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.722, 0.608, 0, 1));
-	if (ImGui::Button("Add hinge") && _create_joint_cbck) {
+	if (ImGui::Button("Add hinge", ImVec2(ImGui::GetWindowSize().x * 0.9f, 0.0f)) && _create_joint_cbck) {
 		_create_joint_cbck(
 			ds2::joint_type::hinge,
 			main_tools_conf::new_joint_pos_a,
@@ -83,7 +92,7 @@ void main_tools_ui::draw()
 	ImGui::PopStyleColor(1);
 
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.424, 0.6, 0.949, 1));
-	if (ImGui::Button("Add motor") && _create_joint_cbck) {
+	if (ImGui::Button("Add motor", ImVec2(ImGui::GetWindowSize().x * 0.9f, 0.0f)) && _create_joint_cbck) {
 		_create_joint_cbck(
 			ds2::joint_type::motor,
 			main_tools_conf::new_joint_pos_a,
@@ -102,6 +111,11 @@ void main_tools_ui::set_create_body_cbck(std::function<void(const ds2::shape_gro
 void main_tools_ui::set_create_joint_cbck(std::function<void(ds2::joint_type type, const vl::vec2d& pos_a, const vl::vec2d& pos_b)> func)
 {
 	_create_joint_cbck = func;
+}
+
+void main_tools_ui::set_remove_all_cbck(std::function<void(void)> func)
+{
+	_remove_all_cbck = func;
 }
 
 void main_tools_ui::set_polygon_tool(polygon_tool* pt)

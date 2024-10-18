@@ -43,6 +43,7 @@ public:
 
 	void remove(const body* b);
 	void remove(const dble_joint* j);
+	void remove_all();
 	
 	// simulation
 	void start_simulation();

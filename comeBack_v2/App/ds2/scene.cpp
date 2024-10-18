@@ -50,8 +50,11 @@ const std::vector<ds2::joint*>& ds2::scene::iterative_joints() const
 
 void ds2::scene::update(const double& dt, sf::RenderWindow& win){
     if (dt == 0.0) return;
-    for (auto& i : _objects)
+
+    for (auto& i : _objects) {
+        if (!i->is_static()) i->vel() += _gravity_v * dt;
         i->update(dt);
+    }
 
     for (auto i : _joints) {
         i->update(dt);
@@ -85,9 +88,27 @@ const int ds2::scene::joint_iterations() const
     return _joint_iterations;
 }
 
+void ds2::scene::set_gravity_v(const vl::vec2d& v)
+{
+    _gravity_v = v;
+}
+
+const vl::vec2d& ds2::scene::gravity_v() const
+{
+    return _gravity_v;
+}
+
 const std::list<ds2::object_collision_data>& ds2::scene::collisions() const
 {
 	return _collisions;
+}
+
+void ds2::scene::apply_to_objects(std::function<void(object*)> func)
+{
+    assert(func && "Passed function is invalid");
+    for (object* obj : _objects) {
+        func(obj);
+    }
 }
 
 inline bool ds2::scene::overlaping_layers(const object* a, const object* b)

@@ -24,6 +24,7 @@ public:
 
 	const float step_time() const;	// in ms
 	const int ips() const;
+	const vl::vec2d& gravity_v() const;
 
 private:
 	ds2::scene* _scene;
@@ -34,7 +35,9 @@ private:
 	float _fps;
 	float _nominal_fps;
 	float _target_step_time;	// in ms
-	float _real_step_time;	// in ms
+	float _real_step_time;		// in ms
+
+	vl::vec2f _gravity_v;
 	
 	int _ips;	// iterations per step
 	simulation_ui_state _sim_state;

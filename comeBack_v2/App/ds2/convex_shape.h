@@ -10,6 +10,8 @@ namespace ds2
 	{
 	public:
 		convex_shape();
+		virtual ~convex_shape() {};
+
 		void add(const vl::vec2d& vertex);
 		void clear();
 		const std::vector<vl::vec2d>& vertices() const;

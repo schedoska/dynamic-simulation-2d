@@ -21,5 +21,6 @@ private:
 	void draw_position_and_rotation();
 	void draw_velocity();
 	void draw_layers();
+	void draw_other();
 };
 

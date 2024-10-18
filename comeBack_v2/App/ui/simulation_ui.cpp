@@ -7,6 +7,7 @@ simulation_ui::simulation_ui()
 	_nominal_fps = 40;
 	_sim_state = simulation_ui_state::edition;
 	_ips = 1;
+	_gravity_v = { 0,100 };
 }
 
 void simulation_ui::set_start_sim_cbck(std::function<void(void)> func)
@@ -29,13 +30,20 @@ const int simulation_ui::ips() const
 	return _ips;
 }
 
+const vl::vec2d& simulation_ui::gravity_v() const
+{
+	return vl::vec2d(
+		static_cast<double>(_gravity_v[0]), 
+		static_cast<double>(_gravity_v[1]));
+}
+
 void simulation_ui::draw()
 {
 	ImGui::Begin("Simulation");
 
 	if (_sim_state == simulation_ui_state::edition) {
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.027, 0.741, 0.082, 1));
-		if (ImGui::Button("Start")) {
+		if (ImGui::Button("Start", ImVec2(ImGui::GetWindowSize().x * 0.4f, 0.0f))) {
 			if (_start_sim_cbck) {
 				_start_sim_cbck();
 				_sim_state = simulation_ui_state::simulation;
@@ -45,14 +53,14 @@ void simulation_ui::draw()
 	}
 	else if (_sim_state == simulation_ui_state::paused) {
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.027, 0.741, 0.082, 1));
-		if (ImGui::Button("Start")) {
+		if (ImGui::Button("Start", ImVec2(ImGui::GetWindowSize().x * 0.4f, 0.0f))) {
 			_sim_state = simulation_ui_state::simulation;
 		}
 		ImGui::PopStyleColor(1);
 	}
 	else {
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.878, 0.165, 0.247, 1));
-		if (ImGui::Button("Stop")) {
+		if (ImGui::Button("Stop", ImVec2(ImGui::GetWindowSize().x * 0.4f, 0.0f))) {
 			_sim_state = simulation_ui_state::paused;
 		}
 		ImGui::PopStyleColor(1);
@@ -62,7 +70,7 @@ void simulation_ui::draw()
 		_sim_state == simulation_ui_state::simulation) {
 		ImGui::SameLine();
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.949, 0.188, 0.188, 1));
-		if (ImGui::Button("Restart")) {
+		if (ImGui::Button("Restart", ImVec2(ImGui::GetWindowSize().x * 0.4f, 0.0f))) {
 			if (_restart_sim_cbck) {
 				_restart_sim_cbck();
 				_sim_state = simulation_ui_state::edition;
@@ -77,10 +85,8 @@ void simulation_ui::draw()
 	ImGui::SeparatorText("Simulation speed");
 
 	float tbf = 1000.0 / _nominal_fps; // time between frames in ms
-	if (ImGui::InputFloat("Target time step", &_target_step_time, 0.2f, 10.0f, "%.1f ms")) {
-		_target_step_time = std::min(std::max(_target_step_time, 0.f), tbf);
-	}
-	
+	ImGui::SliderFloat("Target time step", &_target_step_time, 0, tbf, "%.1f ms");
+
 	static float _play_speed = 100.0; // in percent
 	ImGui::DragFloat("Play speed", &_play_speed, 1, 0, 1000, "%.1f");
 
@@ -97,10 +103,10 @@ void simulation_ui::draw()
 	_real_step_time = _expected_sim_step / float(_ips);
 	
 	if (ImGui::CollapsingHeader("Simulation speed details", ImGuiTreeNodeFlags_None)) {
-		ImGui::Text("Target simulation step: %.1f ms", _expected_sim_step);
-		ImGui::Text("Iterations per frame: %d", _ips);
-		ImGui::Text("Real time step: %.1f ms", _real_step_time);
-		ImGui::Text("Total simulation step: %.1f ms", _real_step_time * _ips);
+		ImGui::Bullet(); ImGui::Value("Target simulation step", _expected_sim_step, "%.1f ms");
+		ImGui::Bullet(); ImGui::Value("Iterations per frame", _ips);
+		ImGui::Bullet(); ImGui::Value("Real time step", _real_step_time, "%.1f ms");
+		ImGui::Bullet(); ImGui::Value("Total simulation step", _real_step_time * _ips, "%.1f ms");
 	}
 
 	ImGui::SeparatorText("Joints");
@@ -108,6 +114,18 @@ void simulation_ui::draw()
 	ImGui::InputInt("Iterations", &iterations, 1, 10);
 	iterations = std::max(iterations, 0);
 	_scene->set_joint_iterations(iterations);
+
+	ImGui::SeparatorText("Gravity force");
+	static bool no_gravity = false;
+	ImGui::Checkbox("No gravity", &no_gravity);
+
+	if (no_gravity) {
+		ImGui::BeginDisabled();
+		_gravity_v = { 0,0 };
+	}
+	ImGui::DragFloat("X", &_gravity_v[0]);
+	ImGui::DragFloat("Y", &_gravity_v[1]);
+	if (no_gravity) ImGui::EndDisabled();
 
 	ImGui::End();
 }
