@@ -9,7 +9,10 @@ void joint_conf_ui::set_target(dble_joint* target)
 	_target = target;
 	if (!target) return;
 	
-	if (_jc) delete _jc;
+	if (_jc) {
+		delete _jc;
+		_jc = nullptr;
+	}
 
 	switch (target->joint()->type()) {
 	case ds2::joint_type::spring:

@@ -118,10 +118,19 @@ namespace ds2
 		const double& ang_vel() const;
 		void set_torque(const double& torque);
 		const double& torque() const;
+
+		const double& rel_rot() const;
+		const double& rel_rot_vel() const;
 		
 	private:
 		double _ang_vel;
 		double _torque;
+
+		double _last_rel_rot;
+		double _rel_rot;		// retlative rotation between objects
+		double _rel_rot_vel;	// retlative rotation velocity between objects
+
+		size_t _it_counter;		// counting joint iterations
 	};
 }
 
