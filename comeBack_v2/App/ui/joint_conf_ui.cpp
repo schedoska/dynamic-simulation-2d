@@ -16,7 +16,7 @@ void joint_conf_ui::set_target(dble_joint* target)
 
 	switch (target->joint()->type()) {
 	case ds2::joint_type::spring:
-		_jc = new spring_joint_conf(dynamic_cast<ds2::spring_joint*>(target->joint()));
+		_jc = new spring_joint_conf(dynamic_cast<dble_spring*>(target));
 		break;
 	case ds2::joint_type::hinge:
 		_jc = new hinge_joint_conf(dynamic_cast<ds2::hinge_joint*>(target->joint()));
@@ -61,26 +61,40 @@ void joint_conf_ui::draw()
 	ImGui::End();
 }
 
-spring_joint_conf::spring_joint_conf(ds2::spring_joint* target)
+spring_joint_conf::spring_joint_conf(dble_spring* target)
 {
 	_target = target;
 }
 
 void spring_joint_conf::draw()
 {
+	ds2::spring_joint* j = _target->spring_joint();
 	ImGui::SeparatorText("Spring joint");
 
-	float strength = _target->strength();
+	float strength = j->strength();
 	ImGui::DragFloat("strength", &strength);
-	_target->set_strength(strength);
+	j->set_strength(strength);
 
-	float damping = _target->damping();
+	float damping = j->damping();
 	ImGui::DragFloat("damping", &damping);
-	_target->set_damping(damping);
+	j->set_damping(damping);
 
-	float length = _target->length();
+	bool auto_len = _target->auto_lenght();
+	ImGui::Checkbox("Auto length", &auto_len);
+	_target->set_auto_length(auto_len);
+
+	if (auto_len) {
+		ImGui::BeginDisabled();
+		j->set_length(j->loc_distance());
+	}
+
+	float length = j->length();
 	ImGui::DragFloat("length", &length);
-	_target->set_length(length);
+	j->set_length(length);
+
+	if (auto_len) {
+		ImGui::EndDisabled();
+	}
 }
 
 hinge_joint_conf::hinge_joint_conf(ds2::hinge_joint* target)

@@ -79,6 +79,7 @@ void app::simulation_update(const sf::Time& dt)
 void app::edition_update(const sf::Time& dt)
 {
 	sf::Vector2f mouse_pos = (sf::Vector2f)sf::Mouse::getPosition(*_window);
+	vl::vec2d mouse_pos_vec2d = utils::sfml_to_vec2d(mouse_pos);
 	bool left_mouse_btn = sf::Mouse::isButtonPressed(sf::Mouse::Left);
 	bool left_ctrl_btn = sf::Keyboard::isKeyPressed(sf::Keyboard::LControl);
 	bool delete_btn = sf::Keyboard::isKeyPressed(sf::Keyboard::Delete);
@@ -131,12 +132,16 @@ void app::edition_update(const sf::Time& dt)
 
 	/* Copy paste mechnism */
 	if (left_ctrl_btn && c_btn) {
-		buffor_body = bh.target();
+		_buffor_body = bh.target();
+		_buffor_joint = jh.target();
 	}
 	static bool block = false;
 	if (left_ctrl_btn && v_btn && !block) {
-		if (buffor_body) {
-			create_body_copy(*buffor_body, utils::sfml_to_vec2d(mouse_pos));
+		if (_buffor_body) {
+			create_body_cpy(*_buffor_body, mouse_pos_vec2d);
+		}
+		else if (_buffor_joint) {
+			create_joint_cpy(*_buffor_joint, mouse_pos_vec2d, mouse_pos_vec2d + vl::vec2d(50, 0));
 		}
 		block = true;
 	}
@@ -174,7 +179,7 @@ void app::create_body(const ds2::shape_group& shape, const vl::vec2d& pos)
 	bh.set_target(b);
 }
 
-void app::create_body_copy(const body& original, const vl::vec2d& pos)
+void app::create_body_cpy(const body& original, const vl::vec2d& pos)
 {
 	std::string name = "Object #" + std::to_string((int)_bodies.size() + 1);
 	body* b = new body(original);
@@ -200,6 +205,31 @@ void app::create_joint(ds2::joint_type type, const vl::vec2d& pos_a, const vl::v
 		break;
 	}
 	_dble_joints.push_back(j);
+}
+
+void app::create_joint_cpy(dble_joint& original, const vl::vec2d& pos_a, const vl::vec2d& pos_b)
+{
+	dble_joint* j;
+	switch (original.joint()->type()) {
+	case ds2::joint_type::spring:
+		j = dynamic_cast<dble_spring*>(&original)->create_copy();
+		break;
+	case ds2::joint_type::hinge:
+		j = dynamic_cast<dble_hinge*>(&original)->create_copy();
+		break;
+	case ds2::joint_type::motor:
+		j = dynamic_cast<dble_motor*>(&original)->create_copy();
+		break;
+	}
+	_dble_joints.push_back(j);
+	j->set_body_a(nullptr);
+	j->set_body_b(nullptr);
+	j->joint()->set_loc_a(pos_a);
+	j->joint()->set_loc_b(pos_b);
+	
+	sf::Vector2f mouse_pos = (sf::Vector2f)sf::Mouse::getPosition(*_window);
+	joint_at_data jad = joint_at(utils::sfml_to_vec2d(mouse_pos));
+	jh.set_target(jad.dble_joint, jad.type);
 }
 
 void app::remove(const body* b)
@@ -240,7 +270,9 @@ void app::start_simulation()
 		}
 	}
 
-	//set_bodies_display_mode(body::display_mode::off, body::display_mode::object_color);
+	bh.set_target(nullptr);
+	jh.set_target(nullptr);
+	jc_ui.set_target(nullptr);
 }
 
 void app::restart_simulation()
@@ -330,12 +362,15 @@ joint_at_data app::joint_at(const vl::vec2d& scene_pos) const
 		double dist_a = (scene_pos - i->global_a()).len();
 		double dist_b = (scene_pos - i->global_b()).len();
 
+		constexpr double snap_r = 
+			dble_joint_conf::joint_radius + dble_joint_conf::joint_outline_thickness;
+
 		if (jt == ds2::joint_type::hinge || jt == ds2::joint_type::motor) {
-			if (dist_a < 50) return joint_at_data{ dj, joint_handler_mode::both };
+			if (dist_a < snap_r) return joint_at_data{ dj, joint_handler_mode::both };
 		}
 		else {
-			if (dist_a < 50) return joint_at_data{ dj, joint_handler_mode::a };
-			if (dist_b < 50) return joint_at_data{ dj, joint_handler_mode::b };
+			if (dist_a < snap_r) return joint_at_data{ dj, joint_handler_mode::a };
+			if (dist_b < snap_r) return joint_at_data{ dj, joint_handler_mode::b };
 		}
 	}
 	return joint_at_data{ nullptr, joint_handler_mode::a };

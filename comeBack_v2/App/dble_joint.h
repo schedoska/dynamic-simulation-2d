@@ -10,6 +10,7 @@ public:
 	dble_joint(body* a, body* b);
 	virtual void draw(sf::RenderWindow& window) = 0;
 	virtual ~dble_joint() = default;
+	virtual dble_joint* create_copy() = 0;
 
 	body* body_a();
 	body* body_b();
@@ -31,15 +32,21 @@ public:
 		const vl::vec2d& pos_a = vl::vec2d(),
 		const vl::vec2d& pos_b = vl::vec2d());
 	~dble_spring();
+	dble_joint* create_copy() override;
+
 	void draw(sf::RenderWindow& window) override;
 	ds2::spring_joint* spring_joint();
 	const ds2::spring_joint* spring_joint() const;
 	ds2::joint* joint() override;
 
+	bool auto_lenght() const;
+	void set_auto_length(const bool auto_length);
+
 private:
 	sf::CircleShape _a_shape;
 	sf::CircleShape _b_shape;
 	ds2::spring_joint* _spring_joint;
+	bool _auto_length;
 };
 
 class dble_hinge : public dble_joint
@@ -51,6 +58,8 @@ public:
 		const vl::vec2d& pos_a = vl::vec2d(),
 		const vl::vec2d& pos_b = vl::vec2d());
 	~dble_hinge();
+	dble_joint* create_copy() override;
+
 	void draw(sf::RenderWindow& window) override;
 	ds2::hinge_joint* hinge_joint();
 	const ds2::hinge_joint* hinge_joint() const;
@@ -70,6 +79,8 @@ public:
 		const vl::vec2d& pos_a = vl::vec2d(),
 		const vl::vec2d& pos_b = vl::vec2d());
 	~dble_motor();
+	dble_joint* create_copy() override;
+
 	void draw(sf::RenderWindow& window) override;
 	ds2::motor_joint* motor_joint();
 	const ds2::motor_joint* motor_joint() const;
@@ -80,3 +91,14 @@ private:
 	ds2::motor_joint* _motor_joint;
 };
 
+namespace dble_joint_conf 
+{
+	constexpr double joint_radius = 7.0;
+	constexpr double joint_outline_thickness = 2.0;
+	
+	const sf::Color hinge_color = sf::Color::Green;
+	const sf::Color motor_color = sf::Color::Blue;
+	const sf::Color spring_color = sf::Color::Red;
+
+	const sf::Color joint_outline_color = sf::Color::White;
+}

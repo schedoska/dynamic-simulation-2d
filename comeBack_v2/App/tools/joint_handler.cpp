@@ -7,8 +7,11 @@ joint_handler::joint_handler()
 	_border.setFillColor(sf::Color::Transparent);
 	_border.setOutlineColor(sf::Color::Red);
 	_border.setOutlineThickness(4);
-	_border.setSize(sf::Vector2f(40, 40));
-	_border.setOrigin(20, 20);
+
+	constexpr double size =
+		dble_joint_conf::joint_radius + dble_joint_conf::joint_outline_thickness + 20.0;
+	_border.setSize(sf::Vector2f(size, size));
+	_border.setOrigin(size / 2.0, size / 2.0);
 
 	_connected_obj_shape.setFillColor(sf::Color(0, 0, 0, 60));
 	_connected_obj_shape.setSize(sf::Vector2f(20, 20));

@@ -10,6 +10,7 @@ class joint_conf
 {
 public:
 	virtual void draw() {};
+	virtual ~joint_conf() {};
 };
 
 class joint_conf_ui
@@ -27,11 +28,11 @@ private:
 class spring_joint_conf : public joint_conf
 {
 public:
-	spring_joint_conf(ds2::spring_joint* target);
+	spring_joint_conf(dble_spring* target);
 	void draw() override;
 
 private:
-	ds2::spring_joint* _target;
+	dble_spring* _target;
 };
 
 class hinge_joint_conf : public joint_conf

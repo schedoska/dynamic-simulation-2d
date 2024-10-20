@@ -38,8 +38,9 @@ public:
 	void draw();
 
 	void create_body(const ds2::shape_group& shape, const vl::vec2d& pos);
-	void create_body_copy(const body& original, const vl::vec2d& pos);
+	void create_body_cpy(const body& original, const vl::vec2d& pos);
 	void create_joint(ds2::joint_type type, const vl::vec2d& pos_a, const vl::vec2d& pos_b);
+	void create_joint_cpy(dble_joint& original, const vl::vec2d& pos_a, const vl::vec2d& pos_b);
 
 	void remove(const body* b);
 	void remove(const dble_joint* j);
@@ -64,8 +65,11 @@ private:
 
 	ds2::scene _scene;
 	float _step_time;
-	body* buffor_body;
 	unsigned int _current_id;
+
+	// For copying mechanism
+	body* _buffor_body;
+	dble_joint* _buffor_joint;
 
 	// Tools
 	body_handler bh;

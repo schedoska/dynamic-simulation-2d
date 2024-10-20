@@ -9,24 +9,34 @@ dble_spring::dble_spring(
 )
 	: dble_joint(a, b)
 {
-	_a_shape.setFillColor(sf::Color::Red);
-	_a_shape.setOutlineColor(sf::Color::White);
-	_a_shape.setOutlineThickness(3);
-	_a_shape.setRadius(10);
-	_a_shape.setOrigin(10, 10);
+	_a_shape.setFillColor(dble_joint_conf::spring_color);
+	_a_shape.setOutlineColor(dble_joint_conf::joint_outline_color);
+	_a_shape.setOutlineThickness(dble_joint_conf::joint_outline_thickness);
+	_a_shape.setRadius(dble_joint_conf::joint_radius);
+	_a_shape.setOrigin(dble_joint_conf::joint_radius, dble_joint_conf::joint_radius);
 
-	_b_shape.setFillColor(sf::Color::Red);
-	_b_shape.setOutlineColor(sf::Color::White);
-	_b_shape.setOutlineThickness(3);
-	_b_shape.setRadius(10);
-	_b_shape.setOrigin(10, 10);
+	_b_shape.setFillColor(dble_joint_conf::spring_color);
+	_b_shape.setOutlineColor(dble_joint_conf::joint_outline_color);
+	_b_shape.setOutlineThickness(dble_joint_conf::joint_outline_thickness);
+	_b_shape.setRadius(dble_joint_conf::joint_radius);
+	_b_shape.setOrigin(dble_joint_conf::joint_radius, dble_joint_conf::joint_radius);
 
-	_spring_joint = new ds2::spring_joint(a, b, pos_a, pos_b);
+	_auto_length = true;
+	_spring_joint = new ds2::spring_joint(a, b, pos_a, pos_b); 
 }
 
 dble_spring::~dble_spring()
 {
 	delete _spring_joint;
+}
+
+dble_joint* dble_spring::create_copy()
+{
+	ds2::spring_joint* js = new ds2::spring_joint(*_spring_joint);
+	dble_spring* dble_s = new dble_spring(nullptr, nullptr);
+	delete dble_s->_spring_joint;
+	dble_s->_spring_joint = js;
+	return dble_s;
 }
 
 void dble_spring::draw(sf::RenderWindow& window)
@@ -56,6 +66,16 @@ ds2::joint* dble_spring::joint()
 	return _spring_joint;
 }
 
+bool dble_spring::auto_lenght() const
+{
+	return _auto_length;
+}
+
+void dble_spring::set_auto_length(const bool auto_length)
+{
+	_auto_length = auto_length;
+}
+
 dble_hinge::dble_hinge(
 	body* a,
 	body* b,
@@ -64,11 +84,11 @@ dble_hinge::dble_hinge(
 )
 	: dble_joint(a, b)
 {
-	_shape.setFillColor(sf::Color::Green);
-	_shape.setOutlineColor(sf::Color::White);
-	_shape.setOutlineThickness(3);
-	_shape.setRadius(10);
-	_shape.setOrigin(10, 10);
+	_shape.setFillColor(dble_joint_conf::hinge_color);
+	_shape.setOutlineColor(dble_joint_conf::joint_outline_color);
+	_shape.setOutlineThickness(dble_joint_conf::joint_outline_thickness);
+	_shape.setRadius(dble_joint_conf::joint_radius);
+	_shape.setOrigin(dble_joint_conf::joint_radius, dble_joint_conf::joint_radius);
 
 	_hinge_joint = new ds2::hinge_joint(a, b, pos_a, pos_b);
 }
@@ -76,6 +96,15 @@ dble_hinge::dble_hinge(
 dble_hinge::~dble_hinge()
 {
 	delete _hinge_joint;
+}
+
+dble_joint* dble_hinge::create_copy()
+{
+	ds2::hinge_joint* js = new ds2::hinge_joint(*_hinge_joint);
+	dble_hinge* dble_s = new dble_hinge(nullptr, nullptr);
+	delete dble_s->_hinge_joint;
+	dble_s->_hinge_joint = js;
+	return dble_s;
 }
 
 void dble_hinge::draw(sf::RenderWindow& window)
@@ -109,11 +138,11 @@ dble_motor::dble_motor(
 )
 	: dble_joint(a, b)
 {
-	_shape.setFillColor(sf::Color::Blue);
-	_shape.setOutlineColor(sf::Color::White);
-	_shape.setOutlineThickness(3);
-	_shape.setRadius(10);
-	_shape.setOrigin(10, 10);
+	_shape.setFillColor(dble_joint_conf::motor_color);
+	_shape.setOutlineColor(dble_joint_conf::joint_outline_color);
+	_shape.setOutlineThickness(dble_joint_conf::joint_outline_thickness);
+	_shape.setRadius(dble_joint_conf::joint_radius);
+	_shape.setOrigin(dble_joint_conf::joint_radius, dble_joint_conf::joint_radius);
 
 	_motor_joint = new ds2::motor_joint(a, b, pos_a, pos_b);
 }
@@ -121,6 +150,15 @@ dble_motor::dble_motor(
 dble_motor::~dble_motor()
 {
 	delete _motor_joint;
+}
+
+dble_joint* dble_motor::create_copy()
+{
+	ds2::motor_joint* js = new ds2::motor_joint(*_motor_joint);
+	dble_motor* dble_s = new dble_motor(nullptr, nullptr);
+	delete dble_s->_motor_joint;
+	dble_s->_motor_joint = js;
+	return dble_s;
 }
 
 void dble_motor::draw(sf::RenderWindow& window)

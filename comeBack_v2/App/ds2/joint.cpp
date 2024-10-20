@@ -147,6 +147,11 @@ void ds2::spring_joint::set_damping(const double& damping)
 	_damping = damping;
 }
 
+double ds2::spring_joint::loc_distance() const
+{
+	return (_obj_a->global(_loc_a) - _obj_b->global(_loc_b)).len();
+}
+
 ds2::hinge_joint::hinge_joint(
 	object* a, 
 	object* b, 
@@ -257,7 +262,7 @@ void ds2::motor_joint::update(const double& dt, const unsigned& n)
 		
 		double force = _torque * (_rel_rot_vel / dt - _ang_vel);
 		force = std::min(std::max(force, -10.0), 10.0);
-		std::cout << force << std::endl;
+
 		_obj_b->apply_force_local({ 0, force }, _loc_b + vl::vec2d(100, 0), dt);
 		_obj_b->apply_force_local({ 0, -force }, _loc_b - vl::vec2d(100, 0), dt);
 		_obj_a->apply_force_local({ 0, -force }, _loc_a + vl::vec2d(100, 0), dt);

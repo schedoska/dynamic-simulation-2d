@@ -70,6 +70,8 @@ namespace ds2
 		const double& damping() const;
 		void set_damping(const double& damping);
 
+		double loc_distance() const; // distance between loc_a and loc_b
+
 	protected:
 		double _length;
 		double _strength;

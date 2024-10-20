@@ -134,11 +134,13 @@ void object_conf_ui::draw_layers()
 	ImGui::SeparatorText("Layers");
 	body* _target = _target_handler->target();
 
-	static bool one_layer = true;
-	ImGui::Checkbox("One layer", &one_layer);
+	bool one_layer = (_target->layer_max() == _target->layer_min());
+	if (ImGui::Checkbox("One layer", &one_layer)) {
+		if (!one_layer) _target->layer_max() = _target->layer_min() + 1;
+	}
 	if (one_layer) {
 		ImGui::InputInt("Layer", &_target->layer_max());
-		_target->layer_min() = _target->layer_max();
+		_target->layer_max() = _target->layer_min();
 	}
 	else {
 		ImGui::InputInt("Layer min", &_target->layer_min());
