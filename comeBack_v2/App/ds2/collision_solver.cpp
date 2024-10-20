@@ -25,6 +25,13 @@ void ds2::collision_solver::solve_collision(const object_collision_data& cd, sf:
 	vl::vec2d mass_cp_b_norm = mass_cp_b;
 	mass_cp_b_norm.normalize();
 
+	/* Spin correction system */
+	constexpr double spin = 0.00002;
+	double spin_a = spin * vl::cross(mass_cp_a, dv) * obj_b->mass() / mass_total;
+	double spin_b = spin * vl::cross(mass_cp_b, dv) * obj_a->mass() / mass_total;
+	obj_b->rot() += spin_b;
+	obj_a->rot() -= spin_a;
+
 	/* DEBUG DRAW */
 	utils::drawLine(obj_a->pos(), obj_a->pos() + mass_cp_a, win, sf::Color::Green);
 	utils::drawLine(obj_b->pos(), obj_b->pos() + mass_cp_b, win, sf::Color::Green);
@@ -53,7 +60,7 @@ void ds2::collision_solver::solve_collision(const object_collision_data& cd, sf:
 	
 	/* Friction impulses */
 	vl::vec2d dv_perp = vl::vec2d(dv[1], -dv[0]);
-	double fj = 0.1 * vr.dot(dv_perp);
+	double fj = 0.01 * vr.dot(dv_perp);
 
 	double Jf = fj / (ma_inv + mb_inv + std::pow(vl::cross(mass_cp_a, dv_perp), 2) / obj_a->inertia() +
 		std::pow(vl::cross(mass_cp_b, dv_perp), 2) / obj_b->inertia());

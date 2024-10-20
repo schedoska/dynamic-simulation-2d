@@ -245,14 +245,19 @@ void ds2::motor_joint::update(const double& dt, const unsigned& n)
 
 	if (++_it_counter == n) {
 		_it_counter = 0;
+		double prev_vel = _rel_rot_vel;
 		_rel_rot = utils::angle2(b_loc_v, a_loc_v);
 		_rel_rot_vel = (_rel_rot - _last_rel_rot);
+
+		double d_v = _rel_rot_vel - prev_vel;
 
 		if (_rel_rot < -M_PI_2 && _last_rel_rot > M_PI_2) _rel_rot_vel += 2.0 * M_PI;
 		if (_rel_rot > M_PI_2 && _last_rel_rot < -M_PI_2) _rel_rot_vel -= 2.0 * M_PI;
 		_last_rel_rot = _rel_rot;
 		
 		double force = _torque * (_rel_rot_vel / dt - _ang_vel);
+		force = std::min(std::max(force, -10.0), 10.0);
+		std::cout << force << std::endl;
 		_obj_b->apply_force_local({ 0, force }, _loc_b + vl::vec2d(100, 0), dt);
 		_obj_b->apply_force_local({ 0, -force }, _loc_b - vl::vec2d(100, 0), dt);
 		_obj_a->apply_force_local({ 0, -force }, _loc_a + vl::vec2d(100, 0), dt);

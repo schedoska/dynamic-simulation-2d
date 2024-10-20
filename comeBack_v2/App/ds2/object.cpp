@@ -126,15 +126,12 @@ vl::vec2d ds2::object::global(const vl::vec2d& local) const
 vl::vec2d ds2::object::local(const vl::vec2d& global) const
 {
     vl::vec2d v = global - pos();
-    //double x = cos(-_rot) * v[0] - sin(-_rot) * v[1];
-    //double y = sin(-_rot) * v[0] + cos(-_rot) * v[1];
     return vl::rotate(v, -_rot);
 }
 
 void ds2::object::apply_force(const vl::vec2d& force, const vl::vec2d& point, const double& dt)
 {
     _vel += (force / _mass) * dt;
-    //_rot_vel += (vl::cross(point, local(force) + pos()) / _inertia) * dt;
     _rot_vel += (vl::cross(point, vl::rotate(force, -_rot)) / _inertia) * dt;
 }
 
