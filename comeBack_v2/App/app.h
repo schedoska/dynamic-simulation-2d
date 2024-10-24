@@ -5,16 +5,20 @@
 
 #include "body.h"
 #include "dble_joint.h"
+#include "grid.h"
+#include "marker.h"
 
 #include "tools/body_handler.h"
 #include "tools/polygon_tool.h"
 #include "tools/joint_handler.h"
 #include "tools/force_tool.h"
+#include "tools/marker_handler.h"
 
 #include "ui/object_conf_ui.h"
 #include "ui/main_tools_ui.h"
 #include "ui/simulation_ui.h"
 #include "ui/joint_conf_ui.h"
+#include "ui/force_tool_ui.h"
 
 #include "ds2/scene.h"
 
@@ -54,14 +58,13 @@ public:
 	void save_json(const std::string& path);
 	void load_json(const std::string& path);
 
-	void set_bodies_display_mode(body::display_mode inside, body::display_mode outline);
-
 private:
 	app_mode _mode;
 	sf::RenderWindow *_window;
 
 	std::vector<body*> _bodies;
 	std::vector<dble_joint*> _dble_joints;
+	std::vector<marker*> _markers;
 
 	ds2::scene _scene;
 	float _step_time;
@@ -76,13 +79,18 @@ private:
 	joint_handler jh;
 	polygon_tool pt;
 	force_tool ft;
+	marker_handler mh;
 
 	// UI elements 
 	object_conf_ui oc_ui;
 	main_tools_ui mt_ui;
 	simulation_ui sim_ui;
 	joint_conf_ui jc_ui;
+	force_tool_ui ft_ui;
+	
+	grid _grid;
 
 	body* body_at(const vl::vec2d& scene_pos) const;
 	joint_at_data joint_at(const vl::vec2d& scene_pos) const;
+	marker* marker_at(const vl::vec2d& scene_pos) const;
 };

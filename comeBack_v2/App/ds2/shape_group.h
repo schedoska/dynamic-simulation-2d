@@ -26,6 +26,8 @@ namespace ds2
 		void scale(const vl::vec2d& scale) override;
 		void rotate(const double& rad) override;
 
+		std::vector<vl::vec2d> convex_outline();
+
 	private:
 		std::vector<circle_shape> _circles;
 		std::vector<convex_shape> _convexes;

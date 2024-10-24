@@ -2,6 +2,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "../body.h"
+#include "../grid.h"
 
 enum handler {
 	top,
@@ -26,6 +27,7 @@ public:
 	void set_target(body* target);
 	body* target() const;
 	const bool is_active() const;
+	void set_grid(grid* g);
 
 	void set_border();	// adjust border to fit target	
 
@@ -42,8 +44,10 @@ private:
 	sf::RectangleShape _velocity_line;
 	sf::CircleShape _velocity_com;
 
+	grid* _grid;
+
 	void update_handlers_pos();
-	void update_active(const sf::Vector2f& mouse_pos);
+	void update_active(sf::Vector2f mouse_pos);
 	void stretch_border(handler h);
 	bool borders_contains(const sf::Vector2f& v);
 	double snap_angle(const double& rad, const int n);

@@ -16,6 +16,8 @@ polygon_tool::polygon_tool()
 	_vx_shape.setFillColor(polygon_tool_conf::vertex_color);
 	_vx_shape.setRadius(size / 2.0);
 	_vx_shape.setOrigin(size / 2.0, size / 2.0);
+
+	_grid = nullptr;
 }
 
 void polygon_tool::update(const sf::Window* window)
@@ -33,6 +35,7 @@ void polygon_tool::update(const sf::Window* window)
 
 	bool snapped_start = false;
 	_snap_pos = static_cast<sf::Vector2f>(sf::Mouse::getPosition(*window));
+	if (_grid) _snap_pos = _grid->snap(_snap_pos);
 
 	if (_vertices.size() > 0) {
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) {
@@ -103,6 +106,11 @@ void polygon_tool::set_triangulation_mode(bool delauney)
 const bool polygon_tool::active() const
 {
 	return _active;
+}
+
+void polygon_tool::set_grid(grid* g)
+{
+	_grid = g;
 }
 
 void polygon_tool::create_shape()

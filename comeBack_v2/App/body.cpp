@@ -20,16 +20,8 @@ body::body(const unsigned int& id, const std::string& name, ds2::shape_group sha
 
 void body::draw(sf::RenderWindow& window)
 {
-	for (auto& i : _circle_gr) {
-		i.setPosition(utils::vec2_to_sfml(pos()));
-		i.setRotation(utils::RadToDegrees(rot()));
-		window.draw(i);
-	}
-	for (auto& i : _convex_gr) {
-		i.setPosition(utils::vec2_to_sfml(pos()));
-		i.setRotation(utils::RadToDegrees(rot()));
-		window.draw(i);
-	}
+	draw_outlines(window);
+	draw_infill(window);
 }
 
 void body::set_fill_color(const sf::Color& fill_color)
@@ -62,38 +54,68 @@ void body::set_id(const unsigned int& id)
 	_id = id;
 }
 
-void body::set_body_display_mode(display_mode mode)
+void body::draw_outlines(sf::RenderWindow& window)
 {
-	sf::Color c;
-	switch (mode) {
-	case display_mode::object_color:
-		c = _fill_color;			break;
-	case display_mode::off:
-		c = sf::Color::Transparent; break;
-	case display_mode::white:
-		c = sf::Color::White;		break;
+	auto loop = [](int a, int n) { return ((a % n) + n) % n; };
+
+	for (auto& i : _convex_gr) {
+		size_t size = i.getPointCount();
+		for (int q = 0; q < size; ++q) {
+			vl::vec2d b = utils::sfml_to_vec2d(i.getPoint(loop(q, size)));
+			vl::vec2d e = utils::sfml_to_vec2d(i.getPoint(loop(q + 1, size)));
+			draw_line(global(b), global(e), window, sf::Color::White, _outline_thicness);
+			draw_point(global(b), window, sf::Color::White, _outline_thicness / 2.0);
+		}
 	}
-	for (auto& i : _convex_gr) i.setFillColor(c);
-	for (auto& i : _circle_gr) i.setFillColor(c);
 }
 
-void body::set_edges_display_mode(display_mode mode)
+void body::draw_infill(sf::RenderWindow& window)
 {
-	sf::Color c;
-	switch (mode) {
-	case display_mode::object_color:
-		c = _fill_color;			break;
-	case display_mode::off:
-		c = sf::Color::Transparent; break;
-	case display_mode::white:
-		c = sf::Color::White;		break;
+	for (auto& i : _circle_gr) {
+		i.setPosition(utils::vec2_to_sfml(pos()));
+		i.setRotation(utils::RadToDegrees(rot()));
+		window.draw(i);
 	}
 	for (auto& i : _convex_gr) {
-		i.setOutlineColor(c);
+		i.setPosition(utils::vec2_to_sfml(pos()));
+		i.setRotation(utils::RadToDegrees(rot()));
+		window.draw(i);
 	}
-	for (auto& i : _circle_gr) {
-		i.setOutlineColor(c);
-	}
+}
+
+void body::draw_line(
+	const vl::vec2d& beg, 
+	const vl::vec2d& end, 
+	sf::RenderWindow& window, 
+	sf::Color color, 
+	const float& thicness)
+{
+	static sf::RectangleShape line;
+	line.setPosition(utils::vec2_to_sfml(beg));
+	vl::vec2d delta = beg - end;
+
+	line.setSize(sf::Vector2f(delta.len(), thicness));
+	float angle = utils::RadToDegrees(atan(delta[1] / delta[0]));
+	if (end[0] <= beg[0]) angle -= 180;
+	line.setRotation(angle);
+	line.setOrigin(0, thicness / 2.0);
+
+	line.setFillColor(color);
+	window.draw(line);
+}
+
+void body::draw_point(
+	const vl::vec2d& pos, 
+	sf::RenderWindow& window, 
+	sf::Color color, 
+	const float& radius)
+{
+	static sf::CircleShape shape;
+	shape.setRadius(radius);
+	shape.setOrigin(radius, radius);
+	shape.setFillColor(color);
+	shape.setPosition(utils::vec2_to_sfml(pos));
+	window.draw(shape);
 }
 
 void body::update_shape()
@@ -105,7 +127,7 @@ void body::update_shape()
 		const std::vector<vl::vec2d>& vert = i.vertices();
 		sf::ConvexShape cs;
 		cs.setFillColor(_fill_color);
-		cs.setOutlineThickness(_outline_thicness);
+		cs.setOutlineThickness(0);
 		cs.setPointCount(vert.size());
 		for (int i = 0; i < vert.size(); i++) {
 			cs.setPoint(i, utils::vec2_to_sfml(vert[i]));
@@ -115,7 +137,7 @@ void body::update_shape()
 	for (const auto& i : shape().circles()) {
 		sf::CircleShape cs;
 		cs.setFillColor(_fill_color);
-		cs.setOutlineThickness(_outline_thicness);
+		cs.setOutlineThickness(0);
 		cs.setRadius(i.radius());
 		vl::vec2d offset = i.loc_pos() * -1.f + vl::vec2d(i.radius(), i.radius());
 		cs.setOrigin(utils::vec2_to_sfml(offset));

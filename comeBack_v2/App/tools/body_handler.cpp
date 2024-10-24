@@ -23,6 +23,8 @@ body_handler::body_handler()
 	_velocity_com.setRadius(handler_conf::velocity_com_radius);
 	_velocity_com.setOrigin(handler_conf::velocity_com_radius, handler_conf::velocity_com_radius);
 	_velocity_com.setFillColor(handler_conf::velocity_line_color);
+
+	_grid = nullptr;
 }
 
 void body_handler::update(const sf::Window* window)
@@ -63,7 +65,8 @@ void body_handler::update(const sf::Window* window)
 	if (borders_contains(mouse_pos) && !_active) {
 		_current_handler = handler::position;
 		_active = true;
-		_grab_pos = mouse_pos - _border.getPosition();
+		_grab_pos = (mouse_pos - _border.getPosition());
+		//_grab_pos = mouse_pos - _border.getGlobalBounds().getPosition();
 	}
 }
 
@@ -100,6 +103,11 @@ const bool body_handler::is_active() const
 	return _active;
 }
 
+void body_handler::set_grid(grid* g)
+{
+	_grid = g;
+}
+
 void body_handler::update_handlers_pos()
 {
 	double w2 = _border.getSize().x / 2.0;
@@ -129,11 +137,18 @@ void body_handler::update_handlers_pos()
 	_rotator.setRotation(_border.getRotation());
 }
 
-void body_handler::update_active(const sf::Vector2f& mouse_pos)
+void body_handler::update_active(sf::Vector2f mouse_pos)
 {
+	if (_grid) {
+		mouse_pos = _grid->snap(mouse_pos);
+	}
+
 	if (_current_handler == handler::position) {
 		_border.setOutlineColor(handler_conf::border_hover_color);
-		_border.setPosition(mouse_pos - _grab_pos);
+		_border.setPosition(_grid->snap(mouse_pos - _grab_pos));
+		sf::Vector2f tl = _border.getGlobalBounds().getPosition();
+		sf::Vector2f d = tl - _grid->snap(tl);
+		_border.move(-d - sf::Vector2f(handler_conf::border_width, handler_conf::border_width));
 		return;
 	}
 	else if (_current_handler == handler::rotator) {

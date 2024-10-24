@@ -11,8 +11,11 @@ app::app(sf::RenderWindow* window)
 	ImGui::SFML::Init(*_window);
 
 	_current_id = 0;
+
 	bh.set_target(nullptr);
+	bh.set_grid(&_grid);
 	oc_ui.set_target(&bh);
+	ft_ui.set_target(&ft);
 
 	mt_ui.set_polygon_tool(&pt);
 	mt_ui.set_create_body_cbck(std::bind(
@@ -20,6 +23,7 @@ app::app(sf::RenderWindow* window)
 	mt_ui.set_create_joint_cbck(std::bind(
 		&app::create_joint, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 	mt_ui.set_remove_all_cbck(std::bind(&app::remove_all, this));
+	mt_ui.set_grid(&_grid);
 		
 	sim_ui.set_start_sim_cbck(std::bind(&app::start_simulation, this));
 	sim_ui.set_restart_sim_cbck(std::bind(&app::restart_simulation, this));
@@ -27,8 +31,18 @@ app::app(sf::RenderWindow* window)
 
 	pt.set_create_body_cbck(std::bind(
 		&app::create_body, this, std::placeholders::_1, std::placeholders::_2));
+	pt.set_grid(&_grid);
+
+	jh.set_grid(&_grid);
+	mh.set_grid(&_grid);
 
 	load_json("C:\\Users\\chedo\\OneDrive\\Pulpit\\test.json");
+
+	marker* m = new marker();
+	m->set_global_pos({ 100,100 });
+	_markers.push_back(m);
+
+	mh.set_target(m);
 }
 
 app::~app()
@@ -55,19 +69,16 @@ void app::simulation_update(const sf::Time& dt)
 	bool left_mouse_btn = sf::Mouse::isButtonPressed(sf::Mouse::Left);
 
 	ft.update(_window, dt);
+	for (auto& m : _markers) m->update(_window);
 
-	if (left_mouse_btn && ImGui::GetIO().WantCaptureMouse == false) {
-		body* b = body_at(utils::sfml_to_vec2d(mouse_pos));
-		ft.set_target(b, mouse_pos);
+	if (!ft.target()) {
+		if (left_mouse_btn && ImGui::GetIO().WantCaptureMouse == false) {
+			body* b = body_at(utils::sfml_to_vec2d(mouse_pos));
+			ft.set_target(b, mouse_pos);
+		}
 	}
 
 	_scene.set_gravity_v(sim_ui.gravity_v());
-
-	// DRAG FRICTION
-	for (auto& i : _bodies) {
-		if (i->mass() != ds2::inf_mass) {}
-			//i->vel() -= i->vel() * 0.1;
-	}
 
 	int ips = sim_ui.ips();
 	double st = sim_ui.step_time() / 1000.0; // in seconds
@@ -91,32 +102,47 @@ void app::edition_update(const sf::Time& dt)
 
 	bh.update(_window);
 	jh.update(_window);
+	mh.update(_window);
 
 	if (left_mouse_btn && ImGui::GetIO().WantCaptureMouse == false) {
-		if (!jh.is_active() && !bh.is_active()) 
+		if (!jh.is_active() && !bh.is_active() && !mh.is_active()) 
 		{
-			joint_at_data jad = joint_at(utils::sfml_to_vec2d(mouse_pos));
-			body* b = body_at(utils::sfml_to_vec2d(mouse_pos));
+			joint_at_data jad = joint_at(mouse_pos_vec2d);
+			body* b = body_at(mouse_pos_vec2d);
+			marker* m = marker_at(mouse_pos_vec2d);
 
 			if (jh.target() && left_ctrl_btn) {
 				jh.target_set_object(b);
 				return;
 			}
+			if (mh.target() && left_ctrl_btn) {
+				mh.target_set_object(b);
+				return;
+			}
 
-			if (jad.dble_joint) {
+			if (m) {
+				mh.set_target(m);
+				bh.set_target(nullptr);
+				jh.set_target(nullptr);
+				jc_ui.set_target(nullptr);
+			}
+			else if (jad.dble_joint) {
 				jh.set_target(jad.dble_joint, jad.type);
 				jc_ui.set_target(jad.dble_joint);
 				bh.set_target(nullptr);
+				mh.set_target(nullptr);
 			}
 			else if (b) {
 				bh.set_target(b);
 				jh.set_target(nullptr);
 				jc_ui.set_target(nullptr);
+				mh.set_target(nullptr);
 			}
 			else {
 				bh.set_target(nullptr);
 				jh.set_target(nullptr);
 				jc_ui.set_target(nullptr);
+				mh.set_target(nullptr);
 			}
 		}
 	}
@@ -150,18 +176,26 @@ void app::edition_update(const sf::Time& dt)
 
 void app::draw()
 {
-	for (auto& i : _bodies) i->draw(*_window);
-
 	if (_mode == app_mode::edition) {
+		_grid.draw(_window);
+		for (auto& i : _bodies) i->draw(*_window);
 		bh.draw(_window);
 		jh.draw(_window);
 		pt.draw(_window);
+		mh.draw(_window);
 		oc_ui.draw();
 		mt_ui.draw();
 		jc_ui.draw();
+		for (auto& i : _markers) i->draw(*_window);
 	}
 	else {
+		for (auto& i : _bodies) i->draw(*_window);
 		ft.draw(_window);
+		ft_ui.draw();
+		for (auto& i : _markers) {
+			i->draw_path(*_window);
+			i->draw(*_window);
+		}
 	}
 	sim_ui.draw();
 
@@ -187,6 +221,10 @@ void app::create_body_cpy(const body& original, const vl::vec2d& pos)
 	b->pos() = pos;
 	_bodies.push_back(b);
 	bh.set_target(b);
+
+	for (auto i : b->shape().convex_outline()) {
+		std::cout << i << std::endl;
+	}
 }
 
 void app::create_joint(ds2::joint_type type, const vl::vec2d& pos_a, const vl::vec2d& pos_b)
@@ -334,14 +372,6 @@ void app::load_json(const std::string& path)
 	ifs.close();
 }
 
-void app::set_bodies_display_mode(body::display_mode inside, body::display_mode outline)
-{
-	for (auto& b : _bodies) {
-		b->set_body_display_mode(inside);
-		b->set_edges_display_mode(outline);
-	}
-}
-
 body* app::body_at(const vl::vec2d& scene_pos) const
 {
 	ds2::object pos_obj(scene_pos);
@@ -374,6 +404,15 @@ joint_at_data app::joint_at(const vl::vec2d& scene_pos) const
 		}
 	}
 	return joint_at_data{ nullptr, joint_handler_mode::a };
+}
+
+marker* app::marker_at(const vl::vec2d& scene_pos) const
+{
+	for (marker* m : _markers) {
+		double dist = (scene_pos - m->pos()).len();
+		if (dist < 10) return m;
+	}
+	return nullptr;
 }
 
 

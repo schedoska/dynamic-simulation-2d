@@ -5,6 +5,11 @@
 
 #include "../ds2/regular_shape.h"
 
+main_tools_ui::main_tools_ui()
+{
+	_grid = nullptr;
+}
+
 void main_tools_ui::draw()
 {
 	ImGui::Begin("Tools");
@@ -58,7 +63,6 @@ void main_tools_ui::draw()
 	ImGui::Text("sides");
 	ImGui::PopStyleColor(1);
 
-
 	// Circle creation
 	ImGui::SeparatorText("Circle shape");
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.153, 0.306, 0.741, 1));
@@ -69,7 +73,6 @@ void main_tools_ui::draw()
 			main_tools_conf::new_shape_pos);
 	}
 	ImGui::PopStyleColor(1);
-
 
 	// Joints creation
 	ImGui::SeparatorText("Joints");
@@ -100,6 +103,24 @@ void main_tools_ui::draw()
 	}
 	ImGui::PopStyleColor(1);
 
+	// Grid section
+	ImGui::SeparatorText("Grid");
+
+	bool active_grid = _grid->active();
+	if (ImGui::Checkbox("Grid snapping", &active_grid)) {
+		_grid->set_active(active_grid);
+	}
+
+	if (!active_grid) ImGui::BeginDisabled();
+
+	int size_grid = _grid->grid_size();
+	if (ImGui::InputInt("Grid size", &size_grid, 5)) {
+		size_grid = std::min(std::max(size_grid, 20), 200);
+		_grid->set_grid_size(size_grid);
+	}
+
+	if (!active_grid) ImGui::EndDisabled();
+
 	ImGui::End();
 }
 
@@ -121,6 +142,11 @@ void main_tools_ui::set_remove_all_cbck(std::function<void(void)> func)
 void main_tools_ui::set_polygon_tool(polygon_tool* pt)
 {
 	_pt = pt;
+}
+
+void main_tools_ui::set_grid(grid* _grid)
+{
+	this->_grid = _grid;
 }
 
 std::vector<vl::vec2d> main_tools_ui::create_convex(const vl::vec2d& pos, const double& size, const int sides)

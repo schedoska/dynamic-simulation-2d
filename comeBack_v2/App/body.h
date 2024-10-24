@@ -6,10 +6,6 @@
 class body : public ds2::object
 {
 public:
-	enum display_mode {
-		off, object_color, white
-	};
-
 	body(const unsigned int& id);
 	body(
 		const unsigned int& id,
@@ -27,9 +23,6 @@ public:
 	const unsigned int& id() const;
 	void set_id(const unsigned int& id);
 
-	void set_body_display_mode(display_mode mode);
-	void set_edges_display_mode(display_mode mode);
-
 private:
 	float _outline_thicness = 2;
 	sf::Color _fill_color;
@@ -38,5 +31,22 @@ private:
 
 	std::vector<sf::CircleShape> _circle_gr;
 	std::vector<sf::ConvexShape> _convex_gr;
+
+	void draw_outlines(sf::RenderWindow& window);
+	void draw_infill(sf::RenderWindow& window);
+
+	void draw_line(
+		const vl::vec2d& beg,
+		const vl::vec2d& end,
+		sf::RenderWindow& window,
+		sf::Color color,
+		const float& thicness);
+
+	void draw_point(
+		const vl::vec2d& pos,
+		sf::RenderWindow& window,
+		sf::Color color,
+		const float& radius
+	);
 };
 

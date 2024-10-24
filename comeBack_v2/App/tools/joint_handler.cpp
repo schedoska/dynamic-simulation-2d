@@ -16,6 +16,8 @@ joint_handler::joint_handler()
 	_connected_obj_shape.setFillColor(sf::Color(0, 0, 0, 60));
 	_connected_obj_shape.setSize(sf::Vector2f(20, 20));
 	_connected_obj_shape.setOrigin(10, 10);
+
+	_grid = nullptr;
 }
 
 void joint_handler::update(const sf::Window* window)
@@ -28,7 +30,9 @@ void joint_handler::update(const sf::Window* window)
 		_active = false;
 	}
 	else if (_active) {
-		_border.setPosition(mouse_pos - _grab_pos);
+		sf::Vector2f new_pos = mouse_pos - _grab_pos;
+		if (_grid) new_pos = _grid->snap(new_pos);
+		_border.setPosition(new_pos);
 		set_target();
 		return;
 	}
@@ -127,6 +131,11 @@ void joint_handler::target_set_object(body* obj)
 		}
 	}
 	_turn = !_turn;
+}
+
+void joint_handler::set_grid(grid* g)
+{
+	_grid = g;
 }
 
 void joint_handler::set_target()

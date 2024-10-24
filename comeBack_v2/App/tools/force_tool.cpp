@@ -4,6 +4,10 @@
 force_tool::force_tool()
 {
 	_force_line.setFillColor(sf::Color::White);
+	_proportional_froce = false;
+	_strength = 40.f;
+	_damping = 3.f;
+	_rot_damping = 1.f;
 }
 
 void force_tool::update(const sf::Window* window, const sf::Time& dt)
@@ -16,8 +20,15 @@ void force_tool::update(const sf::Window* window, const sf::Time& dt)
 
 	_glob_end_pos = utils::sfml_to_vec2d(sf::Mouse::getPosition(*window));
 
-	vl::vec2d force_v = _glob_end_pos - _target->global(_loc_grab_pos);
-	_target->apply_force(force_v * 10, _loc_grab_pos, dt.asSeconds());
+	vl::vec2d dv = _glob_end_pos - _target->global(_loc_grab_pos);
+	double len = dv.len();
+	dv.normalize();
+	double rel_vel = (_target->vel()).dot(dv);
+	double f = _strength * len - _damping * rel_vel;
+	_proportional_froce ? f *= _target->mass() : f;
+
+	_target->apply_force(dv * _strength * len - _target->vel() * _damping, _loc_grab_pos, dt.asSeconds());
+	_target->rot_vel() -= _rot_damping * _target->rot_vel() * dt.asSeconds();
 }
 
 void force_tool::draw(sf::RenderWindow* window)
@@ -32,7 +43,17 @@ void force_tool::draw(sf::RenderWindow* window)
 	sf::Vector2f delta = beg - end;
 	double len = utils::sfml_to_vec2d(delta).len();
 
-	_force_line.setSize(sf::Vector2f(len, 7));
+	constexpr double min_white_len = 50;
+	constexpr double max_black_len = 200;
+
+	float b = 270 - 0.2 * len;
+	b = std::max(std::min(b, 255.f), 180.f);
+	_force_line.setFillColor(sf::Color(b, b, b, 200));
+	float thicness = 10.0 - 0.01 * len;
+	thicness = std::max(std::min(thicness, 7.f), 1.f);
+
+	_force_line.setSize(sf::Vector2f(len, thicness));
+	_force_line.setOrigin(0, thicness / 2.0);
 	float angle = utils::RadToDegrees(atan(delta.y / delta.x));
 	if (end.x <= beg.x) angle -= 180;
 	_force_line.setRotation(angle);
@@ -51,4 +72,44 @@ void force_tool::set_target(body* target, const sf::Vector2i& mouse_pos)
 body* force_tool::target() const
 {
 	return _target;
+}
+
+void force_tool::set_strength(const float& strength)
+{
+	_strength = strength;
+}
+
+void force_tool::set_damping(const float& damping)
+{
+	_damping = damping;
+}
+
+void force_tool::set_rot_damping(const float& rot_damping)
+{
+	_rot_damping = rot_damping;
+}
+
+void force_tool::set_proportional_force(const bool proportional_force)
+{
+	_proportional_froce = proportional_force;
+}
+
+const float& force_tool::strength() const
+{
+	return _strength;
+}
+
+const float& force_tool::damping() const
+{
+	return _damping;
+}
+
+const float& force_tool::rot_damping() const
+{
+	return _rot_damping;
+}
+
+bool force_tool::proportional_force() const
+{
+	return _proportional_froce;
 }

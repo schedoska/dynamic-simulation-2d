@@ -1,4 +1,6 @@
 #include "shape_group.h"
+#include <unordered_map>
+#include <list>
 
 ds2::shape_group::shape_group()
 {}
@@ -97,4 +99,10 @@ void ds2::shape_group::rotate(const double& rad)
     for (auto& i : _convexes) i.rotate(rad);
     for (auto& i : _circles)  i.rotate(rad);
 }
+
+std::vector<vl::vec2d> ds2::shape_group::convex_outline()
+{   
+    return std::vector<vl::vec2d>();
+}
+
 

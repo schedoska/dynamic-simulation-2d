@@ -4,6 +4,7 @@
 #include "../ds2/shape_group.h"
 #include "../ds2/concave_shape.h"
 #include <functional>
+#include "../grid.h"
 
 class polygon_tool
 {
@@ -17,6 +18,7 @@ public:
 		std::function<void(const ds2::shape_group& shape, const vl::vec2d& pos)> func);
 	void set_triangulation_mode(bool delauney);
 	const bool active() const;
+	void set_grid(grid* g);
 
 private:
 	// is currently drawing
@@ -28,6 +30,7 @@ private:
 	sf::CircleShape _vx_shape;
 
 	ds2::triangulation _triangulation_mode;
+	grid* _grid;
 
 	void create_shape();
 	void draw_line(
@@ -47,7 +50,7 @@ namespace polygon_tool_conf
 	constexpr float start_vertex_size = 20;
 	constexpr float vertex_size = 18;
 	constexpr float line_width = 4;
-	constexpr float snap_len = 50;
+	constexpr float snap_len = 20;
 
 	const sf::Color start_vertex_color = sf::Color::Blue;
 	const sf::Color vertex_color = sf::Color::Green;

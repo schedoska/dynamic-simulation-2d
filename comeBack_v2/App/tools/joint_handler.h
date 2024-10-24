@@ -3,6 +3,7 @@
 #include <SFML/Graphics.hpp>
 #include "../dble_joint.h"
 #include "../body.h"
+#include "../grid.h"
 
 enum class joint_handler_mode { a, b, both };
 
@@ -20,6 +21,7 @@ public:
 	dble_joint* target() const;
 	const bool is_active() const;
 	void target_set_object(body* obj);
+	void set_grid(grid* g);
 
 private:
 	sf::RectangleShape _border;
@@ -30,6 +32,7 @@ private:
 	dble_joint* _target;
 	joint_handler_mode _mode;
 	bool _turn;		// true = a assignment turn, false = b
+	grid* _grid;
 
 	void set_target();
 	void draw_line(

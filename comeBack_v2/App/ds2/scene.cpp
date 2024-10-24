@@ -51,14 +51,14 @@ const std::vector<ds2::joint*>& ds2::scene::iterative_joints() const
 void ds2::scene::update(const double& dt, sf::RenderWindow& win){
     if (dt == 0.0) return;
 
+    for (auto i : _joints) {
+        i->update(dt);
+    }
     for (auto& i : _objects) {
         if (!i->is_static()) i->vel() += _gravity_v * dt;
         i->update(dt);
     }
 
-    for (auto i : _joints) {
-        i->update(dt);
-    }
     for (int j = 0; j < _joint_iterations; ++j) {
         for (auto i : _iterative_joints) {
             i->update(dt, _joint_iterations);
