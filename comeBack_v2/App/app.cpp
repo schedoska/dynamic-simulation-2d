@@ -27,7 +27,9 @@ app::app(sf::RenderWindow* window)
 		
 	sim_ui.set_start_sim_cbck(std::bind(&app::start_simulation, this));
 	sim_ui.set_restart_sim_cbck(std::bind(&app::restart_simulation, this));
+	sim_ui.set_graphic_settings_cbck(std::bind(&app::update_graphics_settings, this));
 	sim_ui.set_scene(&_scene);
+	sim_ui.set_graphic_settings(&_graphic_settings);
 
 	pt.set_create_body_cbck(std::bind(
 		&app::create_body, this, std::placeholders::_1, std::placeholders::_2));
@@ -311,6 +313,10 @@ void app::start_simulation()
 	bh.set_target(nullptr);
 	jh.set_target(nullptr);
 	jc_ui.set_target(nullptr);
+
+	body::graphics_settings s(false, 4, sf::Color::White, false, sf::Color::Transparent);
+	_graphic_settings = s;
+	update_graphics_settings();
 }
 
 void app::restart_simulation()
@@ -370,6 +376,11 @@ void app::load_json(const std::string& path)
 		_dble_joints.push_back(j);
 	}
 	ifs.close();
+}
+
+void app::update_graphics_settings()
+{
+	for (auto& b : _bodies) b->set_graphics_settings(_graphic_settings);
 }
 
 body* app::body_at(const vl::vec2d& scene_pos) const

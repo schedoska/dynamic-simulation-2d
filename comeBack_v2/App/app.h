@@ -58,6 +58,8 @@ public:
 	void save_json(const std::string& path);
 	void load_json(const std::string& path);
 
+	void update_graphics_settings();
+
 private:
 	app_mode _mode;
 	sf::RenderWindow *_window;
@@ -89,6 +91,7 @@ private:
 	force_tool_ui ft_ui;
 	
 	grid _grid;
+	body::graphics_settings _graphic_settings;
 
 	body* body_at(const vl::vec2d& scene_pos) const;
 	joint_at_data joint_at(const vl::vec2d& scene_pos) const;

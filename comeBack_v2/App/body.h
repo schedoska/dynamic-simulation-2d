@@ -6,6 +6,23 @@
 class body : public ds2::object
 {
 public:
+	struct graphics_settings
+	{
+		graphics_settings(
+			bool fill_first, 
+			float outline_thicness, 
+			sf::Color outline_color,
+			bool default_color,
+			sf::Color fill_color = sf::Color::White);
+		graphics_settings();
+
+		bool fill_first;
+		bool default_color;
+		float outline_thicness;
+		sf::Color outline_color;
+		sf::Color fill_color;
+	};
+
 	body(const unsigned int& id);
 	body(
 		const unsigned int& id,
@@ -23,9 +40,12 @@ public:
 	const unsigned int& id() const;
 	void set_id(const unsigned int& id);
 
+	void set_graphics_settings(const graphics_settings& settings);
+
 private:
-	float _outline_thicness = 2;
+	graphics_settings _settings;
 	sf::Color _fill_color;
+
 	std::string _name;
 	unsigned int _id;
 
@@ -48,5 +68,7 @@ private:
 		sf::Color color,
 		const float& radius
 	);
+
+	void update_fill_color();
 };
 

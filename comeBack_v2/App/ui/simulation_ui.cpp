@@ -8,6 +8,7 @@ simulation_ui::simulation_ui()
 	_sim_state = simulation_ui_state::edition;
 	_ips = 1;
 	_gravity_v = { 0,100 };
+	_settings = nullptr;
 }
 
 void simulation_ui::set_start_sim_cbck(std::function<void(void)> func)
@@ -18,6 +19,11 @@ void simulation_ui::set_start_sim_cbck(std::function<void(void)> func)
 void simulation_ui::set_restart_sim_cbck(std::function<void(void)> func)
 {
 	_restart_sim_cbck = func;
+}
+
+void simulation_ui::set_graphic_settings_cbck(std::function<void(void)> func)
+{
+	_graphic_settings_cbck = func;
 }
 
 const float simulation_ui::step_time() const
@@ -35,6 +41,38 @@ const vl::vec2d& simulation_ui::gravity_v() const
 	return vl::vec2d(
 		static_cast<double>(_gravity_v[0]), 
 		static_cast<double>(_gravity_v[1]));
+}
+
+void simulation_ui::draw_graphic_ui()
+{
+	ImGui::SeparatorText("Graphics settings");
+
+	/* Settings for: Show structure = 1 && Color == 1 */
+	static body::graphics_settings gs1 = { true, 2.0, sf::Color::White, true };
+	/* Settings for: Show structure = 0 && Color == 1 */
+	static body::graphics_settings gs2 = { false, 4.0, sf::Color::White, true };
+	/* Settings for: Show structure = 1 && Color == 0 */
+	static body::graphics_settings gs3 = { true, 2.0, sf::Color::White, false, sf::Color::Transparent };
+	/* Settings for: Show structure = 0 && Color == 0 */
+	static body::graphics_settings gs4 = { true, 2.0, sf::Color::White, false, sf::Color::Transparent };
+
+	bool settings_changed = false;
+	static bool structures = false;
+	static bool colors = true;
+	if (ImGui::Checkbox("Show structure", &structures)) {
+		settings_changed = true;
+	}
+	if (ImGui::Checkbox("Color", &colors)) {
+		settings_changed = true;
+	}
+	
+	if (settings_changed && _graphic_settings_cbck) {
+		if (structures && colors) *_settings = gs1;
+		else if (!structures && colors) *_settings = gs2;
+		else if (structures && !colors) *_settings = gs3;
+		else if (!structures && !colors) *_settings = gs4;
+		_graphic_settings_cbck();
+	}
 }
 
 void simulation_ui::draw()
@@ -115,6 +153,8 @@ void simulation_ui::draw()
 	iterations = std::max(iterations, 0);
 	_scene->set_joint_iterations(iterations);
 
+	draw_graphic_ui();
+
 	ImGui::SeparatorText("Gravity force");
 	static bool no_gravity = false;
 	ImGui::Checkbox("No gravity", &no_gravity);
@@ -127,12 +167,18 @@ void simulation_ui::draw()
 	ImGui::DragFloat("Y", &_gravity_v[1]);
 	if (no_gravity) ImGui::EndDisabled();
 
+
 	ImGui::End();
 }
 
 void simulation_ui::set_scene(ds2::scene* scene)
 {
 	_scene = scene;
+}
+
+void simulation_ui::set_graphic_settings(body::graphics_settings* settings)
+{
+	_settings = settings;
 }
 
 void simulation_ui::set_fps(const float& fps, const float& nominal_fps)
