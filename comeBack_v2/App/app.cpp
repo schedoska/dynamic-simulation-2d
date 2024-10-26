@@ -23,6 +23,8 @@ app::app(sf::RenderWindow* window)
 	mt_ui.set_create_joint_cbck(std::bind(
 		&app::create_joint, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 	mt_ui.set_remove_all_cbck(std::bind(&app::remove_all, this));
+	mt_ui.set_create_marker_cbck(std::bind(
+		&app::create_marker, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 	mt_ui.set_grid(&_grid);
 		
 	sim_ui.set_start_sim_cbck(std::bind(&app::start_simulation, this));
@@ -38,13 +40,9 @@ app::app(sf::RenderWindow* window)
 	jh.set_grid(&_grid);
 	mh.set_grid(&_grid);
 
+	m_ui.set_target(&mh);
+
 	load_json("C:\\Users\\chedo\\OneDrive\\Pulpit\\test.json");
-
-	marker* m = new marker();
-	m->set_global_pos({ 100,100 });
-	_markers.push_back(m);
-
-	mh.set_target(m);
 }
 
 app::~app()
@@ -71,8 +69,7 @@ void app::simulation_update(const sf::Time& dt)
 	bool left_mouse_btn = sf::Mouse::isButtonPressed(sf::Mouse::Left);
 
 	ft.update(_window, dt);
-	for (auto& m : _markers) m->update(_window);
-
+	
 	if (!ft.target()) {
 		if (left_mouse_btn && ImGui::GetIO().WantCaptureMouse == false) {
 			body* b = body_at(utils::sfml_to_vec2d(mouse_pos));
@@ -86,6 +83,7 @@ void app::simulation_update(const sf::Time& dt)
 	double st = sim_ui.step_time() / 1000.0; // in seconds
 	for (int i = 0; i < ips; ++i) {
 		_scene.update(st, *_window);
+		for (auto& m : _markers) m->update(_window, st);
 	}
 }
 
@@ -153,8 +151,10 @@ void app::edition_update(const sf::Time& dt)
 	if (delete_btn) {
 		remove(bh.target());
 		remove(jh.target());
+		remove(mh.target());
 		bh.set_target(nullptr);
 		jh.set_target(nullptr);
+		mh.set_target(nullptr);
 		jc_ui.set_target(nullptr);
 	}
 
@@ -162,6 +162,7 @@ void app::edition_update(const sf::Time& dt)
 	if (left_ctrl_btn && c_btn) {
 		_buffor_body = bh.target();
 		_buffor_joint = jh.target();
+		_buffor_marker = mh.target();
 	}
 	static bool block = false;
 	if (left_ctrl_btn && v_btn && !block) {
@@ -170,6 +171,9 @@ void app::edition_update(const sf::Time& dt)
 		}
 		else if (_buffor_joint) {
 			create_joint_cpy(*_buffor_joint, mouse_pos_vec2d, mouse_pos_vec2d + vl::vec2d(50, 0));
+		}
+		else if (_buffor_marker) {
+			create_marker_cpy(*_buffor_marker, mouse_pos_vec2d);
 		}
 		block = true;
 	}
@@ -188,6 +192,7 @@ void app::draw()
 		oc_ui.draw();
 		mt_ui.draw();
 		jc_ui.draw();
+		m_ui.draw();
 		for (auto& i : _markers) i->draw(*_window);
 	}
 	else {
@@ -211,6 +216,7 @@ void app::create_body(const ds2::shape_group& shape, const vl::vec2d& pos)
 {
 	std::string name = "Object #" + std::to_string((int)_bodies.size() + 1);
 	body* b = new body(++_current_id, name, shape, pos);
+	b->set_graphics_settings(_graphic_settings);
 	_bodies.push_back(b);
 	bh.set_target(b);
 }
@@ -219,6 +225,7 @@ void app::create_body_cpy(const body& original, const vl::vec2d& pos)
 {
 	std::string name = "Object #" + std::to_string((int)_bodies.size() + 1);
 	body* b = new body(original);
+	b->set_graphics_settings(_graphic_settings);
 	b->set_id(++_current_id);
 	b->pos() = pos;
 	_bodies.push_back(b);
@@ -272,6 +279,20 @@ void app::create_joint_cpy(dble_joint& original, const vl::vec2d& pos_a, const v
 	jh.set_target(jad.dble_joint, jad.type);
 }
 
+void app::create_marker(const vl::vec2d& pos, const double& path_max_len, const double& path_res)
+{
+	marker* m = new marker(path_max_len, path_res);
+	m->set_global_pos(pos);
+	_markers.push_back(m);
+}
+
+void app::create_marker_cpy(marker& original, const vl::vec2d& pos)
+{
+	marker* m = new marker(original);
+	m->set_global_pos(pos);
+	_markers.push_back(m);
+}
+
 void app::remove(const body* b)
 {
 	if (b == nullptr) return;
@@ -286,12 +307,25 @@ void app::remove(const dble_joint* j)
 	delete j;
 }
 
+void app::remove(const marker* m)
+{
+	if (m == nullptr) return;
+	_markers.erase(std::remove(_markers.begin(), _markers.end(), m));
+	delete m;
+}
+
 void app::remove_all()
 {
 	std::vector<body*> _bodies_cpy(_bodies);
 	std::vector<dble_joint*> _dble_joints_cpy(_dble_joints);
+	std::vector<marker*> _markers_cpy(_markers);
 	for (auto& i : _bodies_cpy) remove(i);
 	for (auto& i : _dble_joints_cpy) remove(i);
+	for (auto& i : _markers_cpy) remove(i);
+	bh.set_target(nullptr);
+	jh.set_target(nullptr);
+	jc_ui.set_target(nullptr);
+	mh.set_target(nullptr);
 }
 
 void app::start_simulation()
@@ -313,10 +347,7 @@ void app::start_simulation()
 	bh.set_target(nullptr);
 	jh.set_target(nullptr);
 	jc_ui.set_target(nullptr);
-
-	body::graphics_settings s(false, 4, sf::Color::White, false, sf::Color::Transparent);
-	_graphic_settings = s;
-	update_graphics_settings();
+	mh.set_target(nullptr);
 }
 
 void app::restart_simulation()
@@ -341,6 +372,9 @@ void app::save_json(const std::string& path)
 	for (dble_joint* joint_it : _dble_joints) {
 		json_obj["joints"].push_back(json_utils::serialize(joint_it));
 	}
+	for (const marker* marker_it : _markers) {
+		json_obj["markers"].push_back(json_utils::serialize(*marker_it));
+	}
 	ofs << std::setw(3) << json_obj;
 	ofs.close();
 }
@@ -353,6 +387,7 @@ void app::load_json(const std::string& path)
 
 	jh.set_target(nullptr);
 	bh.set_target(nullptr);
+	mh.set_target(nullptr);
 	_scene.remove_all();
 	for (auto* b : _bodies) {
 		delete b;
@@ -360,12 +395,17 @@ void app::load_json(const std::string& path)
 	for (auto* j : _dble_joints) {
 		delete j;
 	}
+	for (auto* m : _markers) {
+		delete m;
+	}
 	_bodies.clear();
 	_dble_joints.clear();
+	_markers.clear();
 
 	for (const auto& i : json_obj["bodies"]) {
 		// iteracja po kolejnych obiektach
 		body* b = new body(json_utils::deserialize_body(i));
+		b->set_graphics_settings(_graphic_settings);
 		b->update_shape();
 		_bodies.push_back(b);
 		_current_id = std::max(_current_id, b->id());
@@ -374,6 +414,11 @@ void app::load_json(const std::string& path)
 		// iteracja po kolejnych przegubach
 		dble_joint* j = json_utils::deserialize_joint(i, _bodies);
 		_dble_joints.push_back(j);
+	}
+	for (const auto& i : json_obj["markers"]) {
+		// iteracja po kolejnych markerach
+		marker* m = json_utils::deserialize_marker(i, _bodies);
+		_markers.push_back(m);
 	}
 	ifs.close();
 }

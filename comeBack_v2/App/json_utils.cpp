@@ -51,6 +51,17 @@ nlohmann::json json_utils::serialize(const sf::Color& c)
 	return nlohmann::json{ {"r", c.r}, {"g", c.g}, {"b", c.b}, {"a", c.a} };
 }
 
+nlohmann::json json_utils::serialize(const marker& m)
+{
+	nlohmann::json json_m;
+	json_m["loc_pos"] = serialize(m.loc_pos());
+	json_m["body"] = m.target_body() ? m.target_body()->id() : -1;
+	json_m["max_path_len"] = m.path_max_len();
+	json_m["path_res"] = m.path_res();
+	json_m["color"] = serialize(m.path_color());
+	return json_m;
+}
+
 nlohmann::json json_utils::serialize(dble_joint* h)
 {
 	nlohmann::json json_joint;
@@ -161,6 +172,15 @@ dble_motor* json_utils::deserialize_motor(const nlohmann::json& json_j, std::vec
 	motor->motor_joint()->set_stiffness(json_j["stiffness"].get<double>());
 	motor->motor_joint()->set_friction(json_j["friction"].get<double>());
 	return motor;
+}
+
+marker* json_utils::deserialize_marker(const nlohmann::json& json_m, std::vector<body*>& bodies)
+{
+	marker* m = new marker(json_m["max_path_len"].get<double>(), json_m["path_res"].get<double>());
+	m->set_body(body_of_id(json_m["body"].get<unsigned>(), bodies));
+	m->set_loc_pos(deserialize_vec2d(json_m["loc_pos"]));
+	m->set_path_color(deserialize_color(json_m["color"]));
+	return m;
 }
 
 vl::vec2d json_utils::deserialize_vec2d(const nlohmann::json& json_v)

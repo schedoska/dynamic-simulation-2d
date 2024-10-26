@@ -3,7 +3,7 @@
 
 ds2::scene::scene()
 {
-    _joint_iterations = 3;
+    _joint_iterations = 50;
 }
 
 void ds2::scene::add(object* object)

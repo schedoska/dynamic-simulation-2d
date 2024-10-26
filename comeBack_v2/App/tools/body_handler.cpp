@@ -145,10 +145,15 @@ void body_handler::update_active(sf::Vector2f mouse_pos)
 
 	if (_current_handler == handler::position) {
 		_border.setOutlineColor(handler_conf::border_hover_color);
-		_border.setPosition(_grid->snap(mouse_pos - _grab_pos));
-		sf::Vector2f tl = _border.getGlobalBounds().getPosition();
-		sf::Vector2f d = tl - _grid->snap(tl);
-		_border.move(-d - sf::Vector2f(handler_conf::border_width, handler_conf::border_width));
+		if (_grid->active()) {
+			_border.setPosition(_grid->snap(mouse_pos - _grab_pos));
+			sf::Vector2f tl = _border.getGlobalBounds().getPosition();
+			sf::Vector2f d = tl - _grid->snap(tl);
+			_border.move(-d - sf::Vector2f(handler_conf::border_width, handler_conf::border_width));
+		}
+		else {
+			_border.setPosition(mouse_pos - _grab_pos);
+		}
 		return;
 	}
 	else if (_current_handler == handler::rotator) {
@@ -308,6 +313,27 @@ void body_handler::draw_velocity(sf::RenderWindow* window)
 
 	window->draw(_velocity_com);
 	window->draw(_velocity_line);
+}
+
+void body_handler::draw_line(
+	const sf::Vector2f& beg,
+	const sf::Vector2f& end,
+	sf::RenderWindow& window, 
+	sf::Color color, 
+	const float& thicness)
+{
+	static sf::RectangleShape line;
+	line.setPosition(beg);
+	vl::vec2d delta = utils::sfml_to_vec2d(beg - end);
+
+	line.setSize(sf::Vector2f(delta.len(), thicness));
+	float angle = utils::RadToDegrees(atan(delta[1] / delta[0]));
+	if (end.x <= beg.x) angle -= 180;
+	line.setRotation(angle);
+	line.setOrigin(0, thicness / 2.0);
+
+	line.setFillColor(color);
+	window.draw(line);
 }
 
 void body_handler::set_border()

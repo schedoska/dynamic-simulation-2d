@@ -56,6 +56,12 @@ private:
 
 	/* Draws line visualizating direction and lenght of velocity vector */
 	void draw_velocity(sf::RenderWindow* window);
+	void draw_line(
+		const sf::Vector2f& beg,
+		const sf::Vector2f& end,
+		sf::RenderWindow& window,
+		sf::Color color,
+		const float& thicness);
 };
 
 namespace handler_conf 

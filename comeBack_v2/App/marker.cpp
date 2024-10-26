@@ -3,6 +3,8 @@
 
 marker::marker()
 {
+	_path_color = sf::Color::White;
+
 	_marker_shape.setSize(sf::Vector2f(10, 10));
 	_marker_shape.setOrigin(5, 5);
 	_marker_shape.setFillColor(sf::Color::White);
@@ -10,9 +12,17 @@ marker::marker()
 	_marker_shape.setOutlineColor(sf::Color::Blue);
 	
 	_target_body = nullptr;
-	_path_length = 200;
-	_path_res = 2;
-	_path_step - 0;
+
+	_path_res = 0.025;
+	_path_max_len = 1.0;
+	_path_current_len = 0.0;
+	_path_res_acc = 0.0;
+}
+
+marker::marker(const double& path_max_len, const double& path_res) : marker()
+{
+	_path_max_len = path_max_len;
+	_path_res = path_res;
 }
 
 void marker::draw(sf::RenderWindow& window)
@@ -21,16 +31,24 @@ void marker::draw(sf::RenderWindow& window)
 	window.draw(_marker_shape);
 }
 
-void marker::update(const sf::Window* window)
+void marker::update(const sf::Window* window, const double& dt)
 {
-	if (++_path_step > _path_res) {
-		_path_step = 0;
+	_path_res_acc += dt;
+
+	if (_path_res_acc > _path_res) {
+		double st = _path_res_acc;
+		_path_res_acc = 0.0;
 		_path.push_front(pos());
-		if (_path.size() > _path_length) _path.pop_back();
+		_path_current_len += st;
+
+		while (_path_current_len > _path_max_len) {
+			_path.pop_back();
+			_path_current_len -= st;
+		}
 	}
 }
 
-body* marker::target_body()
+const body* marker::target_body() const
 {
 	return _target_body;
 }
@@ -62,6 +80,46 @@ const vl::vec2d& marker::pos() const
 	}
 }
 
+const vl::vec2d& marker::loc_pos() const
+{
+	return _loc_pos;
+}
+
+void marker::set_loc_pos(const vl::vec2d& loc_pos)
+{
+	_loc_pos = loc_pos;
+}
+
+const double marker::path_res() const
+{
+	return _path_res;
+}
+
+void marker::set_path_res(const double& path_res)
+{
+	_path_res = path_res;
+}
+
+const double marker::path_max_len() const
+{
+	return _path_max_len;
+}
+
+void marker::set_max_path_len(const double& max_path_len)
+{
+	_path_max_len = max_path_len;
+}
+
+const sf::Color& marker::path_color() const
+{
+	return _path_color;
+}
+
+void marker::set_path_color(const sf::Color& color)
+{
+	_path_color = color;
+}
+
 void marker::draw_line(
 	const vl::vec2d& beg, 
 	const vl::vec2d& end, 
@@ -87,8 +145,14 @@ void marker::draw_path(sf::RenderWindow& window)
 {
 	vl::vec2d prev = { 0,0 };
 	if (_path.size() > 0) prev = _path.front();
+
+	double step = 255.0 / _path.size();
+	float br = 255;
+
 	for (const auto& v : _path) {
-		draw_line(prev, v, window, sf::Color::White, 3);
+		sf::Color c = _path_color;
+		c.a = (br -= step);
+		draw_line(prev, v, window, c, 3);
 		prev = v;
 	}
 }

@@ -19,6 +19,7 @@
 #include "ui/simulation_ui.h"
 #include "ui/joint_conf_ui.h"
 #include "ui/force_tool_ui.h"
+#include "ui/marker_ui.h"
 
 #include "ds2/scene.h"
 
@@ -45,9 +46,12 @@ public:
 	void create_body_cpy(const body& original, const vl::vec2d& pos);
 	void create_joint(ds2::joint_type type, const vl::vec2d& pos_a, const vl::vec2d& pos_b);
 	void create_joint_cpy(dble_joint& original, const vl::vec2d& pos_a, const vl::vec2d& pos_b);
+	void create_marker(const vl::vec2d& pos, const double& path_max_len, const double& path_res);
+	void create_marker_cpy(marker& original , const vl::vec2d& pos);
 
 	void remove(const body* b);
 	void remove(const dble_joint* j);
+	void remove(const marker* m);
 	void remove_all();
 	
 	// simulation
@@ -75,6 +79,7 @@ private:
 	// For copying mechanism
 	body* _buffor_body;
 	dble_joint* _buffor_joint;
+	marker* _buffor_marker;
 
 	// Tools
 	body_handler bh;
@@ -89,6 +94,7 @@ private:
 	simulation_ui sim_ui;
 	joint_conf_ui jc_ui;
 	force_tool_ui ft_ui;
+	marker_ui m_ui;
 	
 	grid _grid;
 	body::graphics_settings _graphic_settings;

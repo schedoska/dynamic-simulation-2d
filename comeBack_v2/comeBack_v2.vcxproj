@@ -64,6 +64,7 @@
     <ClInclude Include="App\ui\joint_conf_ui.h" />
     <ClInclude Include="App\marker.h" />
     <ClInclude Include="App\tools\marker_handler.h" />
+    <ClInclude Include="App\ui\marker_ui.h" />
     <ClInclude Include="nlohmann\adl_serializer.hpp" />
     <ClInclude Include="nlohmann\byte_container_with_subtype.hpp" />
     <ClInclude Include="nlohmann\detail\abi_macros.hpp" />
@@ -152,6 +153,7 @@
     <ClCompile Include="App\ds2\regular_shape.cpp" />
     <ClCompile Include="App\marker.cpp" />
     <ClCompile Include="App\tools\marker_handler.cpp" />
+    <ClCompile Include="App\ui\marker_ui.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

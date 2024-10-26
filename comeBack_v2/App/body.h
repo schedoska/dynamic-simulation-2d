@@ -21,6 +21,10 @@ public:
 		float outline_thicness;
 		sf::Color outline_color;
 		sf::Color fill_color;
+
+		bool display_box;
+		float box_thicness;
+		sf::Color box_color;
 	};
 
 	body(const unsigned int& id);
@@ -45,6 +49,7 @@ public:
 private:
 	graphics_settings _settings;
 	sf::Color _fill_color;
+	sf::RectangleShape _box_shape;
 
 	std::string _name;
 	unsigned int _id;

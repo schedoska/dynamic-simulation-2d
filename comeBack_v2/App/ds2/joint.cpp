@@ -173,13 +173,15 @@ void ds2::hinge_joint::update(const double& dt, const unsigned& n)
 
 	vl::vec2d a1 = _obj_a->global(_loc_a) - _obj_a->pos();
 	vl::vec2d a2 = cpos - _obj_a->pos();
-	double a_dang = utils::angle2(a1, a2) * _stiffness;
+	//double a_dang = utils::angle2(a1, a2) * _stiffness;
+	double a_dang = utils::angle2(a1, a2) * _stiffness * a1.len() * 0.01;
 	_obj_a->rot() += a_dang;
 	_obj_a->rot_vel() += (a_dang / dt) * _friction;
 
 	vl::vec2d b1 = _obj_b->global(_loc_b) - _obj_b->pos();
 	vl::vec2d b2 = cpos - _obj_b->pos();
-	double b_dang = utils::angle2(b1, b2) * _stiffness;
+	//double b_dang = utils::angle2(b1, b2) * _stiffness;
+	double b_dang = utils::angle2(b1, b2) * _stiffness * b1.len() * 0.01;
 	_obj_b->rot() += b_dang;
 	_obj_b->rot_vel() += (b_dang / dt) * _friction;
 
@@ -245,8 +247,9 @@ void ds2::motor_joint::update(const double& dt, const unsigned& n)
 {
 	hinge_joint::update(dt);
 
-	vl::vec2d b_loc_v = _obj_b->pos() - _obj_b->global(_loc_b);
-	vl::vec2d a_loc_v = _obj_a->pos() - _obj_a->global(_loc_a);
+	constexpr double a = 0.00001; // Offset to avoid zero length vector
+	vl::vec2d b_loc_v = _obj_b->pos() - _obj_b->global(_loc_b) + vl::vec2d(a, 0);
+	vl::vec2d a_loc_v = _obj_a->pos() - _obj_a->global(_loc_a) + vl::vec2d(-a, 0);;
 
 	if (++_it_counter == n) {
 		_it_counter = 0;
@@ -261,7 +264,7 @@ void ds2::motor_joint::update(const double& dt, const unsigned& n)
 		_last_rel_rot = _rel_rot;
 		
 		double force = _torque * (_rel_rot_vel / dt - _ang_vel);
-		force = std::min(std::max(force, -100.0), 100.0);
+		force = std::min(std::max(force, -200.0), 200.0);
 
 		_obj_b->apply_force_local({ 0, force }, _loc_b + vl::vec2d(100, 0), dt);
 		_obj_b->apply_force_local({ 0, -force }, _loc_b - vl::vec2d(100, 0), dt);

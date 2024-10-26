@@ -7,6 +7,7 @@ body::body(const unsigned int& id)
 	_name = ""; 
 	set_fill_color(sf::Color(rand() % 255, rand() % 255, rand() % 255));
 	update_shape();
+	_box_shape.setFillColor(sf::Color::Transparent);
 }
 
 body::body(const unsigned int& id, const std::string& name, ds2::shape_group shape, const vl::vec2d& pos)
@@ -17,6 +18,7 @@ body::body(const unsigned int& id, const std::string& name, ds2::shape_group sha
 	_shape = shape;
 	_pos = pos;
 	update_shape();
+	_box_shape.setFillColor(sf::Color::Transparent);
 }
 
 void body::draw(sf::RenderWindow& window)
@@ -28,6 +30,13 @@ void body::draw(sf::RenderWindow& window)
 	else {
 		draw_outlines(window);
 		draw_infill(window);
+	}
+
+	if (_settings.display_box) {
+		ds2::rect box = _shape.box(pos(), rot());
+		_box_shape.setPosition(utils::vec2_to_sfml(box.pos));
+		_box_shape.setSize(sf::Vector2f(box.w, box.h));
+		window.draw(_box_shape);
 	}
 }
 
@@ -65,6 +74,9 @@ void body::set_graphics_settings(const graphics_settings& settings)
 {
 	_settings = settings;
 	update_fill_color();
+	_box_shape.setFillColor(sf::Color::Transparent);
+	_box_shape.setOutlineColor(settings.box_color);
+	_box_shape.setOutlineThickness(settings.box_thicness);
 }
 
 void body::draw_outlines(sf::RenderWindow& window)
@@ -174,7 +186,7 @@ body::graphics_settings::graphics_settings(
 	float outline_thicness, 
 	sf::Color outline_color, 
 	bool default_color, 
-	sf::Color fill_color)
+	sf::Color fill_color) : graphics_settings()
 {
 	this->fill_first = fill_first;
 	this->outline_color = outline_color;
@@ -189,5 +201,7 @@ body::graphics_settings::graphics_settings()
 	this->outline_color = sf::Color::White;
 	this->outline_thicness = 2;
 	this->default_color = true;
-	this->fill_color = sf::Color::White;
+	this->fill_color = sf::Color::Transparent;
+	this->box_color = sf::Color::Red;
+	this->box_thicness = 3;
 }

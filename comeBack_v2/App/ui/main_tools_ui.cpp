@@ -121,6 +121,20 @@ void main_tools_ui::draw()
 
 	if (!active_grid) ImGui::EndDisabled();
 
+	ImGui::SeparatorText("Markers");
+
+	static float path_max_len = 1.0;
+	static float path_res = 0.02;
+	ImGui::InputFloat("Length", &path_max_len, 0.1, 1.0, "%.2f sec");
+	ImGui::InputFloat("Resolution", &path_res, 0.01, 0.1, "%.2f sec");
+	ImGui::Value("Node count", int(path_max_len / path_res));
+
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.478, 0.216, 0.961, 1));
+	if (ImGui::Button("Add marker", ImVec2(ImGui::GetWindowSize().x * 0.9f, 0.0f)) && _create_marker_cbck) {
+		_create_marker_cbck(main_tools_conf::new_shape_pos, path_max_len, path_res);
+	}
+	ImGui::PopStyleColor(1);
+
 	ImGui::End();
 }
 
@@ -132,6 +146,11 @@ void main_tools_ui::set_create_body_cbck(std::function<void(const ds2::shape_gro
 void main_tools_ui::set_create_joint_cbck(std::function<void(ds2::joint_type type, const vl::vec2d& pos_a, const vl::vec2d& pos_b)> func)
 {
 	_create_joint_cbck = func;
+}
+
+void main_tools_ui::set_create_marker_cbck(std::function<void(const vl::vec2d& pos, double path_max_len, double path_res)> func)
+{
+	_create_marker_cbck = func;
 }
 
 void main_tools_ui::set_remove_all_cbck(std::function<void(void)> func)

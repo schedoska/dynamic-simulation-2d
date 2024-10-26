@@ -47,32 +47,32 @@ void simulation_ui::draw_graphic_ui()
 {
 	ImGui::SeparatorText("Graphics settings");
 
-	/* Settings for: Show structure = 1 && Color == 1 */
-	static body::graphics_settings gs1 = { true, 2.0, sf::Color::White, true };
-	/* Settings for: Show structure = 0 && Color == 1 */
-	static body::graphics_settings gs2 = { false, 4.0, sf::Color::White, true };
-	/* Settings for: Show structure = 1 && Color == 0 */
-	static body::graphics_settings gs3 = { true, 2.0, sf::Color::White, false, sf::Color::Transparent };
-	/* Settings for: Show structure = 0 && Color == 0 */
-	static body::graphics_settings gs4 = { true, 2.0, sf::Color::White, false, sf::Color::Transparent };
+	bool flag = false;
+	if (ImGui::Checkbox("Show structure", &_settings->fill_first)) {
+		flag = true;
+	}
+	if (ImGui::Checkbox("Color", &_settings->default_color)) {
+		flag = true;
+		_settings->fill_color = sf::Color::Transparent;
+	}
 
-	bool settings_changed = false;
-	static bool structures = false;
-	static bool colors = true;
-	if (ImGui::Checkbox("Show structure", &structures)) {
-		settings_changed = true;
+	bool s = _settings->fill_first;
+	bool d = _settings->default_color;
+	if (!s && d) {
+		_settings->outline_thicness = 4.0;
 	}
-	if (ImGui::Checkbox("Color", &colors)) {
-		settings_changed = true;
+	else {
+		_settings->outline_thicness = 2.0;
 	}
-	
-	if (settings_changed && _graphic_settings_cbck) {
-		if (structures && colors) *_settings = gs1;
-		else if (!structures && colors) *_settings = gs2;
-		else if (structures && !colors) *_settings = gs3;
-		else if (!structures && !colors) *_settings = gs4;
-		_graphic_settings_cbck();
+
+	if (ImGui::Checkbox("Display boxes", &_settings->display_box))
+	{
+		flag = true;
+		_settings->box_color = sf::Color::Red;
+		_settings->box_thicness = 3;
 	}
+
+	if (flag && _graphic_settings_cbck) _graphic_settings_cbck();
 }
 
 void simulation_ui::draw()
