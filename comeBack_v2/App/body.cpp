@@ -77,6 +77,13 @@ void body::set_graphics_settings(const graphics_settings& settings)
 	_box_shape.setFillColor(sf::Color::Transparent);
 	_box_shape.setOutlineColor(settings.box_color);
 	_box_shape.setOutlineThickness(settings.box_thicness);
+
+	float ot = _settings.outline_thicness;
+	if (!_settings.fill_first && _settings.default_color) ot /= 2.0;
+	for (auto& i : _circle_gr) {
+		i.setOutlineThickness(ot);
+		i.setOutlineColor(_settings.outline_color);
+	}
 }
 
 void body::draw_outlines(sf::RenderWindow& window)
@@ -170,11 +177,17 @@ void body::update_shape()
 		}
 		_convex_gr.push_back(cs);
 	}
+
+	float ot = _settings.outline_thicness;
+	if (!_settings.fill_first && _settings.default_color) ot /= 2.0;
+
 	for (const auto& i : shape().circles()) {
 		sf::CircleShape cs;
 		cs.setFillColor(fc);
 		cs.setOutlineThickness(0);
 		cs.setRadius(i.radius());
+		cs.setOutlineThickness(ot);
+		cs.setOutlineColor(_settings.outline_color);
 		vl::vec2d offset = i.loc_pos() * -1.f + vl::vec2d(i.radius(), i.radius());
 		cs.setOrigin(utils::vec2_to_sfml(offset));
 		_circle_gr.push_back(cs);
@@ -197,11 +210,11 @@ body::graphics_settings::graphics_settings(
 
 body::graphics_settings::graphics_settings()
 {
-	this->fill_first = true;
+	this->fill_first = false;
 	this->outline_color = sf::Color::White;
-	this->outline_thicness = 2;
+	this->outline_thicness = 4;
 	this->default_color = true;
 	this->fill_color = sf::Color::Transparent;
 	this->box_color = sf::Color::Red;
-	this->box_thicness = 3;
+	this->box_thicness = 2;
 }

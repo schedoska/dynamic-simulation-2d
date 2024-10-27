@@ -41,8 +41,12 @@ app::app(sf::RenderWindow* window)
 	mh.set_grid(&_grid);
 
 	m_ui.set_target(&mh);
+	_dble_collisions = new dble_collisions(_scene.collisions());
+	sim_ui.set_dble_collisions(_dble_collisions);
 
 	load_json("C:\\Users\\chedo\\OneDrive\\Pulpit\\test.json");
+	_background_txt.loadFromFile("gradient.png");
+	_background_sprite.setTexture(_background_txt);
 }
 
 app::~app()
@@ -182,27 +186,13 @@ void app::edition_update(const sf::Time& dt)
 
 void app::draw()
 {
+	_window->draw(_background_sprite);
+
 	if (_mode == app_mode::edition) {
-		_grid.draw(_window);
-		for (auto& i : _bodies) i->draw(*_window);
-		bh.draw(_window);
-		jh.draw(_window);
-		pt.draw(_window);
-		mh.draw(_window);
-		oc_ui.draw();
-		mt_ui.draw();
-		jc_ui.draw();
-		m_ui.draw();
-		for (auto& i : _markers) i->draw(*_window);
+		edition_draw();
 	}
 	else {
-		for (auto& i : _bodies) i->draw(*_window);
-		ft.draw(_window);
-		ft_ui.draw();
-		for (auto& i : _markers) {
-			i->draw_path(*_window);
-			i->draw(*_window);
-		}
+		simulation_draw();
 	}
 	sim_ui.draw();
 
@@ -212,11 +202,39 @@ void app::draw()
 	ImGui::SFML::Render(*_window);
 }
 
+void app::simulation_draw()
+{
+	for (auto& i : _bodies) i->draw(*_window);
+	ft.draw(_window);
+	ft_ui.draw();
+	for (auto& i : _markers) {
+		i->draw_path(*_window);
+		i->draw(*_window);
+	}
+	_dble_collisions->draw(*_window);
+}
+
+void app::edition_draw()
+{
+	_grid.draw(_window);
+	for (auto& i : _bodies) i->draw(*_window);
+	bh.draw(_window);
+	jh.draw(_window);
+	pt.draw(_window);
+	mh.draw(_window);
+	oc_ui.draw();
+	mt_ui.draw();
+	jc_ui.draw();
+	m_ui.draw();
+	for (auto& i : _markers) i->draw(*_window);
+}
+
 void app::create_body(const ds2::shape_group& shape, const vl::vec2d& pos)
 {
 	std::string name = "Object #" + std::to_string((int)_bodies.size() + 1);
 	body* b = new body(++_current_id, name, shape, pos);
 	b->set_graphics_settings(_graphic_settings);
+	b->set_layer_range(_current_id, _current_id);
 	_bodies.push_back(b);
 	bh.set_target(b);
 }

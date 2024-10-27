@@ -33,8 +33,8 @@ void ds2::collision_solver::solve_collision(const object_collision_data& cd, sf:
 	obj_a->rot() -= spin_a;
 
 	/* DEBUG DRAW */
-	utils::drawLine(obj_a->pos(), obj_a->pos() + mass_cp_a, win, sf::Color::Green);
-	utils::drawLine(obj_b->pos(), obj_b->pos() + mass_cp_b, win, sf::Color::Green);
+	// utils::drawLine(obj_a->pos(), obj_a->pos() + mass_cp_a, win, sf::Color::Green);
+	// utils::drawLine(obj_b->pos(), obj_b->pos() + mass_cp_b, win, sf::Color::Green);
 
 	dv.normalize();
 

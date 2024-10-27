@@ -47,13 +47,13 @@ private:
 
 namespace polygon_tool_conf
 {
-	constexpr float start_vertex_size = 20;
-	constexpr float vertex_size = 18;
+	constexpr float start_vertex_size = 19;
+	constexpr float vertex_size = 14;
 	constexpr float line_width = 4;
 	constexpr float snap_len = 20;
 
-	const sf::Color start_vertex_color = sf::Color::Blue;
-	const sf::Color vertex_color = sf::Color::Green;
+	const sf::Color start_vertex_color = sf::Color(8, 201, 69);
+	const sf::Color vertex_color = sf::Color(74, 74, 74);
 	const sf::Color line_color = sf::Color::White;
-	const sf::Color active_line_color = sf::Color::Red;
+	const sf::Color active_line_color = sf::Color(77, 136, 247);
 }

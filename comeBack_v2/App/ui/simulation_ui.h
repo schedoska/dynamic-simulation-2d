@@ -5,6 +5,7 @@
 #include "../ds2/shape_group.h"
 #include "../ds2/scene.h"
 #include "../body.h"
+#include "../dble_collisions.h"
 
 #include <functional>
 
@@ -17,6 +18,7 @@ class simulation_ui
 public:
 	simulation_ui();
 	void set_scene(ds2::scene* scene);
+	void set_dble_collisions(dble_collisions* _dble_collisions);
 	void set_graphic_settings(body::graphics_settings* settings);
 	void set_fps(const float& fps, const float& nominal_fps);
 	void draw();
@@ -32,6 +34,7 @@ public:
 private:
 	ds2::scene* _scene;
 	body::graphics_settings* _settings;
+	dble_collisions* _dble_collisions;
 	
 	std::function<void(void)> _start_sim_cbck;
 	std::function<void(void)> _restart_sim_cbck;

@@ -72,7 +72,7 @@ void object_conf_ui::draw_physical_properties()
 	}
 
 	if (is_static) ImGui::BeginDisabled();
-	static bool adj_inertia = false;
+	static bool adj_inertia = true;
 	float target_mass = _target->mass();
 	if (ImGui::DragFloat("Mass", &target_mass, 1.0, 0.0, 10e10, "%.2f kg", ImGuiSliderFlags_AlwaysClamp))
 	{
@@ -139,13 +139,14 @@ void object_conf_ui::draw_layers()
 		if (!one_layer) _target->layer_max() = _target->layer_min() + 1;
 	}
 	if (one_layer) {
-		ImGui::InputInt("Layer", &_target->layer_max());
+		ImGui::InputInt("Layer", &_target->layer_min());
 		_target->layer_max() = _target->layer_min();
 	}
 	else {
 		ImGui::InputInt("Layer min", &_target->layer_min());
 		ImGui::InputInt("Layer max", &_target->layer_max());
 	}
+	_target->layer_min() = std::min(_target->layer_min(), _target->layer_max());
 }
 
 void object_conf_ui::draw_other()

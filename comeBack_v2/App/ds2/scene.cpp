@@ -49,6 +49,7 @@ const std::vector<ds2::joint*>& ds2::scene::iterative_joints() const
 }
 
 void ds2::scene::update(const double& dt, sf::RenderWindow& win){
+    _collisions.clear();
     if (dt == 0.0) return;
 
     for (auto i : _joints) {
@@ -58,7 +59,6 @@ void ds2::scene::update(const double& dt, sf::RenderWindow& win){
         if (!i->is_static()) i->vel() += _gravity_v * dt;
         i->update(dt);
     }
-
     for (int j = 0; j < _joint_iterations; ++j) {
         for (auto i : _iterative_joints) {
             i->update(dt, _joint_iterations);
@@ -67,15 +67,16 @@ void ds2::scene::update(const double& dt, sf::RenderWindow& win){
 
     for (auto a = _objects.begin(); a != _objects.end(); ++a) {
         for (auto b = a + 1; b != _objects.end(); ++b) {
-            if (!overlaping_layers(*a,*b))
+            if (!overlaping_layers(*a, *b)) {
                 continue;
+            }
             object_collision_data ocd = collision_detection::check(*a, *b);
-            if (ocd.data.collides == false) 
-                continue;
-            collision_solver::solve_collision(ocd, win);
+            if (ocd.data.collides == true) {
+                collision_solver::solve_collision(ocd, win);
+                _collisions.push_back(ocd);
+            }
         }
     }    
-
 }
 
 void ds2::scene::set_joint_iterations(const int& joint_iterations)

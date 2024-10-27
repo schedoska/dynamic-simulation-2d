@@ -96,9 +96,9 @@ namespace dble_joint_conf
 	constexpr double joint_radius = 7.0;
 	constexpr double joint_outline_thickness = 2.0;
 	
-	const sf::Color hinge_color = sf::Color::Green;
-	const sf::Color motor_color = sf::Color::Blue;
-	const sf::Color spring_color = sf::Color::Red;
+	const sf::Color hinge_color = sf::Color(35, 196, 35);
+	const sf::Color motor_color = sf::Color(3, 111, 252);
+	const sf::Color spring_color = sf::Color(209, 74, 69);
 
 	const sf::Color joint_outline_color = sf::Color::White;
 }

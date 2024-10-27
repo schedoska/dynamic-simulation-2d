@@ -35,6 +35,7 @@
     <ClInclude Include="App\tools\force_tool.h" />
     <ClInclude Include="App\grid.h" />
     <ClInclude Include="App\ui\force_tool_ui.h" />
+    <ClInclude Include="App\dble_collisions.h" />
     <ClInclude Include="imgui\imconfig-SFML.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui-SFML.h" />
@@ -129,6 +130,7 @@
     <ClCompile Include="App\tools\force_tool.cpp" />
     <ClCompile Include="App\grid.cpp" />
     <ClCompile Include="App\ui\force_tool_ui.cpp" />
+    <ClCompile Include="App\dble_collisions.cpp" />
     <ClCompile Include="imgui\imgui-SFML.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />

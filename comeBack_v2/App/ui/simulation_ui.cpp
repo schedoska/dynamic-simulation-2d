@@ -9,6 +9,7 @@ simulation_ui::simulation_ui()
 	_ips = 1;
 	_gravity_v = { 0,100 };
 	_settings = nullptr;
+	_dble_collisions = nullptr;
 }
 
 void simulation_ui::set_start_sim_cbck(std::function<void(void)> func)
@@ -71,8 +72,12 @@ void simulation_ui::draw_graphic_ui()
 		_settings->box_color = sf::Color::Red;
 		_settings->box_thicness = 3;
 	}
-
 	if (flag && _graphic_settings_cbck) _graphic_settings_cbck();
+
+	bool display_collisions = _dble_collisions->active();
+	if (ImGui::Checkbox("Display collisions", &display_collisions)) {
+		_dble_collisions->set_active(display_collisions);
+	}
 }
 
 void simulation_ui::draw()
@@ -174,6 +179,11 @@ void simulation_ui::draw()
 void simulation_ui::set_scene(ds2::scene* scene)
 {
 	_scene = scene;
+}
+
+void simulation_ui::set_dble_collisions(dble_collisions* _dble_collisions)
+{
+	this->_dble_collisions = _dble_collisions;
 }
 
 void simulation_ui::set_graphic_settings(body::graphics_settings* settings)

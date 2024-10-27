@@ -34,7 +34,6 @@ private:
 
 	double _path_res;			// in seconds: time between each vecrtex
 	double _path_res_acc;		// in seconds;
-
 	double _path_max_len;	    // in seconds
 	double _path_current_len;	// in seconds
 

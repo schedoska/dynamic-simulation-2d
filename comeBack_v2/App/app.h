@@ -7,6 +7,7 @@
 #include "dble_joint.h"
 #include "grid.h"
 #include "marker.h"
+#include "dble_collisions.h"
 
 #include "tools/body_handler.h"
 #include "tools/polygon_tool.h"
@@ -40,7 +41,10 @@ public:
 	void update(const sf::Time& dt);
 	void simulation_update(const sf::Time& dt);
 	void edition_update(const sf::Time& dt);
+
 	void draw();
+	void simulation_draw();
+	void edition_draw();
 
 	void create_body(const ds2::shape_group& shape, const vl::vec2d& pos);
 	void create_body_cpy(const body& original, const vl::vec2d& pos);
@@ -98,8 +102,12 @@ private:
 	
 	grid _grid;
 	body::graphics_settings _graphic_settings;
+	dble_collisions* _dble_collisions;
 
 	body* body_at(const vl::vec2d& scene_pos) const;
 	joint_at_data joint_at(const vl::vec2d& scene_pos) const;
 	marker* marker_at(const vl::vec2d& scene_pos) const;
+
+	sf::Texture _background_txt;
+	sf::Sprite _background_sprite;
 };
